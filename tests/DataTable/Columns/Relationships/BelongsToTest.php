@@ -1,5 +1,5 @@
 <?php
-namespace Frozennode\Administrator\Tests\DataTable\Columns\Relationships;
+namespace SaAkSin\Administrator\Tests\DataTable\Columns\Relationships;
 
 use Mockery as m;
 
@@ -27,7 +27,7 @@ class BelongsToDeepNestStub {
 	}
 }
 
-class BelongsToTest extends \PHPUnit_Framework_TestCase {
+class BelongsToTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -62,12 +62,12 @@ class BelongsToTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->db = m::mock('Illuminate\Database\DatabaseManager');
 
 		$options = array('column_name' => 'test', 'relationship' => 'method', 'select' => 'foo');
-		$this->column = m::mock('Frozennode\Administrator\DataTable\Columns\Relationships\BelongsTo',
+		$this->column = m::mock('SaAkSin\Administrator\DataTable\Columns\Relationships\BelongsTo',
 											array($this->validator, $this->config, $this->db, $options))->makePartial();
 	}
 

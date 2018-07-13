@@ -1,4 +1,4 @@
-<?php namespace Frozennode\Administrator;
+<?php namespace SaAkSin\Administrator;
 
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Http\Request;

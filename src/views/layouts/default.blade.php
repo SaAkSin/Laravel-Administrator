@@ -10,7 +10,7 @@
 	@endforeach
 
 	<!--[if lte IE 9]>
-		<link href="{{asset('packages/frozennode/administrator/css/browsers/lte-ie9.css')}}" media="all" type="text/css" rel="stylesheet">
+		<link href="{{asset('packages/saaksin/administrator/css/browsers/lte-ie9.css')}}" media="all" type="text/css" rel="stylesheet">
 	<![endif]-->
 
 </head>

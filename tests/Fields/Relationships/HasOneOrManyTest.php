@@ -1,9 +1,9 @@
 <?php
-namespace Frozennode\Administrator\Tests\Fields\Relationships;
+namespace SaAkSin\Administrator\Tests\Fields\Relationships;
 
 use Mockery as m;
 
-class HasOneOrManyTest extends \PHPUnit_Framework_TestCase {
+class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -38,11 +38,11 @@ class HasOneOrManyTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->db = m::mock('Illuminate\Database\DatabaseManager');
 		$options = array('field_name' => 'field', 'type' => 'has_one');
-		$this->field = m::mock('Frozennode\Administrator\Fields\Relationships\HasOneOrMany',
+		$this->field = m::mock('SaAkSin\Administrator\Fields\Relationships\HasOneOrMany',
 									array($this->validator, $this->config, $this->db, $options))->makePartial();
 	}
 

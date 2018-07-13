@@ -1,10 +1,10 @@
 <?php
-namespace Frozennode\Administrator\Tests\Config;
+namespace SaAkSin\Administrator\Tests\Config;
 
 use Mockery as m;
-use Frozennode\Administrator\Config\Config;
+use SaAkSin\Administrator\Config\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase {
+class ConfigTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -25,15 +25,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @var string
 	 */
-	protected $class = 'Frozennode\Administrator\Config\Config';
+	protected $class = 'SaAkSin\Administrator\Config\Config';
 
 	/**
 	 * Set up function
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Config', array($this->validator, $this->validator, array('name' => 'model_name')))->makePartial();
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Config', array($this->validator, $this->validator, array('name' => 'model_name')))->makePartial();
 	}
 
 	/**

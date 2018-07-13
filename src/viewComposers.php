@@ -30,7 +30,7 @@ View::composer('administrator::index', function($view)
 	$view->rows = $dataTable->getRows(app('db'), $view->filters);
 	$view->formWidth = $config->getOption('form_width');
 	$view->baseUrl = $baseUrl;
-	$view->assetUrl = url('packages/frozennode/administrator/');
+	$view->assetUrl = url('packages/saaksin/administrator/');
 	$view->route = $route['path'].'/';
 	$view->itemId = isset($view->itemId) ? $view->itemId : null;
 });
@@ -50,7 +50,7 @@ View::composer('administrator::settings', function($view)
 	$view->arrayFields = $fieldFactory->getEditFieldsArrays();
 	$view->actions = $actionFactory->getActionsOptions();
 	$view->baseUrl = $baseUrl;
-	$view->assetUrl = url('packages/frozennode/administrator/');
+	$view->assetUrl = url('packages/saaksin/administrator/');
 	$view->route = $route['path'].'/';
 });
 
@@ -69,38 +69,38 @@ View::composer(array('administrator::layouts.default'), function($view)
 	//set up the basic asset arrays
 	$view->css = array();
 	$view->js = array(
-		'jquery' => asset('packages/frozennode/administrator/js/jquery/jquery-1.8.2.min.js'),
-		'jquery-ui' => asset('packages/frozennode/administrator/js/jquery/jquery-ui-1.10.3.custom.min.js'),
-		'customscroll' => asset('packages/frozennode/administrator/js/jquery/customscroll/jquery.customscroll.js'),
+		'jquery' => asset('packages/saaksin/administrator/js/jquery/jquery-1.8.2.min.js'),
+		'jquery-ui' => asset('packages/saaksin/administrator/js/jquery/jquery-ui-1.10.3.custom.min.js'),
+		'customscroll' => asset('packages/saaksin/administrator/js/jquery/customscroll/jquery.customscroll.js'),
 	);
 
 	//add the non-custom-page css assets
 	if (!$view->page && !$view->dashboard)
 	{
 		$view->css += array(
-			'jquery-ui' => asset('packages/frozennode/administrator/css/ui/jquery-ui-1.9.1.custom.min.css'),
-			'jquery-ui-timepicker' => asset('packages/frozennode/administrator/css/ui/jquery.ui.timepicker.css'),
-			'select2' => asset('packages/frozennode/administrator/js/jquery/select2/select2.css'),
-			'jquery-colorpicker' => asset('packages/frozennode/administrator/css/jquery.lw-colorpicker.css'),
+			'jquery-ui' => asset('packages/saaksin/administrator/css/ui/jquery-ui-1.9.1.custom.min.css'),
+			'jquery-ui-timepicker' => asset('packages/saaksin/administrator/css/ui/jquery.ui.timepicker.css'),
+			'select2' => asset('packages/saaksin/administrator/js/jquery/select2/select2.css'),
+			'jquery-colorpicker' => asset('packages/saaksin/administrator/css/jquery.lw-colorpicker.css'),
 		);
 	}
 
 	//add the package-wide css assets
 	$view->css += array(
-		'customscroll' => asset('packages/frozennode/administrator/js/jquery/customscroll/customscroll.css'),
-		'main' => asset('packages/frozennode/administrator/css/main.css'),
+		'customscroll' => asset('packages/saaksin/administrator/js/jquery/customscroll/customscroll.css'),
+		'main' => asset('packages/saaksin/administrator/css/main.css'),
 	);
 
 	//add the non-custom-page js assets
 	if (!$view->page && !$view->dashboard)
 	{
 		$view->js += array(
-			'select2' => asset('packages/frozennode/administrator/js/jquery/select2/select2.js'),
-			'jquery-ui-timepicker' => asset('packages/frozennode/administrator/js/jquery/jquery-ui-timepicker-addon.js'),
-			'ckeditor' => asset('packages/frozennode/administrator/js/ckeditor/ckeditor.js'),
-			'ckeditor-jquery' => asset('packages/frozennode/administrator/js/ckeditor/adapters/jquery.js'),
-			'markdown' => asset('packages/frozennode/administrator/js/markdown.js'),
-			'plupload' => asset('packages/frozennode/administrator/js/plupload/js/plupload.full.js'),
+			'select2' => asset('packages/saaksin/administrator/js/jquery/select2/select2.js'),
+			'jquery-ui-timepicker' => asset('packages/saaksin/administrator/js/jquery/jquery-ui-timepicker-addon.js'),
+			'ckeditor' => asset('packages/saaksin/administrator/js/ckeditor/ckeditor.js'),
+			'ckeditor-jquery' => asset('packages/saaksin/administrator/js/ckeditor/adapters/jquery.js'),
+			'markdown' => asset('packages/saaksin/administrator/js/markdown.js'),
+			'plupload' => asset('packages/saaksin/administrator/js/plupload/js/plupload.full.js'),
 		);
 
 		//localization js assets
@@ -109,27 +109,27 @@ View::composer(array('administrator::layouts.default'), function($view)
 		if ($locale !== 'en')
 		{
 			$view->js += array(
-				'plupload-l18n' => asset('packages/frozennode/administrator/js/plupload/js/i18n/'.$locale.'.js'),
-				'timepicker-l18n' => asset('packages/frozennode/administrator/js/jquery/localization/jquery-ui-timepicker-'.$locale.'.js'),
-				'datepicker-l18n' => asset('packages/frozennode/administrator/js/jquery/i18n/jquery.ui.datepicker-'.$locale.'.js'),
-				'select2-l18n' => asset('packages/frozennode/administrator/js/jquery/select2/select2_locale_'.$locale.'.js'),
+				'plupload-l18n' => asset('packages/saaksin/administrator/js/plupload/js/i18n/'.$locale.'.js'),
+				'timepicker-l18n' => asset('packages/saaksin/administrator/js/jquery/localization/jquery-ui-timepicker-'.$locale.'.js'),
+				'datepicker-l18n' => asset('packages/saaksin/administrator/js/jquery/i18n/jquery.ui.datepicker-'.$locale.'.js'),
+				'select2-l18n' => asset('packages/saaksin/administrator/js/jquery/select2/select2_locale_'.$locale.'.js'),
 			);
 		}
 
 		//remaining js assets
 		$view->js += array(
-			'knockout' => asset('packages/frozennode/administrator/js/knockout/knockout-2.2.0.js'),
-			'knockout-mapping' => asset('packages/frozennode/administrator/js/knockout/knockout.mapping.js'),
-			'knockout-notification' => asset('packages/frozennode/administrator/js/knockout/KnockoutNotification.knockout.min.js'),
-			'knockout-update-data' => asset('packages/frozennode/administrator/js/knockout/knockout.updateData.js'),
-			'knockout-custom-bindings' => asset('packages/frozennode/administrator/js/knockout/custom-bindings.js'),
-			'accounting' => asset('packages/frozennode/administrator/js/accounting.js'),
-			'colorpicker' => asset('packages/frozennode/administrator/js/jquery/jquery.lw-colorpicker.min.js'),
-			'history' => asset('packages/frozennode/administrator/js/history/native.history.js'),
-			'admin' => asset('packages/frozennode/administrator/js/admin.js'),
-			'settings' => asset('packages/frozennode/administrator/js/settings.js'),
+			'knockout' => asset('packages/saaksin/administrator/js/knockout/knockout-2.2.0.js'),
+			'knockout-mapping' => asset('packages/saaksin/administrator/js/knockout/knockout.mapping.js'),
+			'knockout-notification' => asset('packages/saaksin/administrator/js/knockout/KnockoutNotification.knockout.min.js'),
+			'knockout-update-data' => asset('packages/saaksin/administrator/js/knockout/knockout.updateData.js'),
+			'knockout-custom-bindings' => asset('packages/saaksin/administrator/js/knockout/custom-bindings.js'),
+			'accounting' => asset('packages/saaksin/administrator/js/accounting.js'),
+			'colorpicker' => asset('packages/saaksin/administrator/js/jquery/jquery.lw-colorpicker.min.js'),
+			'history' => asset('packages/saaksin/administrator/js/history/native.history.js'),
+			'admin' => asset('packages/saaksin/administrator/js/admin.js'),
+			'settings' => asset('packages/saaksin/administrator/js/settings.js'),
 		);
 	}
 
-	$view->js += array('page' => asset('packages/frozennode/administrator/js/page.js'));
+	$view->js += array('page' => asset('packages/saaksin/administrator/js/page.js'));
 });

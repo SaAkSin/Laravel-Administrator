@@ -1,11 +1,11 @@
 <?php
-namespace Frozennode\Administrator\Tests;
+namespace SaAkSin\Administrator\Tests;
 
 use Mockery as m;
 
 class EloquentStub extends \Illuminate\Database\Eloquent\Model {}
 
-class ValidatorTest extends \PHPUnit_Framework_TestCase {
+class ValidatorTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The UrlGenerator mock
@@ -27,7 +27,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
 	public function setUp()
 	{
 		$this->url = m::mock('Illuminate\Routing\UrlGenerator');
-		$this->validator = m::mock('Frozennode\Administrator\Validator')->makePartial();
+		$this->validator = m::mock('SaAkSin\Administrator\Validator')->makePartial();
 	}
 
 	/**
@@ -100,7 +100,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
 
 	public function testValidateEloquentSucceeds()
 	{
-		$this->assertTrue($this->validator->validateEloquent(null, 'Frozennode\Administrator\Tests\EloquentStub', null));
+		$this->assertTrue($this->validator->validateEloquent(null, 'SaAkSin\Administrator\Tests\EloquentStub', null));
 	}
 
 	public function testValidateEloquentFails()

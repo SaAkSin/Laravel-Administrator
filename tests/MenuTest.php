@@ -1,9 +1,9 @@
 <?php
-namespace Frozennode\Administrator\Tests;
+namespace SaAkSin\Administrator\Tests;
 
 use Mockery as m;
 
-class MenuTest extends \PHPUnit_Framework_TestCase {
+class MenuTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Config Repository mock
@@ -32,8 +32,8 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function setUp()
 	{
 		$this->config = m::mock('Illuminate\Config\Repository');
-		$this->configFactory = m::mock('Frozennode\Administrator\Config\Factory');
-		$this->menu = m::mock('Frozennode\Administrator\Menu', array($this->config, $this->configFactory))->makePartial();
+		$this->configFactory = m::mock('SaAkSin\Administrator\Config\Factory');
+		$this->menu = m::mock('SaAkSin\Administrator\Menu', array($this->config, $this->configFactory))->makePartial();
 	}
 
 	/**
@@ -47,7 +47,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function testGetMenuSimpleReturnWithPermission()
 	{
 		$this->config->shouldReceive('get')->once()->andReturn(array('test_name'));
-		$itemconfig = m::mock('Frozennode\Administrator\Config\Config');
+		$itemconfig = m::mock('SaAkSin\Administrator\Config\Config');
 		$itemconfig->shouldReceive('getOption')->twice()->andReturn(true, 'test_title');
 		$this->configFactory->shouldReceive('make')->once()->andReturn($itemconfig);
 		$this->assertEquals($this->menu->getMenu(), array('test_name' => 'test_title'));
@@ -56,7 +56,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function testGetMenuSimpleReturnWithoutPermission()
 	{
 		$this->config->shouldReceive('get')->once()->andReturn(array('test_name'));
-		$itemconfig = m::mock('Frozennode\Administrator\Config\Config');
+		$itemconfig = m::mock('SaAkSin\Administrator\Config\Config');
 		$itemconfig->shouldReceive('getOption')->once()->andReturn(false);
 		$this->configFactory->shouldReceive('make')->once()->andReturn($itemconfig);
 		$this->assertEquals($this->menu->getMenu(), array());
@@ -65,7 +65,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function testGetMenuNested()
 	{
 		$this->config->shouldReceive('get')->once()->andReturn(array('Header' => array('test_name')));
-		$itemconfig = m::mock('Frozennode\Administrator\Config\Config');
+		$itemconfig = m::mock('SaAkSin\Administrator\Config\Config');
 		$itemconfig->shouldReceive('getOption')->twice()->andReturn(true, 'test_title');
 		$this->configFactory->shouldReceive('make')->once()->andReturn($itemconfig);
 		$this->assertEquals($this->menu->getMenu(), array('Header' => array('test_name' => 'test_title')));
@@ -74,7 +74,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function testGetMenuNestedWithoutPermission()
 	{
 		$this->config->shouldReceive('get')->once()->andReturn(array('Header' => array('test_name')));
-		$itemconfig = m::mock('Frozennode\Administrator\Config\Config');
+		$itemconfig = m::mock('SaAkSin\Administrator\Config\Config');
 		$itemconfig->shouldReceive('getOption')->once()->andReturn(false);
 		$this->configFactory->shouldReceive('make')->once()->andReturn($itemconfig);
 		$this->assertEquals($this->menu->getMenu(), array());
@@ -83,7 +83,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function testGetMenuDeepNested()
 	{
 		$this->config->shouldReceive('get')->once()->andReturn(array('Header' => array('Header2' => array('test_name'))));
-		$itemconfig = m::mock('Frozennode\Administrator\Config\Config');
+		$itemconfig = m::mock('SaAkSin\Administrator\Config\Config');
 		$itemconfig->shouldReceive('getOption')->twice()->andReturn(true, 'test_title');
 		$this->configFactory->shouldReceive('make')->once()->andReturn($itemconfig);
 		$this->assertEquals($this->menu->getMenu(), array('Header' => array('Header2' => array('test_name' => 'test_title'))));
@@ -92,7 +92,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase {
 	public function testGetMenuDeepNestedWithoutPermission()
 	{
 		$this->config->shouldReceive('get')->once()->andReturn(array('Header' => array('Header2' => array('test_name'))));
-		$itemconfig = m::mock('Frozennode\Administrator\Config\Config');
+		$itemconfig = m::mock('SaAkSin\Administrator\Config\Config');
 		$itemconfig->shouldReceive('getOption')->once()->andReturn(false);
 		$this->configFactory->shouldReceive('make')->once()->andReturn($itemconfig);
 		$this->assertEquals($this->menu->getMenu(), array());

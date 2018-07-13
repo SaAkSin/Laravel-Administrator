@@ -1,10 +1,10 @@
 # Laravel Administrator
 
-Administrator is an administrative interface builder for [Laravel](http://laravel.com). With Administrator you can visually manage your Eloquent models and their relations, and also create stand-alone settings pages for storing site data and performing site tasks.
+기존 Frozonnode 의 Laravel-Administrator 가 더 이상 업데이트 되지않아, 이를 바탕으로하여 패키지를 업그레이드 및 개발하고 있습니다. Administrator is an administrative interface builder for [Laravel](http://laravel.com). With Administrator you can visually manage your Eloquent models and their relations, and also create stand-alone settings pages for storing site data and performing site tasks.
 
-- **Author:** Jan Hartigan
-- **Website:** [http://frozennode.com](http://administrator.frozennode.com/)
-- **Version:** 5.0.12
+- **Author:** 이기석
+- **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
+- **Version:** 5.1.0
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
@@ -15,14 +15,14 @@ Administrator is an administrative interface builder for [Laravel](http://larave
 To install Administrator as a Composer package to be used with Laravel 5, simply run:
 
 ```sh
-composer require "frozennode/administrator: 5.*"
+composer require "saaksin/administrator: 5.*"
 ```
 
 Once it's installed, you can register the service provider in `config/app.php` in the `providers` array:
 
 ```php
 'providers' => [
-	'Frozennode\Administrator\AdministratorServiceProvider',
+	'SaAkSin\Administrator\AdministratorServiceProvider',
 ]
 ```
 
@@ -30,26 +30,11 @@ Then publish Administrator's assets with `php artisan vendor:publish`. This will
 
 ### Laravel 4
 
-If you want to use Administrator with Laravel 4, you need to resolve to Administrator 4:
-
-```json
-"frozennode/administrator": "4.*"
-```
-
-Then publish the config file with `php artisan config:publish frozennode/administrator`. This will add the file `app/config/packages/frozennode/administrator/administrator.php`.
-
-Then finally you need to publish the package's assets with the `php artisan asset:publish frozennode/administrator` command.
+더 이상 지원하지 않습니다.
 
 ### Laravel 3
 
-Since Administrator has switched over to Composer, you can no longer use `php artisan bundle:install administrator` or `php artisan bundle:upgrade administrator`. If you want to use Administrator with Laravel 3, you must switch to the [3.3.2 branch](https://github.com/FrozenNode/Laravel-Administrator/tree/3.3.2), download it, and add it in the `/bundles/administrator` directory and add this to your bundles.php file:
-
-```php
-'administrator' => array(
-	'handles' => 'admin', //this determines what URI this bundle will use
-	'auto' => true,
-),
-```
+더 이상 지원하지 않습니다.
 
 ## Documentation
 
@@ -62,6 +47,8 @@ Administrator is released under the MIT License. See the LICENSE file for detail
 
 
 ## Recent Changelog
+
+### 5.1.0
 
 ### 5.0.12
 - Bugfix: Added the table name to the constraint query

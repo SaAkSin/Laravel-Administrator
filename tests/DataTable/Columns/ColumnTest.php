@@ -1,9 +1,9 @@
 <?php
-namespace Frozennode\Administrator\Tests\DataTable\Columns;
+namespace SaAkSin\Administrator\Tests\DataTable\Columns;
 
 use Mockery as m;
 
-class ColumnTest extends \PHPUnit_Framework_TestCase {
+class ColumnTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -38,12 +38,12 @@ class ColumnTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->db = m::mock('Illuminate\Database\DatabaseManager');
 
 		$options = array('column_name' => 'test');
-		$this->column = m::mock('Frozennode\Administrator\DataTable\Columns\Column', array($this->validator, $this->config, $this->db, $options))
+		$this->column = m::mock('SaAkSin\Administrator\DataTable\Columns\Column', array($this->validator, $this->config, $this->db, $options))
 						->makePartial();
 	}
 

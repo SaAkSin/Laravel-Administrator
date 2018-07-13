@@ -1,5 +1,5 @@
 <?php
-namespace Frozennode\Administrator\Tests\Fields\Relationships;
+namespace SaAkSin\Administrator\Tests\Fields\Relationships;
 
 use Mockery as m;
 
@@ -20,7 +20,7 @@ class BelongsToManyEloquentStub {
 	public function __unset($rel) {unset($this->{$rel});}
 }
 
-class BelongsToManyTest extends \PHPUnit_Framework_TestCase {
+class BelongsToManyTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -55,11 +55,11 @@ class BelongsToManyTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->db = m::mock('Illuminate\Database\DatabaseManager');
 		$options = array('field_name' => 'field', 'type' => 'belongs_to_many');
-		$this->field = m::mock('Frozennode\Administrator\Fields\Relationships\BelongsToMany',
+		$this->field = m::mock('SaAkSin\Administrator\Fields\Relationships\BelongsToMany',
 									array($this->validator, $this->config, $this->db, $options))->makePartial();
 	}
 

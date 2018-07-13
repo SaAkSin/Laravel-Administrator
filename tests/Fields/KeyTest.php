@@ -1,9 +1,9 @@
 <?php
-namespace Frozennode\Administrator\Tests\Fields;
+namespace SaAkSin\Administrator\Tests\Fields;
 
 use Mockery as m;
 
-class KeyTest extends \PHPUnit_Framework_TestCase {
+class KeyTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -38,11 +38,11 @@ class KeyTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->db = m::mock('Illuminate\Database\DatabaseManager');
 		$options = array('field_name' => 'field', 'type' => 'key');
-		$this->field = m::mock('Frozennode\Administrator\Fields\Key', array($this->validator, $this->config, $this->db, $options))->makePartial();
+		$this->field = m::mock('SaAkSin\Administrator\Fields\Key', array($this->validator, $this->config, $this->db, $options))->makePartial();
 	}
 
 	/**

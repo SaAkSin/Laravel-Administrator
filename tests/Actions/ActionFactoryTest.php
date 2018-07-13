@@ -1,9 +1,9 @@
 <?php
-namespace Frozennode\Administrator\Tests\DataTable\Columns;
+namespace SaAkSin\Administrator\Tests\DataTable\Columns;
 
 use Mockery as m;
 
-class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
+class ActionFactoryTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -31,9 +31,9 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
-		$this->factory = m::mock('Frozennode\Administrator\Actions\Factory', array($this->validator, $this->config))->makePartial();
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
+		$this->factory = m::mock('SaAkSin\Administrator\Actions\Factory', array($this->validator, $this->config))->makePartial();
 	}
 
 	/**
@@ -89,7 +89,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetByNameSucceeds()
 	{
-		$action = m::mock('Frozennode\Administrator\Actions\Action');
+		$action = m::mock('SaAkSin\Administrator\Actions\Action');
 		$action->shouldReceive('getOption')->once()->andReturn('action');
 		$this->factory->shouldReceive('getActions')->once()->andReturn(array($action));
 		$this->assertEquals($this->factory->getByName('action'), $action);
@@ -97,7 +97,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetByNameFails()
 	{
-		$action = m::mock('Frozennode\Administrator\Actions\Action');
+		$action = m::mock('SaAkSin\Administrator\Actions\Action');
 		$action->shouldReceive('getOption')->once()->andReturn('foo');
 		$this->factory->shouldReceive('getActions')->once()->andReturn(array($action));
 		$this->assertEquals($this->factory->getByName('action'), false);
@@ -105,7 +105,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetByNameGlobalSucceeds()
 	{
-		$action = m::mock('Frozennode\Administrator\Actions\Action');
+		$action = m::mock('SaAkSin\Administrator\Actions\Action');
 		$action->shouldReceive('getOption')->once()->andReturn('action');
 		$this->factory->shouldReceive('getGlobalActions')->once()->andReturn(array($action));
 		$this->assertEquals($this->factory->getByName('action', true), $action);
@@ -113,7 +113,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetByNameGlobalFails()
 	{
-		$action = m::mock('Frozennode\Administrator\Actions\Action');
+		$action = m::mock('SaAkSin\Administrator\Actions\Action');
 		$action->shouldReceive('getOption')->once()->andReturn('foo');
 		$this->factory->shouldReceive('getGlobalActions')->once()->andReturn(array($action));
 		$this->assertEquals($this->factory->getByName('action', true), false);
@@ -128,7 +128,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetActionsOptions()
 	{
-		$action = m::mock('Frozennode\Administrator\Actions\Action');
+		$action = m::mock('SaAkSin\Administrator\Actions\Action');
 		$action->shouldReceive('getOptions')->times(3)->andReturn(1);
 		$this->factory->shouldReceive('getActions')->andReturn(array($action, $action, $action));
 		$this->assertEquals($this->factory->getActionsOptions(), array(1, 1, 1));
@@ -143,7 +143,7 @@ class ActionFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetGlobalActionsOptions()
 	{
-		$action = m::mock('Frozennode\Administrator\Actions\Action');
+		$action = m::mock('SaAkSin\Administrator\Actions\Action');
 		$action->shouldReceive('getOptions')->times(3)->andReturn(1);
 		$this->factory->shouldReceive('getGlobalActions')->andReturn(array($action, $action, $action));
 		$this->assertEquals($this->factory->getGlobalActionsOptions(), array(1, 1, 1));

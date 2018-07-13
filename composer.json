@@ -1,32 +1,33 @@
 {
-	"name": "frozennode/administrator",
-	"description": "A database interface package for Laravel",
-	"homepage": "http://administrator.frozennode.com",
-	"keywords": ["administrator", "admin", "database", "laravel-administrator", "laravel", "cms"],
+	"name": "saaksin/laravel-administrator",
+	"description": "데이터베이스 기반 라라벨 관리자 페이지",
+	"homepage": "https://github.com/SaAkSin/Laravel-Administrator",
+	"keywords": ["administrator", "admin", "laravel-administrator", "laravel"],
 	"license": "MIT",
 	"authors": [
 		{
-			"name": "Jan Hartigan",
-			"email": "jan@frozennode.com"
+			"name": "GiSeok Lee",
+			"email": "gslee@artgrammer.co.kr"
 		}
 	],
 	"support": {
-		"issues": "https://github.com/FrozenNode/Laravel-Administrator/issues"
+		"issues": "https://github.com/SaAkSin/Laravel-Administrator/issues"
 	},
 	"require": {
-		"php": ">=5.4.0",
+		"php": ">=7.1.3",
 		"laravel/framework": "5.*",
 		"ckeditor/ckeditor": "4.*"
 	},
 	"require-dev": {
-		"mockery/mockery": "~0.9"
+		"mockery/mockery": "~0.9",
+		"phpunit/phpunit": "^7"
 	},
 	"autoload": {
 		"classmap": [
 			"src/controllers"
 		],
 		"psr-0": {
-			"Frozennode\\Administrator": "src/"
+			"SaAkSin\\Administrator": "src/"
 		}
 	},
 	"scripts": {

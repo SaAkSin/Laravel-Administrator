@@ -1,9 +1,9 @@
 <?php
-namespace Frozennode\Administrator\Tests\Config\Settings;
+namespace SaAkSin\Administrator\Tests\Config\Settings;
 
 use Mockery as m;
 
-class SettingsConfigTest extends \PHPUnit_Framework_TestCase {
+class SettingsConfigTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -24,8 +24,8 @@ class SettingsConfigTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Settings\Config', array($this->validator, $this->validator, array()))->makePartial();
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Settings\Config', array($this->validator, $this->validator, array()))->makePartial();
 	}
 
 	/**
@@ -82,9 +82,9 @@ class SettingsConfigTest extends \PHPUnit_Framework_TestCase {
 					->shouldReceive('runBeforeSave')->once()
 					->shouldReceive('putToJson')->once()
 					->shouldReceive('setDataModel')->once();
-		$field = m::mock('Frozennode\Administrator\Fields\Field');
+		$field = m::mock('SaAkSin\Administrator\Fields\Field');
 		$field->shouldReceive('getOption')->twice()->andReturn(true, "text");
-		$field_uneditable = m::mock('Frozennode\Administrator\Fields\Field');
+		$field_uneditable = m::mock('SaAkSin\Administrator\Fields\Field');
 		$field_uneditable->shouldReceive('getOption')->once()->andReturn(false);
 		$fields = array('field1' => $field, 'field2' => $field_uneditable);
 		$this->assertTrue($this->config->save($input, $fields));
@@ -99,9 +99,9 @@ class SettingsConfigTest extends \PHPUnit_Framework_TestCase {
 					->shouldReceive('runBeforeSave')->never()
 					->shouldReceive('putToJson')->never()
 					->shouldReceive('setDataModel')->never();
-		$field = m::mock('Frozennode\Administrator\Fields\Field');
+		$field = m::mock('SaAkSin\Administrator\Fields\Field');
 		$field->shouldReceive('getOption')->twice()->andReturn(true, "text");
-		$field_uneditable = m::mock('Frozennode\Administrator\Fields\Field');
+		$field_uneditable = m::mock('SaAkSin\Administrator\Fields\Field');
 		$field_uneditable->shouldReceive('getOption')->once()->andReturn(false);
 		$fields = array('field1' => $field, 'field2' => $field_uneditable);
 		$this->assertEquals($this->config->save($input, $fields), 'some error');
@@ -116,9 +116,9 @@ class SettingsConfigTest extends \PHPUnit_Framework_TestCase {
 					->shouldReceive('runBeforeSave')->once()->andReturn('some error')
 					->shouldReceive('putToJson')->never()
 					->shouldReceive('setDataModel')->never();
-		$field = m::mock('Frozennode\Administrator\Fields\Field');
+		$field = m::mock('SaAkSin\Administrator\Fields\Field');
 		$field->shouldReceive('getOption')->twice()->andReturn(true, "text");
-		$field_uneditable = m::mock('Frozennode\Administrator\Fields\Field');
+		$field_uneditable = m::mock('SaAkSin\Administrator\Fields\Field');
 		$field_uneditable->shouldReceive('getOption')->once()->andReturn(false);
 		$fields = array('field1' => $field, 'field2' => $field_uneditable);
 		$this->assertEquals($this->config->save($input, $fields), 'some error');

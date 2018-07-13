@@ -1,5 +1,5 @@
 <?php
-namespace Frozennode\Administrator\Tests\DataTable\Columns;
+namespace SaAkSin\Administrator\Tests\DataTable\Columns;
 
 use Mockery as m;
 
@@ -14,7 +14,7 @@ class ColumnStub {
 	public $foo = 'bar';
 }
 
-class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
+class ColumnFactoryTest extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * The Validator mock
@@ -50,17 +50,17 @@ class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @var string
 	 */
-	protected $namespace = 'Frozennode\\Administrator\\DataTable\\Columns\\';
+	protected $namespace = 'SaAkSin\\Administrator\\DataTable\\Columns\\';
 
 	/**
 	 * Set up function
 	 */
 	public function setUp()
 	{
-		$this->validator = m::mock('Frozennode\Administrator\Validator');
-		$this->config = m::mock('Frozennode\Administrator\Config\Model\Config');
+		$this->validator = m::mock('SaAkSin\Administrator\Validator');
+		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->db = m::mock('Illuminate\Database\DatabaseManager');
-		$this->factory = m::mock('Frozennode\Administrator\DataTable\Columns\Factory', array($this->validator, $this->config, $this->db))->makePartial();
+		$this->factory = m::mock('SaAkSin\Administrator\DataTable\Columns\Factory', array($this->validator, $this->config, $this->db))->makePartial();
 	}
 
 	/**
@@ -80,7 +80,7 @@ class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
 	public function testGetColumnObject()
 	{
 		$stub = new ColumnStub;
-		$this->factory->shouldReceive('getColumnClassName')->once()->andReturn('Frozennode\Administrator\Tests\DataTable\Columns\ColumnStub');
+		$this->factory->shouldReceive('getColumnClassName')->once()->andReturn('SaAkSin\Administrator\Tests\DataTable\Columns\ColumnStub');
 		$otherStub = $this->factory->getColumnObject(array());
 		$this->assertEquals($otherStub->foo, $stub->foo);
 	}
@@ -170,12 +170,12 @@ class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
 	{
 		$this->validator->shouldReceive('arrayGet')->once()->andReturn(true);
 		$model = m::mock(array('getTable' => 'table', 'getKeyName' => 'normal'));
-		$columnRelated = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnRelated = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnRelated->shouldReceive('getOption')->once()->andReturn(true)
 						->shouldReceive('getIncludedColumn')->andReturn(array('related' => 'whatever'));
-		$columnNormal = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnNormal = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnNormal->shouldReceive('getOption')->times(4)->andReturn(false, false, 'normal', 'normal');
-		$columnComputed = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnComputed = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnComputed->shouldReceive('getOption')->twice()->andReturn(false, true);
 		$this->config->shouldReceive('getDataModel')->once()->andReturn($model);
 		$this->factory->shouldReceive('getColumns')->once()->andReturn(array('related' => $columnRelated, 'normal' => $columnNormal, 'computed' => $columnComputed));
@@ -199,7 +199,7 @@ class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
 		$model = m::mock('Illuminate\Database\ELoquent\Model');
 		$model->shouldReceive('getTable')->once()->andReturn('table')
 				->shouldReceive('getKeyName')->once()->andReturn('id');
-		$field = m::mock('Frozennode\\Administrator\\Fields\\Relationships\\BelongsTo');
+		$field = m::mock('SaAkSin\\Administrator\\Fields\\Relationships\\BelongsTo');
 		$field->shouldReceive('getOption')->twice()->andReturn('bt_id');
 		$this->config->shouldReceive('getDataModel')->once()->andReturn($model);
 		$this->factory->shouldReceive('getColumns')->once()->andReturn(array());
@@ -208,9 +208,9 @@ class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetRelatedColumns()
 	{
-		$columnRelated = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnRelated = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnRelated->shouldReceive('getOption')->times(3)->andReturn(true, 'related');
-		$columnNormal = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnNormal = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnNormal->shouldReceive('getOption')->once()->andReturn(false);
 		$this->factory->shouldReceive('getColumns')->once()->andReturn(array($columnRelated, $columnNormal));
 		$this->assertEquals($this->factory->getRelatedColumns(), array('related' => 'related'));
@@ -218,9 +218,9 @@ class ColumnFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetComputedColumns()
 	{
-		$columnRelated = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnRelated = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnRelated->shouldReceive('getOption')->once()->andReturn(true);
-		$columnComputed = m::mock('Frozennode\Administrator\DataTable\Columns\Column');
+		$columnComputed = m::mock('SaAkSin\Administrator\DataTable\Columns\Column');
 		$columnComputed->shouldReceive('getOption')->times(4)->andReturn(false, true, 'computed');
 		$this->factory->shouldReceive('getColumns')->once()->andReturn(array($columnRelated, $columnComputed));
 		$this->assertEquals($this->factory->getComputedColumns(), array('computed' => 'computed'));
