@@ -320,7 +320,8 @@ class Factory {
 		if (is_file($path))
 		{
 			//set the options var
-			$options = require $path;
+			require_once $path;
+			$options = call_user_func($name);
 
 			//add the name in
 			$options['name'] = $name;
