@@ -1,6 +1,8 @@
 <?php
 namespace SaAkSin\Administrator;
 
+use Illuminate\Validation\ValidationRuleParser;
+
 class Validator extends \Illuminate\Validation\Validator {
 
 	protected $overrideCustomMessages = array(
@@ -64,7 +66,8 @@ class Validator extends \Illuminate\Validation\Validator {
 	 */
 	public function setRules(array $rules)
 	{
-		$this->rules = $this->explodeRules($rules);
+		$parser = new ValidationRuleParser([]);
+		$this->rules = $parser->explode($rules)->rules;
 	}
 
 	/**
