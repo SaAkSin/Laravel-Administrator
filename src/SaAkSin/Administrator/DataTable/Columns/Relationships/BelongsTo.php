@@ -1,6 +1,8 @@
 <?php
 namespace SaAkSin\Administrator\DataTable\Columns\Relationships;
 
+use SaAkSin\Administrator\Util;
+
 class BelongsTo extends Relationship {
 
 	/**
