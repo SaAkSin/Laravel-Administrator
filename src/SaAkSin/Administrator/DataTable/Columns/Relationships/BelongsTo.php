@@ -111,8 +111,8 @@ class BelongsTo extends Relationship {
 				$alias = $columnName . '_' . $table;
 				$last_alias = $columnName . '_' . $this->tablePrefix . $model->getTable();
 				$joins .= ' LEFT JOIN ' . $table . ' AS ' . $alias .
-							' ON ' . $alias . '.' . $relationship->getQualifiedRelatedPivotKeyName() .
-								' = ' . $last_alias . '.' . $relationship->getQualifiedForeignPivotKeyName();
+							' ON ' . $alias . '.' . $relationship->getOwnerKey() .
+								' = ' . $last_alias . '.' . $relationship->getForeignKey();
 			}
 		}
 
@@ -123,9 +123,9 @@ class BelongsTo extends Relationship {
 		$from_table = $this->tablePrefix . $relationship_model->getTable();
 		$field_table = $columnName . '_' . $from_table;
 
-		$where = $this->tablePrefix . $first_model->getTable() . '.' . $first_relationship->getQualifiedForeignPivotKeyName() .
+		$where = $this->tablePrefix . $first_model->getTable() . '.' . $first_relationship->getForeignKey() .
 					' = ' .
-					$field_table . '.' . $first_relationship->getQualifiedRelatedPivotKeyName();
+					$field_table . '.' . $first_relationship->getOwnerKey();
 
 		$selects[] = $this->db->raw("(SELECT " . $this->getOption('select') . "
 										FROM " . $from_table." AS " . $field_table . ' ' . $joins . "
