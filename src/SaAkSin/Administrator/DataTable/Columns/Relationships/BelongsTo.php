@@ -111,8 +111,8 @@ class BelongsTo extends Relationship {
 				$alias = $columnName . '_' . $table;
 				$last_alias = $columnName . '_' . $this->tablePrefix . $model->getTable();
 				$joins .= ' LEFT JOIN ' . $table . ' AS ' . $alias .
-							' ON ' . $alias . '.' . $relationship->getOtherKey() .
-								' = ' . $last_alias . '.' . $relationship->getForeignKey();
+							' ON ' . $alias . '.' . $relationship->getQualifiedRelatedPivotKeyName() .
+								' = ' . $last_alias . '.' . $relationship->getQualifiedForeignPivotKeyName();
 			}
 		}
 
@@ -123,9 +123,9 @@ class BelongsTo extends Relationship {
 		$from_table = $this->tablePrefix . $relationship_model->getTable();
 		$field_table = $columnName . '_' . $from_table;
 
-		$where = $this->tablePrefix . $first_model->getTable() . '.' . $first_relationship->getForeignKey() .
+		$where = $this->tablePrefix . $first_model->getTable() . '.' . $first_relationship->getQualifiedForeignPivotKeyName() .
 					' = ' .
-					$field_table . '.' . $first_relationship->getOtherKey();
+					$field_table . '.' . $first_relationship->getQualifiedRelatedPivotKeyName();
 
 		$selects[] = $this->db->raw("(SELECT " . $this->getOption('select') . "
 										FROM " . $from_table." AS " . $field_table . ' ' . $joins . "
@@ -141,7 +141,7 @@ class BelongsTo extends Relationship {
 	{
 		$model = $this->config->getDataModel();
 		$nested = $this->getOption('nested');
-		$fk = $nested['models'][0]->{$nested['pieces'][0]}()->getForeignKey();
+		$fk = $nested['models'][0]->{$nested['pieces'][0]}()->getQualifiedForeignPivotKeyName();
 
 		return array($fk => $model->getTable() . '.' . $fk);
 	}
