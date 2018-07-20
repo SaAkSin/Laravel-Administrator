@@ -29,7 +29,7 @@ class BelongsTo extends Relationship {
 
 		$options['table'] = $relatedModel->getTable();
 		$options['column'] = $relatedModel->getKeyName();
-		$options['foreign_key'] = $relationship->getQualifiedForeignPivotKeyName();
+		$options['foreign_key'] = $relationship->getForeignKey();
 
 		$this->suppliedOptions = $options;
 	}
