@@ -141,7 +141,7 @@ class BelongsTo extends Relationship {
 	{
 		$model = $this->config->getDataModel();
 		$nested = $this->getOption('nested');
-		$fk = $nested['models'][0]->{$nested['pieces'][0]}()->getQualifiedForeignPivotKeyName();
+		$fk = $nested['models'][0]->{$nested['pieces'][0]}()->getForeignKey();
 
 		return array($fk => $model->getTable() . '.' . $fk);
 	}
