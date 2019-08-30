@@ -15,7 +15,7 @@
 	},
 	"require": {
 		"php": ">=7.1.3",
-		"laravel/framework": "5.*",
+		"laravel/framework": "5.8.*",
 		"ckeditor/ckeditor": "4.*"
 	},
 	"require-dev": {
@@ -28,6 +28,13 @@
 		],
 		"psr-0": {
 			"SaAkSin\\Administrator": "src/"
+		}
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"SaAkSin\\Administrator\\AdministratorServiceProvider"
+			]
 		}
 	},
 	"scripts": {
