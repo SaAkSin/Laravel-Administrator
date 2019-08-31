@@ -35,14 +35,14 @@ return array(
 	 *
 	 * @type string
 	 */
-	'model_config_path' => config_path('administrator'),
+	'model_config_path' => base_path('administrator'),
 
 	/**
 	 * The path to your settings config directory
 	 *
 	 * @type string
 	 */
-	'settings_config_path' => config_path('administrator/settings'),
+	'settings_config_path' => base_path('administrator/settings'),
 
 	/**
 	 * The menu structure of the site. For models, you should either supply the name of a model config file or an array of names of model config

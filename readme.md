@@ -4,7 +4,7 @@
 
 - **Author:** 이기석
 - **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
-- **Version:** 5.1.0
+- **Version:** 5.8.0
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
@@ -15,14 +15,15 @@
 To install Administrator as a Composer package to be used with Laravel 5, simply run:
 
 ```sh
-composer require "saaksin/administrator: 5.*"
+composer require "saaksin/laravel-administrator: v5.8.*"
 ```
 
 Once it's installed, you can register the service provider in `config/app.php` in the `providers` array:
 
 ```php
 'providers' => [
-	'SaAkSin\Administrator\AdministratorServiceProvider',
+	...
+	SaAkSin\Administrator\AdministratorServiceProvider::class
 ]
 ```
 
