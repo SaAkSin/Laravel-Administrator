@@ -28,6 +28,50 @@ Once it's installed, you can register the service provider in `config/app.php` i
 ```
 
 Then publish Administrator's assets with `php artisan vendor:publish`. This will add the file `config/administrator.php`. This [config file](http://administrator.frozennode.com/docs/configuration) is the primary way you interact with Administrator. This command will also publish all of the assets, views, and translation files.
+설정 파일은 config 디렉토리 하위가 아닌, 프로젝트 루트 디렉토리에서 administrator, administrator/settings 에 위치합니다.
+
+### 설정파일
+설정파일명과 동일한 함수명으로 시작합니다. 가령, 설정 파일이 users.php 이라면, 반드시 users 함수를 통하여 설정(배열)을 반환합니다.(세션 등과 연계하여 조건에 따른 배열 결과를 반환할 수 있음)
+
+```php
+function users()
+{
+    return array(
+        'title' => '사용자 관리',
+        'single' => '사용자',
+        'model' => App\User::class,
+        .....
+
+    );
+}
+```
+
+### HTTPS
+app/Providers/AppServiceProvider 에서 라우트의 경로를 https 가 되도록 지정합니다.
+```php
+    public function boot(UrlGenerator $url)
+    {
+        $url->forceScheme('https');
+    }
+```
+
+asset url 에 https 주소를 사용하도록 .env 에 ASSET_URL 을 지정합니다.
+```php
+ASSET_URL=https://도메인주소
+```
+
+### FULL TEXT 검색
+filter 에서 MySQL 의 full text 검색을 지원합니다.(대용량 검색)
+
+```php
+'filters' => array(
+        'no' => array(
+            'title' => 'Number',
+            'type' => 'fulltext_mysql'
+        ),
+    ),
+```
+
 
 ### Laravel 4
 
@@ -48,6 +92,9 @@ Administrator is released under the MIT License. See the LICENSE file for detail
 
 
 ## Recent Changelog
+
+### 5.8.0
+- 라라벨 5.8.0 지원
 
 ### 5.1.0
 - 모델 파일내 세션 사용가능
