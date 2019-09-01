@@ -31,6 +31,7 @@ class Factory {
 		'image' => 'SaAkSin\\Administrator\\Fields\\Image',
 		'file' => 'SaAkSin\\Administrator\\Fields\\File',
 		'color' => 'SaAkSin\\Administrator\\Fields\\Color',
+		'fulltext_mysql' => 'SaAkSin\\Administrator\\Fields\\FullTextMySQL',
 
 		//relationships
 		'belongs_to' => 'SaAkSin\\Administrator\\Fields\\Relationships\\BelongsTo',
