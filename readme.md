@@ -72,6 +72,12 @@ filter 에서 MySQL 의 full text 검색을 지원합니다.(대용량 검색)
     ),
 ```
 
+### VIEW 모델 지원
+모델 설정에서 view 모델 여부를 설정할 수 있습니다.(아직은 실험적인 기능이며, 조회시 약간의 성능 개선이 있습니다. MySQL InnoDB)
+
+```php
+'view' => true
+```
 
 ### Laravel 4
 

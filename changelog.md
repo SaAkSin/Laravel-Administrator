@@ -1,4 +1,10 @@
 ## Changelog
+### 5.8.1
+- Added: View 모델 지원(alpha), MySQL InnoDB desc 정렬 속도 이슈 대응
+
+### 5.8.0
+- 라라벨 5.8.0 지원
+- Added: FULL TEXT 검색(MySQL), https 지원
 
 ### 5.0.12
 - Bugfix: Added the table name to the constraint query

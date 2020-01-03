@@ -40,6 +40,7 @@ Below is a list of all the available options. Required options are marked as *(r
 - [Sort](#sort)
 - [Form Width](#form-width)
 - [Link](#link)
+- [VIEW](#view)
 
 <a name="title"></a>
 ### Title *(required)*
@@ -385,3 +386,10 @@ If you set this to any integer value above 285, it will expand the edit field an
 	},
 
 If your model has a front-end link, you might want to have a "view item" link at the top of the edit form that pops out to that page. The relevant `$model` is passed into the function so that you can use it to construct the URL. You should return a valid URL string.
+
+<a name="view"></a>
+## VIEW
+
+    'view' => true
+
+VIEW 모델인 경우 조회시 성능 개선이 있습니다.

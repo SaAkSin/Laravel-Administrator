@@ -41,6 +41,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'link' => null,
 		'rules' => false,
 		'messages' => false,
+        'view' => false,
 	);
 
 	/**
@@ -72,6 +73,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'link' => 'callable',
 		'rules' => 'array',
 		'messages' => 'array',
+        'view' => 'boolean',
 	);
 
 	/**

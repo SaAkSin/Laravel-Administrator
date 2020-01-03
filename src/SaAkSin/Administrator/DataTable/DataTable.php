@@ -78,20 +78,27 @@ class DataTable {
 	 */
 	public function getRows(DB $db, $filters = null, $page = 1, $sort = null)
 	{
-		//prepare the query
-		extract($this->prepareQuery($db, $page, $sort, $filters));
+        $isView = $this->config->getOption('view');
+        if($isView) {
+            // View 인 경우 order by 를 사용하지 않는다. - 성능 이슈
+            //prepare the query
+            extract($this->prepareViewQuery($db, $page, $sort, $filters));
+        }else {
+            //prepare the query
+            extract($this->prepareQuery($db, $page, $sort, $filters));
+        }
 
-		//run the count query
-		$output = $this->performCountQuery($countQuery, $querySql, $queryBindings, $page);
+        //run the count query
+        $output = $this->performCountQuery($countQuery, $querySql, $queryBindings, $page);
 
-		//now we need to limit and offset the rows in remembrance of our dear lost friend paginate()
-		$query->take($this->rowsPerPage);
-		$query->skip($this->rowsPerPage * ($output['page'] === 0 ? $output['page'] : $output['page'] - 1));
+        //now we need to limit and offset the rows in remembrance of our dear lost friend paginate()
+        $query->take($this->rowsPerPage);
+        $query->skip($this->rowsPerPage * ($output['page'] === 0 ? $output['page'] : $output['page'] - 1));
 
-		//parse the results
-		$output['results'] = $this->parseResults($query->get());
+        //parse the results
+        $output['results'] = $this->parseResults($query->get());
 
-		return $output;
+        return $output;
 	}
 
 	/**
@@ -178,7 +185,95 @@ class DataTable {
 		return compact('query', 'querySql', 'queryBindings', 'countQuery', 'sort', 'selects');
 	}
 
-	/**
+    /**
+     * Builds a results array (with results and pagination info)
+     * View 전용
+     *
+     * @param \Illuminate\Database\DatabaseManager 	$db
+     * @param int									$page
+     * @param array									$sort (with 'field' and 'direction' keys)
+     * @param array									$filters
+     *
+     * @return array
+     */
+    public function prepareViewQuery(DB $db, $page = 1, $sort = null, $filters = null)
+    {
+        //grab the model instance
+        $model = $this->config->getDataModel();
+
+        //update the sort options
+        $this->setSort($sort);
+        $sort = $this->getSort();
+
+        //get things going by grouping the set
+        $table = $model->getTable();
+        $keyName = $model->getKeyName();
+//        $query = $model->groupBy($table . '.' . $keyName);
+        $query = $model->select('*');
+
+        //get the Illuminate\Database\Query\Builder instance and set up the count query
+        $dbQuery = $query->getQuery();
+//        $countQuery = $dbQuery->getConnection()->table($table)->groupBy($table . '.' . $keyName);
+        $countQuery = $dbQuery->getConnection()->table($table);
+
+        //run the supplied query filter for both queries if it was provided
+        $this->config->runQueryFilter($dbQuery);
+        $this->config->runQueryFilter($countQuery);
+
+        //set up initial array states for the selects
+        $selects = array($table.'.*');
+
+        //set the filters
+        $this->setFilters($filters, $dbQuery, $countQuery, $selects);
+
+        //set the selects
+        $dbQuery->select($selects);
+
+        //determines if the sort should have the table prefixed to it
+        $sortOnTable = true;
+
+        //get the columns
+        $columns = $this->columnFactory->getColumns();
+
+        //iterate over the columns to check if we need to join any values or add any extra columns
+        foreach ($columns as $column)
+        {
+            //if this is a related column, we'll need to add some selects
+            $column->filterQuery($selects);
+
+            //if this is a related field or
+            if ( ($column->getOption('is_related') || $column->getOption('select')) && $column->getOption('column_name') === $sort['field'])
+            {
+                $sortOnTable = false;
+            }
+        }
+
+        //if the sort is on the model's table, prefix the table name to it
+        if ($sortOnTable)
+        {
+            $sort['field'] = $table . '.' . $sort['field'];
+        }
+
+        //grab the query sql for later
+        $querySql = $query->toSql();
+
+        //order the set by the model table's id
+//        $query->orderBy($sort['field'], $sort['direction']);
+
+        //then retrieve the rows
+        $query->getQuery()->select($selects);
+
+        //only select distinct rows
+//        $query->distinct();
+
+        //load the query bindings
+        $queryBindings = $query->getBindings();
+
+        return compact('query', 'querySql', 'queryBindings', 'countQuery', 'sort', 'selects');
+    }
+
+
+    /**
 	 * Performs the count query and returns info about the pages
 	 *
 	 * @param \Illuminate\Database\Query\Builder	$countQuery
