@@ -120,3 +120,13 @@ It's possible to pass in anonymous functions to any of the custom action text fi
 			//ban the user
 		}
 	),
+	
+<a name="reload"></a>
+## Reload
+
+완료 후, 현재 페이지를 리로드 할 수 있습니다.
+
+    'action' => array(
+        'reload' => true,
+        
+    ),

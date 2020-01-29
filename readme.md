@@ -4,7 +4,7 @@
 
 - **Author:** 이기석
 - **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
-- **Version:** 5.8.0
+- **Version:** 5.8.2
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
@@ -49,10 +49,10 @@ function users()
 ### HTTPS
 app/Providers/AppServiceProvider 에서 라우트의 경로를 https 가 되도록 지정합니다.
 ```php
-    public function boot(UrlGenerator $url)
-    {
-        $url->forceScheme('https');
-    }
+public function boot(UrlGenerator $url)
+{
+    $url->forceScheme('https');
+}
 ```
 
 asset url 에 https 주소를 사용하도록 .env 에 ASSET_URL 을 지정합니다.
@@ -65,14 +65,24 @@ filter 에서 MySQL 의 full text 검색을 지원합니다.(대용량 검색)
 
 ```php
 'filters' => array(
-        'no' => array(
-            'title' => 'Number',
-            'type' => 'fulltext_mysql'
-        ),
+    'no' => array(
+        'title' => 'Number',
+        'type' => 'fulltext_mysql'
     ),
+),
 ```
 
-### VIEW 모델 지원
+### 페이지 리로드
+액션을 성공적으로 실행한 후, 현재 페이지를 리로드하는 기능을 제공합니다.
+
+```php
+'action' => array(
+    'reload' => true
+),
+
+```
+
+### VIEW 모델 지원 (실험중)
 모델 설정에서 view 모델 여부를 설정할 수 있습니다.(아직은 실험적인 기능이며, 조회시 약간의 성능 개선이 있습니다. MySQL InnoDB)
 
 ```php

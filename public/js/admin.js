@@ -564,8 +564,9 @@
 			 * @param string	action
 			 * @param object	messages
 			 * @param string	confirmation
+			 * @param bool		reload
 			 */
-			customAction: function(isItem, action, messages, confirmation)
+			customAction: function(isItem, action, messages, confirmation, reload)
 			{
 				var self = this,
 					data = {_token: csrf, action_name: action},
@@ -628,6 +629,11 @@
 								self.downloadFile(response.download);
 
 							self.updateRows();
+
+							if(reload) {
+								page = self.viewModel.pagination.page();
+								self.viewModel.page(page);
+							}
 						}
 						else
 						{
