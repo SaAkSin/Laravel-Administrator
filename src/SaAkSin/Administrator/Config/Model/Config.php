@@ -28,6 +28,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'filters' => array(),
 		'query_filter' => null,
 		'permission' => true,
+		'before_save' => null,
 		'action_permissions' => array(
 			'create' => true,
 			'delete' => true,
@@ -64,6 +65,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'filters' => 'array',
 		'query_filter' => 'callable',
 		'permission' => 'callable',
+		'before_save' => 'callable',
 		'action_permissions' => 'array',
 		'actions' => 'array',
 		'global_actions' => 'array',
@@ -337,6 +339,12 @@ class Config extends ConfigBase implements ConfigInterface {
 		//if a string was kicked back, it's an error, so return it
 		if (is_string($validation)) return $validation;
 
+        //run the beforeSave function if provided - 추가함
+        $beforeSave = $this->runBeforeSave($data);
+
+        //if a string was kicked back, it's an error, so return it - 추가함
+        if (is_string($beforeSave)) return $beforeSave;
+
 		//save the model
 		$model->save();
 
@@ -348,6 +356,31 @@ class Config extends ConfigBase implements ConfigInterface {
 
 		return true;
 	}
+
+    /**
+     * Runs the before save method with the supplied data
+     *
+     * @param array		$data
+     *
+     * @param mixed
+     */
+    public function runBeforeSave(array &$data)
+    {
+        $beforeSave = $this->getOption('before_save');
+
+        if (is_callable($beforeSave))
+        {
+            $bs = $beforeSave($data);
+
+            //if a string is returned, assume it's an error and kick it back
+            if (is_string($bs))
+            {
+                return $bs;
+            }
+        }
+
+        return true;
+    }
 
 	/**
 	 * Prepare a model for saving given a post input array
