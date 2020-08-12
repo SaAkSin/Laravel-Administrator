@@ -11,6 +11,22 @@
 		<!-- /ko -->
 	<!-- /ko -->
 
+    <?php
+    if($config->checkOption('is_top_actions')) {?>
+        <!-- ko if: $root[$root.primaryKey]() && actions().length -->
+        <div class="custom_buttons">
+            <!-- ko foreach: actions -->
+            <!-- ko if: has_permission && $root.actionPermissions[action_name] !== false -->
+            <input type="button" data-bind="click: function(){$root.customAction(true, action_name, messages, confirmation)}, value: title,
+																	attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+        <?php
+    }
+    ?>
+
 	<!-- ko foreach: editFields -->
 		<!-- ko if: $data && ( $root[$root.primaryKey]() || editable ) && visible -->
 			<div data-bind="attr: {class: type}">
@@ -282,16 +298,21 @@
 		<!-- /ko -->
 	<!-- /ko -->
 
-	<!-- ko if: $root[$root.primaryKey]() && actions().length -->
-		<div class="custom_buttons">
-			<!-- ko foreach: actions -->
-				<!-- ko if: has_permission && $root.actionPermissions[action_name] !== false -->
-					<input type="button" data-bind="click: function(){$root.customAction(true, action_name, messages, confirmation)}, value: title,
+    <?php
+    if(!$config->checkOption('is_top_actions')) {?>
+        <!-- ko if: $root[$root.primaryKey]() && actions().length -->
+        <div class="custom_buttons">
+            <!-- ko foreach: actions -->
+            <!-- ko if: has_permission && $root.actionPermissions[action_name] !== false -->
+            <input type="button" data-bind="click: function(){$root.customAction(true, action_name, messages, confirmation)}, value: title,
 																	attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-				<!-- /ko -->
-			<!-- /ko -->
-		</div>
-	<!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+        <?php
+    }
+    ?>
 
 	<div class="control_buttons">
 		<!-- ko if: $root[$root.primaryKey]() -->

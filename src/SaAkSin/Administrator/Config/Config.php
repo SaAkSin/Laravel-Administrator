@@ -144,6 +144,25 @@ abstract class Config {
 		return $options[$key];
 	}
 
+    /**
+     * Gets a config option, Boolean 형의 옵션 값을 가져옴. 없을 경우 false 을 반환함.
+     *
+     * @param string 	$key
+     *
+     * @return mixed
+     */
+    public function checkOption($key)
+    {
+        $options = $this->getOptions();
+
+        if (!array_key_exists($key, $options))
+        {
+            return false;
+        }
+
+        return $options[$key];
+    }
+
 	/**
 	 * Sets the user options
 	 *
