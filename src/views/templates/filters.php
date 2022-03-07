@@ -18,6 +18,10 @@
 				<input type="text" data-bind="value: value, valueUpdate: 'afterkeydown', attr: {id: field_id}" />
 			<!-- /ko -->
 
+            <!-- ko if: type === 'text_quick' -->
+            <input type="text" data-bind="value: value, attr: {id: field_id}" />
+            <!-- /ko -->
+
             <!-- ko if: type === 'fulltext_mysql' -->
                 <input type="text" data-bind="value: value, valueUpdate: 'afterkeydown', attr: {id: field_id}" />
             <!-- /ko -->
