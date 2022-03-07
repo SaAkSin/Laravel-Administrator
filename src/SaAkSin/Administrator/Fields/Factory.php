@@ -18,6 +18,7 @@ class Factory {
 	protected $fieldTypes = array(
 		'key' => 'SaAkSin\\Administrator\\Fields\\Key',
 		'text' => 'SaAkSin\\Administrator\\Fields\\Text',
+        'text_quick' => 'SaAkSin\\Administrator\\Fields\\TextQuick',
 		'textarea' => 'SaAkSin\\Administrator\\Fields\\Text',
 		'wysiwyg' => 'SaAkSin\\Administrator\\Fields\\Text',
 		'markdown' => 'SaAkSin\\Administrator\\Fields\\Text',
