@@ -72,6 +72,18 @@ filter 에서 MySQL 의 full text 검색을 지원합니다.(대용량 검색)
 ),
 ```
 
+### TEXT 빠른 검색
+filter 에서 시작 단어 검색 및 포커스 아웃 이벤트 시 검색을 시작합니다.
+
+```php
+'filters' => array(
+    'no' => array(
+        'title' => 'Name',
+        'type' => 'text_quick'
+    ),
+),
+```
+
 ### 페이지 리로드
 액션을 성공적으로 실행한 후, 현재 페이지를 리로드하는 기능을 제공합니다.
 
