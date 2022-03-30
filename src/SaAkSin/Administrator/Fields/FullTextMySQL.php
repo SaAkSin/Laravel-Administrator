@@ -53,6 +53,6 @@ class FullTextMySQL extends Field
 		$query->groupBy();
 
 		// 반드시 Binding 파라미터 값을 전달하여야함.
-		$query->whereRaw('MATCH('.$this->config->getDataModel()->getTable().'.'.$this->getOption('field_name').') AGAINST(? IN BOOLEAN MODE)', ['*'.$this->getOption('value').'*']);
+		$query->whereRaw('MATCH('.$this->config->getDataModel()->getTable().'.'.$this->getOption('field_name').') AGAINST(? IN BOOLEAN MODE)', [$this->getOption('value').'*']);
 	}
 }

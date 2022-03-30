@@ -4,7 +4,7 @@
 
 - **Author:** 이기석
 - **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
-- **Version:** 5.8.3
+- **Version:** 5.8.4
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
