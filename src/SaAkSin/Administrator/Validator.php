@@ -2,8 +2,11 @@
 namespace SaAkSin\Administrator;
 
 use Illuminate\Validation\ValidationRuleParser;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
-class Validator extends \Illuminate\Validation\Validator {
+class Validator extends \Illuminate\Validation\Validator
+{
 
 	protected $overrideCustomMessages = array(
 		'string' => "The :attribute option must be a string",
@@ -85,10 +88,8 @@ class Validator extends \Illuminate\Validation\Validator {
 
 		if (isset($array[$key])) return $array[$key];
 
-		foreach (explode('.', $key) as $segment)
-		{
-			if ( ! is_array($array) or ! array_key_exists($segment, $array))
-			{
+		foreach (explode('.', $key) as $segment) {
+			if ( ! is_array($array) or ! array_key_exists($segment, $array)) {
 				return value($default);
 			}
 
@@ -109,15 +110,12 @@ class Validator extends \Illuminate\Validation\Validator {
 	public function isJoined($query, $table)
 	{
 		$tableFound = false;
-		$query = is_a($query, 'Illuminate\Database\Query\Builder') ? $query : $query->getQuery();
+		$query = is_a($query, Builder::class) ? $query : $query->getQuery();
 
-		if ($query->joins)
-		{
+		if ($query->joins) {
 			//iterate over the joins to see if the table is there
-			foreach ($query->joins as $join)
-			{
-				if ($join->table === $table)
-				{
+			foreach ($query->joins as $join) {
+				if ($join->table === $table) {
 					return true;
 				}
 			}
@@ -137,7 +135,7 @@ class Validator extends \Illuminate\Validation\Validator {
 	/**
 	 * Validates that an item is an array
 	 */
-	public function validateArray($attribute, $value)
+	public function validateArray($attribute, $value, $parameters = [])
 	{
 		return is_array($value);
 	}
@@ -149,10 +147,8 @@ class Validator extends \Illuminate\Validation\Validator {
 	{
 		$missing = 0;
 
-		foreach ($parameters as $key)
-		{
-			if (!isset($value[$key]))
-			{
+		foreach ($parameters as $key) {
+			if (!isset($value[$key])) {
 				$missing++;
 			}
 		}
@@ -197,7 +193,7 @@ class Validator extends \Illuminate\Validation\Validator {
 	 */
 	public function validateEloquent($attribute, $value, $parameters)
 	{
-		return class_exists($value) && is_a(new $value, 'Illuminate\Database\Eloquent\Model');
+		return class_exists($value) && is_a(new $value, Model::class);
 	}
 
 }
