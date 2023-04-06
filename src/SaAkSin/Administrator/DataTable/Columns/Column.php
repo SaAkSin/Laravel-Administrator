@@ -246,7 +246,7 @@ class Column
 			return $output($value, $item);
 		}
 		
-		return str_replace('(:value)', $value, $output);
+		return str_replace('(:value)', $value ?: '', $output);
 	}
 
 	/**
