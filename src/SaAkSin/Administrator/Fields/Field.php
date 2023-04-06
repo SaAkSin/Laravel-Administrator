@@ -6,7 +6,8 @@ use SaAkSin\Administrator\Config\ConfigInterface;
 use Illuminate\Database\DatabaseManager as DB;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
-abstract class Field {
+abstract class Field
+{
 
 	/**
 	 * The validator instance
@@ -116,16 +117,14 @@ abstract class Field {
 		//run the visible property closure if supplied
 		$visible = $this->validator->arrayGet($options, 'visible');
 
-		if (is_callable($visible))
-		{
+		if (is_callable($visible)) {
 			$options['visible'] = $visible($this->config->getDataModel()) ? true : false;
 		}
 
 		//run the editable property's closure if supplied
 		$editable = $this->validator->arrayGet($options, 'editable');
 
-		if (isset($editable) && is_callable($editable))
-		{
+		if (isset($editable) && is_callable($editable)) {
 			$options['editable'] = $editable($this->config->getDataModel());
 		}
 
@@ -143,8 +142,7 @@ abstract class Field {
 		$this->validator->override($this->suppliedOptions, $this->getRules());
 
 		//if the validator failed, throw an exception
-		if ($this->validator->fails())
-		{
+		if ($this->validator->fails()) {
 			throw new \InvalidArgumentException("There are problems with your '" . $this->suppliedOptions['field_name'] . "' field in the " .
 									$this->config->getOption('name') . " config: " .	implode('. ', $this->validator->messages()->all()));
 		}
@@ -200,15 +198,12 @@ abstract class Field {
 		$model = $this->config->getDataModel();
 
 		//if this field has a min/max range, set it
-		if ($this->getOption('min_max'))
-		{
-			if ($minValue = $this->getOption('min_value'))
-			{
+		if ($this->getOption('min_max')) {
+			if ($minValue = $this->getOption('min_value')) {
 				$query->where($model->getTable().'.'.$this->getOption('field_name'), '>=', $minValue);
 			}
 
-			if ($maxValue = $this->getOption('max_value'))
-			{
+			if ($maxValue = $this->getOption('max_value')) {
 				$query->where($model->getTable().'.'.$this->getOption('field_name'), '<=', $maxValue);
 			}
 		}
@@ -223,12 +218,9 @@ abstract class Field {
 	 */
 	public function getFilterValue($value)
 	{
-		if (($value!==0 && $value!=='0' && empty($value)) || (is_string($value) && trim($value) === ''))
-		{
+		if (($value!==0 && $value!=='0' && empty($value)) || (is_string($value) && trim($value) === '')) {
 			return false;
-		}
-		else
-		{
+		} else {
 			return $value;
 		}
 	}
@@ -240,8 +232,7 @@ abstract class Field {
 	 */
 	public function getOptions()
 	{
-		if (empty($this->userOptions))
-		{
+		if (empty($this->userOptions)) {
 			//validate the options and then merge them into the defaults
 			$this->build();
 			$this->validateOptions();
@@ -258,14 +249,16 @@ abstract class Field {
 	 *
 	 * @return mixed
 	 */
-	public function getOption($key)
+	public function getOption($key, $default = null)
 	{
 		$options = $this->getOptions();
 
-		if (!array_key_exists($key, $options))
-		{
-			throw new \InvalidArgumentException("An invalid option '$key' was searched for in the '" . $this->userOptions['field_name'] . "' field");
-		}
+        if (!array_key_exists($key, $options)) {
+            if ($default !== null) {
+                return $default;
+            }
+            throw new \InvalidArgumentException("An invalid option '$key' was searched for in the '" . $options['field_name'] . "' field");
+        }
 
 		return $options[$key];
 	}
