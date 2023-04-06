@@ -14,7 +14,8 @@ use Illuminate\Support\Arr;
 /**
  * Handles all requests related to managing the data models
  */
-class AdminController extends Controller {
+class AdminController extends Controller
+{
 
 	/**
 	 * @var \Illuminate\Http\Request
@@ -597,7 +598,9 @@ class AdminController extends Controller {
 			$fieldFactory = app('admin_field_factory');
 		} catch (\ReflectionException $e) {
 			return null;
-		}
+		} catch (BindingResolutionException $e) {
+            return null;
+        }
 		if (array_key_exists('form_request', $config->getOptions())) {
 			try {
 				$model = $config->getFilledDataModel($request, $fieldFactory->getEditFields(), $request->id);
@@ -613,7 +616,7 @@ class AdminController extends Controller {
 					return $errorMessages;
 				}
 				if ($errorsArray) {
-					return implode(".", array_dot($errorsArray));
+					return implode(".", Arr::dot($errorsArray));
 				}
 			}
 		}
