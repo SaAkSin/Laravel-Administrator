@@ -288,6 +288,18 @@ class DataTable {
 		//grab the model instance
 		$model = $this->config->getDataModel();
 
+        // 속도 개선을 위하여 수정
+        if(count($queryBindings) > 0) {
+            $sql = "SELECT COUNT({$model->getKeyName()}) AS aggregate FROM ({$querySql}) AS agg";
+        }else {
+            // deleted_at is null 등이 있음
+            if(strpos($querySql, 'where') > 0) {
+                $sql = "SELECT COUNT({$model->getKeyName()}) AS aggregate FROM ({$querySql}) AS agg";
+            }else {
+                $sql = "SELECT COUNT({$model->getKeyName()}) AS aggregate FROM {$model->getTable()} AS agg";
+            }
+        }
+
 		//then wrap the inner table and perform the count
 		$sql = "SELECT COUNT({$model->getKeyName()}) AS aggregate FROM ({$querySql}) AS agg";
 
