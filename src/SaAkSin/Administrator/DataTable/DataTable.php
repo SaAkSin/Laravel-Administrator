@@ -300,9 +300,6 @@ class DataTable {
             }
         }
 
-		//then wrap the inner table and perform the count
-		$sql = "SELECT COUNT({$model->getKeyName()}) AS aggregate FROM ({$querySql}) AS agg";
-
 		//then perform the count query
 		$results = $countQuery->getConnection()->select($sql, $queryBindings);
 		$numRows = is_array($results[0]) ? $results[0]['aggregate'] : $results[0]->aggregate;
