@@ -21,7 +21,7 @@ return array(
 	 *
 	 *  @type array
 	 */
-	'middleware' => array(),
+	'middleware' => array('web', 'auth'),
 
 	/**
 	 * Page title
@@ -75,7 +75,7 @@ return array(
 	 */
 	'permission'=> function()
 	{
-		return Auth::check();
+		return auth()->check();
 	},
 
 	/**

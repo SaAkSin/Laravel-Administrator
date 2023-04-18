@@ -4,7 +4,7 @@
 
 - **Author:** 이기석
 - **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
-- **Version:** 5.8.4
+- **Version:** 10.0.0
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
@@ -27,8 +27,7 @@ Once it's installed, you can register the service provider in `config/app.php` i
 ]
 ```
 
-Then publish Administrator's assets with `php artisan vendor:publish`. This will add the file `config/administrator.php`. This [config file](http://administrator.frozennode.com/docs/configuration) is the primary way you interact with Administrator. This command will also publish all of the assets, views, and translation files.
-설정 파일은 config 디렉토리 하위가 아닌, 프로젝트 루트 디렉토리에서 administrator, administrator/settings 에 위치합니다.
+이 후, `php artisan vendor:publish` 을 실행합니다. `config/administrator.php` [설정파일](https://github.com/SaAkSin/Laravel-Administrator/blob/dev-10/docs/configuration.md)이 추가 되고, public 디렉토리에 관련 에셋, 뷰, 언어 파일 등이 복사됩니다. 설정 파일들은 config 디렉토리 하위가 아닌, 프로젝트 루트 디렉토리에서 administrator, administrator/settings 에 위치합니다.
 
 ### 설정파일
 설정파일명과 동일한 함수명으로 시작합니다. 가령, 설정 파일이 users.php 이라면, 반드시 users 함수를 통하여 설정(배열)을 반환합니다.(세션 등과 연계하여 조건에 따른 배열 결과를 반환할 수 있음)
@@ -120,6 +119,9 @@ Administrator is released under the MIT License. See the LICENSE file for detail
 
 
 ## Recent Changelog
+
+### 10.0.0
+- 라라벨 10.0.0 지원
 
 ### 5.8.0
 - 라라벨 5.8.0 지원

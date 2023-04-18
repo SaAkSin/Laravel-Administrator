@@ -293,7 +293,7 @@ class AdminController extends Controller
 			$response = array('success' => true, 'data' => $model->toArray());
 
 			//if it's a download response, flash the response to the session and return the download link
-			if (is_a($result, \Symfony\Component\HttpFoundation\BinaryFileResponse::class)) {
+			if (is_a($result, BinaryFileResponse::class)) {
 				$file = $result->getFile()->getRealPath();
 				$headers = $result->headers->all();
 				$this->session->put('administrator_download_response', array('file' => $file, 'headers' => $headers));
@@ -378,11 +378,11 @@ class AdminController extends Controller
 		foreach ($this->request->input('fields', array()) as $field)
 		{
 			//get the constraints, the search term, and the currently-selected items
-			$constraints = array_get($field, 'constraints', array());
-			$term = array_get($field, 'term', array());
-			$type = array_get($field, 'type', false);
-			$fieldName = array_get($field, 'field', false);
-			$selectedItems = array_get($field, 'selectedItems', false);
+			$constraints = Arr::get($field, 'constraints', array());
+			$term = Arr::get($field, 'term', array());
+			$type = Arr::get($field, 'type', false);
+			$fieldName = Arr::get($field, 'field', false);
+			$selectedItems = Arr::get($field, 'selectedItems', false);
 
 			$response[$fieldName] = $fieldFactory->updateRelationshipOptions($fieldName, $type, $constraints, $selectedItems, $term);
 		}
