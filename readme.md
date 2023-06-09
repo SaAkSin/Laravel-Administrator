@@ -45,6 +45,16 @@ function users()
 }
 ```
 
+### 사용자 정의 js 파일 지정
+config/administrator.php 에 custom_js 항목 추가
+
+```php
+'custom_js' => array(
+    'js/custom.js'
+)
+```
+
+
 ### HTTPS
 app/Providers/AppServiceProvider 에서 라우트의 경로를 https 가 되도록 지정합니다.
 ```php
