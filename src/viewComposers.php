@@ -132,4 +132,8 @@ View::composer(array('administrator::layouts.default'), function($view)
 	}
 
 	$view->js += array('page' => asset('packages/saaksin/administrator/js/page.js'));
+
+    // 사용자 정의 js 추가
+    $customs = config('administrator.custom_js');
+    if ($customs) $view->js += $customs;
 });

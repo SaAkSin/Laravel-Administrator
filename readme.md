@@ -4,21 +4,21 @@
 
 - **Author:** 이기석
 - **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
-- **Version:** 5.8.4
+- **Version:** 10.0.0
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/overview.jpg" />
+<img src="https://raw.github.com/SaAkSin/Laravel-Administrator/master/examples/images/overview.jpg" />
 
 ## Composer
 
-To install Administrator as a Composer package to be used with Laravel 5, simply run:
+라라벨 10 에서 composer 를 사용하여 쉽게 설치할 수 있습니다.
 
 ```sh
-composer require "saaksin/laravel-administrator: v5.8.*"
+composer require "saaksin/laravel-administrator: 10.0.*"
 ```
 
-Once it's installed, you can register the service provider in `config/app.php` in the `providers` array:
+설치 후, `config/app.php` 의 `providers` 배열에 서비스 프로파이더를 등록합니다.
 
 ```php
 'providers' => [
@@ -27,8 +27,7 @@ Once it's installed, you can register the service provider in `config/app.php` i
 ]
 ```
 
-Then publish Administrator's assets with `php artisan vendor:publish`. This will add the file `config/administrator.php`. This [config file](http://administrator.frozennode.com/docs/configuration) is the primary way you interact with Administrator. This command will also publish all of the assets, views, and translation files.
-설정 파일은 config 디렉토리 하위가 아닌, 프로젝트 루트 디렉토리에서 administrator, administrator/settings 에 위치합니다.
+이 후, `php artisan vendor:publish` 을 실행합니다. `config/administrator.php` [설정파일](https://github.com/SaAkSin/Laravel-Administrator/blob/dev-10/docs/configuration.md)이 추가 되고, public 디렉토리에 관련 에셋, 뷰, 언어 파일 등이 복사됩니다. 설정 파일들은 config 디렉토리 하위가 아닌, 프로젝트 루트 디렉토리에서 administrator, administrator/settings 에 위치합니다.
 
 ### 설정파일
 설정파일명과 동일한 함수명으로 시작합니다. 가령, 설정 파일이 users.php 이라면, 반드시 users 함수를 통하여 설정(배열)을 반환합니다.(세션 등과 연계하여 조건에 따른 배열 결과를 반환할 수 있음)
@@ -45,6 +44,16 @@ function users()
     );
 }
 ```
+
+### 사용자 정의 js 파일 지정
+config/administrator.php 에 custom_js 항목 추가
+
+```php
+'custom_js' => array(
+    'custom' => asset('js/custom.js'),
+)
+```
+
 
 ### HTTPS
 app/Providers/AppServiceProvider 에서 라우트의 경로를 https 가 되도록 지정합니다.
@@ -120,6 +129,9 @@ Administrator is released under the MIT License. See the LICENSE file for detail
 
 
 ## Recent Changelog
+
+### 10.0.0
+- 라라벨 10.0.0 지원
 
 ### 5.8.0
 - 라라벨 5.8.0 지원
