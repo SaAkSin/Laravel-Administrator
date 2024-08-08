@@ -8,17 +8,17 @@
 
 [![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/overview.jpg" />
+<img src="https://raw.github.com/SaAkSin/Laravel-Administrator/master/examples/images/overview.jpg" />
 
 ## Composer
 
-To install Administrator as a Composer package to be used with Laravel 5, simply run:
+라라벨 10 에서 composer 를 사용하여 쉽게 설치할 수 있습니다.
 
 ```sh
-composer require "saaksin/laravel-administrator: v5.8.*"
+composer require "saaksin/laravel-administrator: 10.0.*"
 ```
 
-Once it's installed, you can register the service provider in `config/app.php` in the `providers` array:
+설치 후, `config/app.php` 의 `providers` 배열에 서비스 프로파이더를 등록합니다.
 
 ```php
 'providers' => [
@@ -50,7 +50,7 @@ config/administrator.php 에 custom_js 항목 추가
 
 ```php
 'custom_js' => array(
-    'js/custom.js'
+    'custom' => asset('js/custom.js'),
 )
 ```
 
