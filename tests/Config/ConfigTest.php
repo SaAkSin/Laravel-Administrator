@@ -30,7 +30,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Config', array($this->validator, $this->validator, array('name' => 'model_name')))->makePartial();
@@ -39,7 +39,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -51,11 +51,10 @@ class ConfigTest extends \PHPUnit\Framework\TestCase {
 		$this->config->validateOptions();
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testValidateFails()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->validator->shouldReceive('override')->once()
 						->shouldReceive('fails')->once()->andReturn(true)
 						->shouldReceive('messages')->once()->andReturn(m::mock(array('all' => array())));
@@ -80,11 +79,10 @@ class ConfigTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($this->config->getOption('name'), 'model_name');
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testGetOptionThrowsException()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->config->shouldReceive('getOptions')->once()->andReturn(array('name' => 'model_name'));
 		$this->config->getOption('foo');
 	}

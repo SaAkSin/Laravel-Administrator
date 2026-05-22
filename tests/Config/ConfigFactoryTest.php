@@ -25,7 +25,7 @@ class ConfigFactoryTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->validator->shouldReceive('override')->once()
@@ -35,7 +35,7 @@ class ConfigFactoryTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -48,11 +48,10 @@ class ConfigFactoryTest extends \PHPUnit\Framework\TestCase {
 		$factory = new Factory($this->validator, $this->validator, array());
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testValidationErrorThrowsException()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->validator->shouldReceive('fails')->once()->andReturn(true)
 						->shouldReceive('messages')->once()->andReturn(m::mock(array('all' => array())));
 
@@ -136,9 +135,9 @@ class ConfigFactoryTest extends \PHPUnit\Framework\TestCase {
 
 	public function testFetchConfigWorks()
 	{
-		$name = 'some_model';
+		$name = 'test_fetch_config_works_unique_model';
 		$filename = __DIR__ . '/' . $name . '.php';
-		file_put_contents($filename, "<?php return array();");
+		file_put_contents($filename, "<?php function test_fetch_config_works_unique_model() { return array(); }");
 		$factory = m::mock('SaAkSin\Administrator\Config\Factory[getPath,getPrefix]', array($this->validator, $this->validator, array()));
 		$factory->shouldReceive('getPath')->once()->andReturn(__DIR__ . '/')
 				->shouldReceive('getPrefix')->once()->andReturn('');
@@ -148,7 +147,7 @@ class ConfigFactoryTest extends \PHPUnit\Framework\TestCase {
 
 	public function testFetchConfigFails()
 	{
-		$name = 'some_model';
+		$name = 'non_existent_unique_model';
 		$factory = m::mock('SaAkSin\Administrator\Config\Factory[getPath,getPrefix]', array($this->validator, $this->validator, array()));
 		$factory->shouldReceive('getPath')->once()->andReturn(__DIR__ . '/')
 				->shouldReceive('getPrefix')->once()->andReturn('');

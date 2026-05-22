@@ -36,7 +36,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -50,14 +50,14 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
 
 	public function testFilterQuery()
 	{
-		$relationship = m::mock(array('getPlainForeignKey' => '', 'getQualifiedParentKeyName' => 'table.column', 'getRelated' => m::mock(array('getTable' => 'table'))));
+		$relationship = m::mock(array('getPlainForeignKey' => '', 'getForeignKeyName' => '', 'getQualifiedParentKeyName' => 'table.column', 'getRelated' => m::mock(array('getTable' => 'table'))));
 		$model = m::mock(array('getTable' => 'table', 'getKeyName' => '', 'method' => $relationship));
 		$grammar = m::mock('Illuminate\Database\Query\Grammars');
 		$grammar->shouldReceive('wrap')->once()->andReturn('');

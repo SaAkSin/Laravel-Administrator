@@ -1,0 +1,1 @@
+<?php function some_model() { return array(); }

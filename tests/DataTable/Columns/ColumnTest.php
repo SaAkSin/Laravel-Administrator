@@ -36,7 +36,7 @@ class ColumnTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -50,7 +50,7 @@ class ColumnTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -63,11 +63,10 @@ class ColumnTest extends \PHPUnit\Framework\TestCase {
 		$this->column->validateOptions();
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testValidateFails()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->column->shouldReceive('getRules')->once()->andReturn(array());
 		$this->validator->shouldReceive('override')->once()
 						->shouldReceive('fails')->once()->andReturn(true)
@@ -120,11 +119,10 @@ class ColumnTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($this->column->getOption('foo'), 'bar');
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testGetOptionFails()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->column->shouldReceive('getOptions')->once()->andReturn(array('column_name' => 'bar'));
 		$this->column->getOption('foo');
 	}

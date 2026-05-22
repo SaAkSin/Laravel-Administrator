@@ -53,7 +53,7 @@ class BelongsToManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -66,7 +66,7 @@ class BelongsToManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -74,7 +74,7 @@ class BelongsToManyTest extends \PHPUnit\Framework\TestCase {
 	public function testBuild()
 	{
 		$relatedModel = m::mock(array('getKeyName' => 'id', 'getTable' => 'other_table'));
-		$relationship = m::mock(array('getRelated' => $relatedModel, 'getForeignKey' => 'some_id', 'getOtherKey' => 'some_other_id',
+		$relationship = m::mock(array('getRelated' => $relatedModel, 'getQualifiedForeignPivotKeyName' => 'some_id', 'getQualifiedRelatedPivotKeyName' => 'some_other_id',
 										'getTable' => 'table'));
 		$model = m::mock(array('field' => $relationship, 'getTable' => 'table'));
 		$this->config->shouldReceive('getDataModel')->twice()->andReturn($model);

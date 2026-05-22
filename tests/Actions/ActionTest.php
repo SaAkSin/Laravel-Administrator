@@ -29,7 +29,7 @@ class ActionTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -41,7 +41,7 @@ class ActionTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -53,11 +53,10 @@ class ActionTest extends \PHPUnit\Framework\TestCase {
 		$this->action->validateOptions();
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testValidateFails()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->validator->shouldReceive('override')->once()
 						->shouldReceive('fails')->once()->andReturn(true)
 						->shouldReceive('messages')->once()->andReturn(m::mock(array('all' => array())));
@@ -129,11 +128,10 @@ class ActionTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($this->action->getOption('foo'), 'bar');
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testGetOptionFails()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->action->shouldReceive('getOptions')->once()->andReturn(array('action_name' => 'bar'));
 		$this->action->getOption('foo');
 	}

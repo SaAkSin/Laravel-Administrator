@@ -60,7 +60,7 @@ class BelongsToTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -74,7 +74,7 @@ class BelongsToTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -124,11 +124,10 @@ class BelongsToTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals(sizeof($nested['models']), 4);
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testGetNestedRelationshipsFails()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$name = 'nope';
 		$stub = new BelongsToStub;
 		$this->config->shouldReceive('getDataModel')->once()->andReturn($stub)
@@ -140,7 +139,7 @@ class BelongsToTest extends \PHPUnit\Framework\TestCase {
 	public function testGetIncludedColumn()
 	{
 		$this->config->shouldReceive('getDataModel')->once()->andReturn(m::mock(array('getTable' => 'table')));
-		$nested = array('pieces' => array('foo'), 'models' => array(m::mock(array('foo' => m::mock(array('getForeignKey' => 'fk'))))));
+		$nested = array('pieces' => array('foo'), 'models' => array(m::mock(array('foo' => m::mock(array('getForeignKey' => 'fk', 'getForeignKeyName' => 'fk'))))));
 		$this->column->shouldReceive('getOption')->once()->andReturn($nested);
 		$this->assertEquals($this->column->getIncludedColumn(), array('fk' => 'table.fk'));
 	}
