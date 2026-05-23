@@ -49,6 +49,9 @@ const applyCKEditorConfig = () => {
             config.filebrowserUploadUrl = '/laravel-filemanager/upload?type=Files&_token=' + token;
             
             config.extraPlugins = 'justify,font,colorbutton';
+
+            // 비보안 경고 팝업 배너 비활성화
+            config.versionCheck = false;
         };
     }
 };
