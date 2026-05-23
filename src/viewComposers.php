@@ -130,7 +130,7 @@ View::composer(array('administrator::layouts.default'), function($view)
 
 		// 2. 필수 독립형 바닐라 라이브러리 등록 (jQuery 무관)
 		$view->js += array(
-			'ckeditor' => asset('packages/saaksin/administrator/js/ckeditor/ckeditor.js'),
+			'ckeditor' => 'https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js',
 			'markdown' => asset('packages/saaksin/administrator/js/markdown.js'),
 			'accounting' => asset('packages/saaksin/administrator/js/accounting.js'),
 			'history' => asset('packages/saaksin/administrator/js/history/native.history.js'),

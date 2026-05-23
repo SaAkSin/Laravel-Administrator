@@ -110,11 +110,11 @@
 					<template x-if="field.editable">
 						<div class="markdown_container">
 							<textarea :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" :style="{ height: (field.height || 180) + 'px' }"></textarea>
-							<div class="preview prose dark:prose-invert prose-sm" x-html="window.marked ? marked.parse($root[field.field_name] || '') : ($root[field.field_name] || '')"></div>
+							<div class="preview prose dark:prose-invert prose-sm" x-html="window.markdown ? markdown.toHTML($root[field.field_name] || '') : ($root[field.field_name] || '')"></div>
 						</div>
 					</template>
 					<template x-if="!field.editable">
-						<div class="uneditable prose dark:prose-invert prose-sm" x-html="window.marked ? marked.parse($root[field.field_name] || '') : ($root[field.field_name] || '')"></div>
+						<div class="uneditable prose dark:prose-invert prose-sm" x-html="window.markdown ? markdown.toHTML($root[field.field_name] || '') : ($root[field.field_name] || '')"></div>
 					</template>
 				</div>
 			</template>
