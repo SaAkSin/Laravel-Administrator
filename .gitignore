@@ -10,4 +10,4 @@ nbproject
 .phpunit.result.cache
 /examples
 /node_modules/
-/public/dist/
+/public
