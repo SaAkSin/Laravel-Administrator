@@ -119,6 +119,8 @@
 
 <!-- 상세 조작 및 서랍 컨테이너 (오리지널 레이아웃 100% 보존) -->
 <div class="item_edit_container" 
+	 x-show="initialized && (activeItem !== null || loadingItem)"
+	 style="display: none;"
 	 :class="{ active: activeItem !== null || loadingItem }"
 	 :style="{ 
 	 	width: expandWidth + 'px', 
