@@ -46,14 +46,7 @@
 	<div class="page_container">
 		<div class="per_page">
 			<select x-model="rowsPerPage"
-					style="width: 60px; font-size: 11px; padding: 2px;"
-					x-init="
-						$nextTick(() => {
-							jQuery($el).select2({minimumResultsForSearch: -1}).on('change', function() {
-								rowsPerPage = parseInt(jQuery($el).val());
-							});
-						});
-					">
+					style="width: 60px; font-size: 11px; padding: 2px; border: 1px solid #ccc; border-radius: 3px; background-color: #fff;">
 				<template x-for="option in rowsPerPageOptions" :key="option.id">
 					<option :value="option.id" x-text="option.text" :selected="option.id == rowsPerPage"></option>
 				</template>

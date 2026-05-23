@@ -168,12 +168,12 @@ function adminController() {
         historyStarted: false,
         showFilters: true,
 
-        // 계산된 속성 (Getters)
+        // 계산된 속성 (Getters - 타입 불일치 방지를 위해 정수 변환 비교)
         get isFirstPage() {
-            return this.pagination.page === 1;
+            return parseInt(this.pagination.page) === 1;
         },
         get isLastPage() {
-            return this.pagination.page === this.pagination.last;
+            return parseInt(this.pagination.page) === parseInt(this.pagination.last);
         },
 
         /**
@@ -879,9 +879,9 @@ function adminController() {
                     return;
                 }
 
-                this.pagination.page = response.last ? response.page : response.last;
-                this.pagination.last = response.last;
-                this.pagination.total = response.total;
+                this.pagination.page = parseInt(response.last ? response.page : response.last) || 1;
+                this.pagination.last = parseInt(response.last) || 1;
+                this.pagination.total = parseInt(response.total) || 0;
                 this.rows = response.results || [];
                 this.loadingRows = false;
             } catch (error) {
@@ -946,7 +946,7 @@ function adminController() {
                 }
             }
 
-            this.pagination.page = newPage;
+            this.pagination.page = parseInt(newPage);
             this.updateRows();
         },
 
