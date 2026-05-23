@@ -10,7 +10,7 @@
  * 특유의 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 현대적으로 재해석하여 완벽히 복원합니다.
  */
 
-/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트 프리미엄 현대화) */
+/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트 프리미엄 현대화 및 30px 보정) */
 input[type="text"],
 input[type="password"],
 input[type="date"],
@@ -19,8 +19,8 @@ input[type="datetime-local"],
 select {
     border: 1px solid #d1d5db !important;
     border-radius: 6px !important;
-    padding: 8px 12px !important;
-    height: 34px !important; /* 고정 높이 34px를 강제 부여하여 기존 18px 찌그러짐 버그를 해결합니다. */
+    padding: 6px 10px !important;
+    height: 30px !important; /* 높이를 시각적으로 더욱 콤팩트하고 단정한 30px로 낮춥니다. */
     font-size: 12px !important;
     color: #1f2937 !important;
     background-color: #ffffff !important;
@@ -32,7 +32,7 @@ select {
 textarea {
     border: 1px solid #d1d5db !important;
     border-radius: 6px !important;
-    padding: 8px 12px !important;
+    padding: 6px 10px !important;
     font-size: 12px !important;
     color: #1f2937 !important;
     background-color: #ffffff !important;
@@ -53,14 +53,16 @@ textarea:focus {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important; /* 부드러운 포커스 링 장착 */
 }
 
-/* 수정 불가능한 비활성화 상태 표현 (깔끔한 연그레이 플랫 디자인) */
+/* 수정 불가능한 비활성화 상태 표현 (배경을 부모 배경색과 일치하는 투명으로 변경하고 보더 제거) */
 .uneditable {
-    background-color: #f9fafb !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 6px !important;
-    padding: 8px 12px !important;
-    color: #4b5563 !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 6px 0 !important;
+    color: #374151 !important;
     font-size: 12px !important;
+    font-weight: 550 !important;
     box-sizing: border-box !important;
     display: inline-block !important;
     width: 100% !important;

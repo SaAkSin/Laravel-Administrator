@@ -428,7 +428,7 @@
 					</template>
 
 					<template x-if="!field.editable">
-						<div class="uneditable" style="padding: 6px 10px; background: #f3f4f6; border-radius: 4px; color: #6b7280;" x-text="selectedItems.map(item => item.text).join(', ') || '-'"></div>
+						<div class="uneditable" x-text="selectedItems.map(item => item.text).join(', ') || '-'"></div>
 					</template>
 				</div>
 			</template>
