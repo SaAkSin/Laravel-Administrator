@@ -52,12 +52,16 @@ class Boolean extends Field {
 	{
 		parent::setFilter($filter);
 
-		$this->userOptions['value'] = $this->validator->arrayGet($filter, 'value', '');
+		$value = $this->validator->arrayGet($filter, 'value', '');
 
-		//if it isn't null, we have to check the 'true'/'false' string
-		if ($this->userOptions['value'] !== '')
+		// null 이거나 빈 문자열인 경우, 필터 미선정 상태로 공백 유지
+		if ($value === null || $value === '')
 		{
-			$this->userOptions['value'] = $this->userOptions['value'] === 'false' || !$this->userOptions['value'] ? 0 : 1;
+			$this->userOptions['value'] = '';
+		}
+		else
+		{
+			$this->userOptions['value'] = $value === 'false' || !$value ? 0 : 1;
 		}
 	}
 
