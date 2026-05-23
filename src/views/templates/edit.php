@@ -124,7 +124,7 @@
 					 "
 					 class="quill-wrapper"
 					 style="margin-top: 6px;">
-					<div class="quill-editor-container" :id="field.field_id" style="min-height: 150px; background: #fff; border: 1px solid #ccc; border-radius: 4px; color: #333;"></div>
+					<div class="quill-editor-container" :id="field.field_id" style="min-height: 150px; background: #fff; color: #333;"></div>
 				</div>
 			</template>
 
@@ -366,28 +366,37 @@
 							<template x-if="['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0">
 								<div class="selected-badges" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
 									<template x-for="item in selectedItems" :key="item.id">
-										<span class="badge-item" style="display: inline-flex; align-items: center; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-size: 12px; gap: 4px;">
+										<span class="badge-item">
 											<span x-text="item.text"></span>
-											<button type="button" @click="removeItem(item)" style="background: none; border: none; color: #4338ca; cursor: pointer; font-weight: bold; font-size: 11px;">×</button>
+											<button type="button" @click="removeItem(item)">×</button>
 										</span>
 									</template>
 								</div>
 							</template>
 
-							<!-- 2) 단일/다중 통합 콤보박스 입력 컨트롤러 -->
-							<div class="combobox-trigger-container" style="position: relative; display: flex; align-items: center; width: 100%;">
+							<!-- 2) 단일/다중 통합 콤보박스 입력 컨트롤러 (display: flex 제거로 아이콘 이탈 해결) -->
+							<div class="combobox-trigger-container" style="position: relative; width: 100%;">
 								<input type="text" 
 									   placeholder="-- 검색 또는 선택 --"
 									   x-model="search"
 									   @focus="open = true"
 									   @click.away="setTimeout(() => open = false, 200)"
 									   @input="if (field.autocomplete) fetchAutocomplete()"
-									   style="width: 100%; padding: 8px 30px 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 12px; color: #1f2937;"
+									   class="relation-combobox-input"
 									   :value="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && !search ? selectedItems[0].text : search" />
 								
-								<!-- 로딩 인디케이터 및 트리거 화살표 -->
-								<div class="icons" style="position: absolute; right: 10px; display: flex; align-items: center; gap: 4px; pointer-events: none;">
+								<!-- 로딩 인디케이터, 돋보기 검색, 및 트리거 화살표 (우측 끝 정렬) -->
+								<div class="icons" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 6px; pointer-events: none;">
 									<div class="spinner" x-show="loading" style="width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.6s linear infinite; pointer-events: auto;"></div>
+									<!-- 미려한 돋보기(검색) SVG 아이콘 탑재 -->
+									<svg xmlns="http://www.w3.org/2000/svg" 
+										 class="search-icon" 
+										 fill="none" 
+										 viewBox="0 0 24 24" 
+										 stroke="currentColor"
+										 style="width: 13px; height: 13px; color: #9ca3af;">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+									</svg>
 									<!-- 미려한 회전식 Chevron Down SVG 아이콘 탑재 -->
 									<svg xmlns="http://www.w3.org/2000/svg" 
 										 class="chevron-icon" 
@@ -396,29 +405,27 @@
 										 fill="none" 
 										 viewBox="0 0 24 24" 
 										 stroke="currentColor"
-										 style="width: 14px; height: 14px; color: #9ca3af; cursor: pointer; transition: transform 0.2s ease; pointer-events: auto;">
+										 style="width: 13px; height: 13px; color: #9ca3af; cursor: pointer; transition: transform 0.2s ease; pointer-events: auto;">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 									</svg>
 								</div>
 							</div>
-
+ 
 							<!-- 3) 모던 드롭다운 옵션 보드 -->
 							<div class="combobox-dropdown" 
 								 x-show="open" 
-								 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; margin-top: 2px; box-sizing: border-box;">
+								 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; margin-top: 6px; box-sizing: border-box;">
 								
 								<div class="options-list">
 									<!-- 검색 결과 없음 표출 -->
 									<template x-if="filteredOptions.length === 0 && !loading">
-										<div style="padding: 8px; color: #9ca3af; font-size: 13px; text-align: center;">검색 결과가 없습니다.</div>
+										<div style="padding: 10px 14px; color: #9ca3af; font-size: 12px; text-align: center;">검색 결과가 없습니다.</div>
 									</template>
 									
 									<template x-for="opt in filteredOptions" :key="opt.id">
 										<div @click="selectItem(opt)" 
-											 style="padding: 8px 12px; cursor: pointer; font-size: 13px; transition: background 0.1s;"
-											 :style="selectedItems.some(item => String(item.id) === String(opt.id)) ? 'background: #f3f4f6; font-weight: bold; color: #4f46e5;' : 'color: #374151;'"
-											 @mouseenter="$el.style.background = '#e0f2fe'"
-											 @mouseleave="$el.style.background = selectedItems.some(item => String(item.id) === String(opt.id)) ? '#f3f4f6' : 'transparent'"
+											 class="combobox-option-item"
+											 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)) }"
 											 x-text="opt.text || opt.name">
 										</div>
 									</template>

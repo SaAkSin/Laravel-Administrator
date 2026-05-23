@@ -8,10 +8,6 @@ nbproject
 .idea
 .antigravitycli
 .phpunit.result.cache
-/examples/demo/node_modules/
-/examples/demo/vendor/
-/examples/demo/.env
-/examples/demo/bootstrap/cache/
-/examples/demo/storage/
+/examples
 /node_modules/
 /public/dist/

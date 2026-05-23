@@ -118,9 +118,8 @@ View::composer(array('administrator::layouts.default'), function($view)
 
 	if (!$view->page && !$view->dashboard)
 	{
-		// 1. Vite 컴파일 현대화 에셋 등록 (Alpine.js 및 Tailwind CSS) 및 핵심 레이아웃 main.css 로드
+		// 1. Vite 컴파일 현대화 에셋 등록 (Alpine.js 및 Tailwind CSS) 및 select2 스타일시트 로드
 		$view->css += array(
-			'main' => asset('packages/saaksin/administrator/css/main.css'),
 			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.css',
 		);
 		$view->js += array(
