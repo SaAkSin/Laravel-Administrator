@@ -1,4 +1,202 @@
 /* Tailwind CSS의 기본 지시어들을 로드하여 유틸리티 클래스 빌드를 활성화합니다. */
-/* @tailwind base; -> 오리지널 CSS 버튼/인풋 디자인 훼손을 방지하기 위해 base 리셋을 전격 비활성화합니다. */
 @tailwind components;
 @tailwind utilities;
+
+/* 
+ * =========================================================================
+ * 🌿 Zero-jQuery 모던 어드민: 클래식 jQuery UI 실버/연그레이 테마 CSS 복원 명세서
+ * =========================================================================
+ * 제이쿼리 의존성 없이 순수 CSS3를 사용하여, 과거 jQuery UI가 입혀주던 
+ * 특유의 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 현대적으로 재해석하여 완벽히 복원합니다.
+ */
+
+/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트, 텍스트에리어) */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select,
+textarea {
+    border: 1px solid #cccccc !important;
+    border-radius: 4px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    color: #333333 !important;
+    background-color: #ffffff !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06) !important;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+    box-sizing: border-box !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #999999 !important;
+    outline: 0 !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06), 0 0 5px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* 수정 불가능한 비활성화 상태 표현 */
+.uneditable {
+    background-color: #f5f5f5 !important;
+    border: 1px solid #dddddd !important;
+    border-radius: 4px !important;
+    padding: 6px 10px !important;
+    color: #666666 !important;
+    font-size: 12px !important;
+    box-sizing: border-box !important;
+    display: inline-block !important;
+    width: 100% !important;
+}
+
+/* 2. 어드민 버튼 명세서 (그라데이션 실버 스타일) */
+input[type="button"],
+input[type="submit"],
+button,
+.control_buttons input,
+.custom_buttons input,
+a.new_item {
+    display: inline-block !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    background-image: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%) !important;
+    background-repeat: repeat-x !important;
+    border: 1px solid #cccccc !important;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
+    border-bottom-color: #b3b3b3 !important;
+    border-radius: 4px !important;
+    color: #333333 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    text-decoration: none !important;
+    transition: background-image 0.15s ease-in-out, border-color 0.15s ease-in-out !important;
+}
+
+input[type="button"]:hover,
+input[type="submit"]:hover,
+button:hover,
+.control_buttons input:hover,
+.custom_buttons input:hover,
+a.new_item:hover {
+    color: #222222 !important;
+    text-decoration: none !important;
+    background-image: linear-gradient(to bottom, #f2f2f2 0%, #dcdcdc 100%) !important;
+    border-color: #b3b3b3 !important;
+}
+
+input[type="button"]:disabled,
+input[type="submit"]:disabled,
+button:disabled {
+    cursor: not-allowed !important;
+    background-image: none !important;
+    background-color: #eeeeee !important;
+    color: #999999 !important;
+    border-color: #dddddd !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* 삭제 전용 붉은 톤의 조화로운 연실버 그라데이션 */
+.remove_button,
+input.remove_button {
+    background-image: linear-gradient(to bottom, #fff5f5 0%, #fcdede 100%) !important;
+    border-color: #f5c2c2 !important;
+    color: #9c2a2a !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+.remove_button:hover,
+input.remove_button:hover {
+    background-image: linear-gradient(to bottom, #fde4e4 0%, #f7c5c5 100%) !important;
+    border-color: #f1a3a3 !important;
+    color: #9c2a2a !important;
+}
+
+/* 3. 격자 테이블 헤더 명세서 (실버 톤 입체 헤더) */
+table.results th {
+    background-image: linear-gradient(to bottom, #fcfcfc 0%, #ededed 100%) !important;
+    border-bottom: 2px solid #d3d3d3 !important;
+    border-right: 1px solid #dcdcdc !important;
+    color: #444444 !important;
+    font-weight: 650 !important;
+    text-shadow: 0 1px 0 #ffffff !important;
+    padding: 10px 12px !important;
+    font-size: 11px !important;
+    box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+table.results th.sortable:hover {
+    background-image: linear-gradient(to bottom, #f3f3f3 0%, #e0e0e0 100%) !important;
+    cursor: pointer !important;
+}
+
+/* 테이블 바디 행 하이라이트 효과 */
+table.results tbody tr.result:hover td {
+    background-color: #f0f7fc !important; /* jQuery UI 클래식 스카이블루 하이라이트 복원 */
+    cursor: pointer !important;
+}
+
+table.results tbody tr.result.selected td {
+    background-color: #d4e8f7 !important; /* 선택된 행 포커스 컬러 */
+}
+
+table.results td {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-right: 1px solid #edf2f7 !important;
+}
+
+/* 4. Combobox 및 Multi-Select 배지 명세서 (relationSelect 연계) */
+.badge-item {
+    background-image: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%) !important;
+    border: 1px solid #d1d5db !important;
+    color: #4b5563 !important;
+    border-radius: 4px !important;
+    padding: 2px 6px !important;
+    font-size: 11px !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04) !important;
+    text-shadow: 0 1px 0 #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.badge-item button {
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #9ca3af !important;
+    text-shadow: none !important;
+    font-size: 13px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: color 0.1s !important;
+}
+
+.badge-item button:hover {
+    color: #dc2626 !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* 콤보박스 드롭다운 실버 섀도우 복원 */
+.combobox-dropdown {
+    border: 1px solid #cccccc !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12) !important;
+    background-color: #ffffff !important;
+}
