@@ -316,7 +316,7 @@
 					 style="position: relative; width: 100%;">
 					
 					<template x-if="field.editable">
-						<input type="hidden" :id="field.field_id" x-model="$root[field.field_name]" :multiple="field.type === 'belongs_to_many'"
+						<input type="text" :id="field.field_id" x-model="$root[field.field_name]"
 							   x-init="
 								 $nextTick(() => {
 									let $el = jQuery('#' + field.field_id);
@@ -330,7 +330,7 @@
 											$root[field.field_name] = $el.val();
 										});
 									} else {
-										let resultsData = listOptions[field.field_name] || [];
+										let resultsData = $root.listOptions[field.field_name] || [];
 										$el.select2({
 											data: { results: resultsData },
 											multiple: field.type === 'belongs_to_many'
