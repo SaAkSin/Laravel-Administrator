@@ -382,13 +382,23 @@
 									   @focus="open = true"
 									   @click.away="setTimeout(() => open = false, 200)"
 									   @input="if (field.autocomplete) fetchAutocomplete()"
-									   style="width: 100%; padding: 6px 30px 6px 10px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box;"
+									   style="width: 100%; padding: 8px 30px 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 12px; color: #1f2937;"
 									   :value="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && !search ? selectedItems[0].text : search" />
 								
 								<!-- 로딩 인디케이터 및 트리거 화살표 -->
-								<div class="icons" style="position: absolute; right: 8px; display: flex; align-items: center; gap: 4px;">
-									<div class="spinner" x-show="loading" style="width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
-									<span style="font-size: 10px; color: #9ca3af; cursor: pointer;" @click="open = !open">▼</span>
+								<div class="icons" style="position: absolute; right: 10px; display: flex; align-items: center; gap: 4px; pointer-events: none;">
+									<div class="spinner" x-show="loading" style="width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.6s linear infinite; pointer-events: auto;"></div>
+									<!-- 미려한 회전식 Chevron Down SVG 아이콘 탑재 -->
+									<svg xmlns="http://www.w3.org/2000/svg" 
+										 class="chevron-icon" 
+										 :class="{ 'rotate-180': open }"
+										 @click="open = !open" 
+										 fill="none" 
+										 viewBox="0 0 24 24" 
+										 stroke="currentColor"
+										 style="width: 14px; height: 14px; color: #9ca3af; cursor: pointer; transition: transform 0.2s ease; pointer-events: auto;">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+									</svg>
 								</div>
 							</div>
 

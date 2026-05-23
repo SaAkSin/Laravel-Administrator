@@ -10,7 +10,7 @@
  * 특유의 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 현대적으로 재해석하여 완벽히 복원합니다.
  */
 
-/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트, 텍스트에리어) */
+/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트, 텍스트에리어 프리미엄 현대화) */
 input[type="text"],
 input[type="password"],
 input[type="date"],
@@ -18,14 +18,14 @@ input[type="time"],
 input[type="datetime-local"],
 select,
 textarea {
-    border: 1px solid #cccccc !important;
-    border-radius: 4px !important;
-    padding: 6px 10px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
     font-size: 12px !important;
-    color: #333333 !important;
+    color: #1f2937 !important;
     background-color: #ffffff !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06) !important;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
     box-sizing: border-box !important;
 }
 
@@ -36,18 +36,18 @@ input[type="time"]:focus,
 input[type="datetime-local"]:focus,
 select:focus,
 textarea:focus {
-    border-color: #999999 !important;
+    border-color: #6366f1 !important; /* 포커스 시 현대적이고 미려한 인디고 컬러 부여 */
     outline: 0 !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06), 0 0 5px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important; /* 부드러운 포커스 링 장착 */
 }
 
-/* 수정 불가능한 비활성화 상태 표현 */
+/* 수정 불가능한 비활성화 상태 표현 (깔끔한 연그레이 플랫 디자인) */
 .uneditable {
-    background-color: #f5f5f5 !important;
-    border: 1px solid #dddddd !important;
-    border-radius: 4px !important;
-    padding: 6px 10px !important;
-    color: #666666 !important;
+    background-color: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    color: #4b5563 !important;
     font-size: 12px !important;
     box-sizing: border-box !important;
     display: inline-block !important;
@@ -159,19 +159,27 @@ table.results td {
     border-right: 1px solid #edf2f7 !important;
 }
 
-/* 4. Combobox 및 Multi-Select 배지 명세서 (relationSelect 연계) */
+/* 4. Combobox 및 Multi-Select 배지 명세서 (모던 파스텔 칩 디자인 개편) */
 .badge-item {
-    background-image: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%) !important;
-    border: 1px solid #d1d5db !important;
-    color: #4b5563 !important;
-    border-radius: 4px !important;
-    padding: 2px 6px !important;
+    background-color: #e0e7ff !important; /* 인디고 파스텔 배경 */
+    background-image: none !important;
+    border: 1px solid #c7d2fe !important;
+    color: #3730a3 !important; /* 진한 인디고 텍스트 */
+    border-radius: 9999px !important; /* 둥근 알약 모양 칩 스타일 */
+    padding: 3px 10px !important;
     font-size: 11px !important;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.04) !important;
-    text-shadow: 0 1px 0 #ffffff !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    text-shadow: none !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 5px !important;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.badge-item:hover {
+    background-color: #c7d2fe !important;
+    border-color: #a5b4fc !important;
 }
 
 .badge-item button {
@@ -179,24 +187,63 @@ table.results td {
     background: none !important;
     border: none !important;
     box-shadow: none !important;
-    color: #9ca3af !important;
+    color: #6366f1 !important;
     text-shadow: none !important;
-    font-size: 13px !important;
+    font-size: 14px !important;
     line-height: 1 !important;
     cursor: pointer !important;
-    transition: color 0.1s !important;
+    transition: color 0.15s ease, transform 0.15s ease !important;
 }
 
 .badge-item button:hover {
-    color: #dc2626 !important;
+    color: #dc2626 !important; /* 호버 시 세련된 레드 컬러 */
+    transform: scale(1.15) !important;
     background: none !important;
     border: none !important;
 }
 
-/* 콤보박스 드롭다운 실버 섀도우 복원 */
+/* 프리미엄 콤보박스 드롭다운 (Glassmorphism & 모던 섀도우) */
 .combobox-dropdown {
-    border: 1px solid #cccccc !important;
-    border-radius: 4px !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.12) !important;
-    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important; /* 은은하고 고급스러운 입체 섀도우 */
+    background-color: rgba(255, 255, 255, 0.98) !important; /* 거의 완벽한 흰색과 높은 밀도의 백드롭 블러 */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    animation: comboboxFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 부드러운 드롭다운 페이드인 모션 */
+}
+
+/* 콤보박스 모던 라운드 그레이 스크롤바 코딩 */
+.combobox-dropdown::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.combobox-dropdown::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 9999px !important;
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+/* 드롭다운 개방 페이드인 애니메이션 키프레임 정의 */
+@keyframes comboboxFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 콤보박스 개방 시 화살표 아이콘 회전 효과 */
+.rotate-180 {
+    transform: rotate(180deg) !important;
 }
