@@ -242,9 +242,6 @@ function adminController() {
             this.initEvents();
 
             // 6. 상태 변화 감시자(Watchers) 등록
-            this.$watch('pagination.page', (value) => {
-                this.page(value);
-            });
 
             this.$watch('rowsPerPage', (value) => {
                 this.updateRowsPerPage(parseInt(value));
@@ -922,9 +919,9 @@ function adminController() {
          * 페이지 네비게이션
          */
         page(page) {
-            const currPage = parseInt(this.pagination.page);
+            const currPage = parseInt(this.pagination.page) || 1;
             let newPage = 1;
-            const lastPage = parseInt(this.pagination.last);
+            const lastPage = parseInt(this.pagination.last) || 1;
 
             if (page === 'prev') {
                 if (currPage > 1) {
@@ -936,11 +933,16 @@ function adminController() {
                 } else {
                     newPage = lastPage;
                 }
-            } else if (!isNaN(parseInt(page))) {
-                if (page > lastPage) {
-                    newPage = lastPage;
-                } else {
-                    newPage = page;
+            } else {
+                const parsed = parseInt(page);
+                if (!isNaN(parsed)) {
+                    newPage = parsed;
+                    if (newPage > lastPage) {
+                        newPage = lastPage;
+                    }
+                    if (newPage < 1) {
+                        newPage = 1;
+                    }
                 }
             }
 

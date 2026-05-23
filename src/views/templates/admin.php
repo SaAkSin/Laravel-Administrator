@@ -67,7 +67,7 @@
 			<input type="button" value="<?php echo trans('administrator::administrator.next') ?>"
 				   :disabled="isLastPage || !pagination.last || !initialized" 
 				   @click="page('next')" />
-			<input type="text" :disabled="pagination.last === 0 || !initialized" x-model.lazy="pagination.page" />
+			<input type="text" :disabled="pagination.last === 0 || !initialized" x-model.lazy="pagination.page" @change="page(pagination.page)" />
 			<span x-text="' / ' + pagination.last"></span>
 		</div>
 	</div>
