@@ -114,7 +114,8 @@
 										filter.value = $el.val();
 									});
 								} else {
-									let resultsData = $root.listOptions[filter.field_name] || [];
+									// 필터 전용 격리 공간인 filter_ 키 데이터를 바라보며, 차선책으로 filter.options를 사용합니다.
+									let resultsData = $root.listOptions['filter_' + filter.field_name] || filter.options || [];
 									$el.select2({
 										data: { results: resultsData },
 										multiple: filter.type === 'belongs_to_many' || filter.type === 'has_many'

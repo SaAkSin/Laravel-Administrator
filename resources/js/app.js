@@ -111,6 +111,7 @@ function adminController() {
 
         // 코어 제어 변수 및 상태 필드
         initialized: false,
+        freezeUpdateRows: false,
         modelName: '',
         modelTitle: '',
         modelSingle: '',
@@ -350,13 +351,14 @@ function adminController() {
             this.filters.forEach((filter, ind) => {
                 if (filter.relationship) {
                     this.listOptions[ind] = filter.options || [];
-                    this.listOptions[filter.field_name] = filter.options || [];
+                    this.listOptions['filter_' + filter.field_name] = filter.options || [];
                 }
             });
 
             this.editFields.forEach((field, ind) => {
                 if (field.relationship) {
                     this.listOptions[ind] = field.options || [];
+                    this.listOptions['edit_' + field.field_name] = field.options || [];
                     this.listOptions[field.field_name] = field.options || [];
                 }
                 if (field.autocomplete) {
@@ -502,9 +504,18 @@ function adminController() {
                     this.statusMessage = this.languages['saved'] || '저장되었습니다.';
                     this.statusMessageType = 'success';
                     
-                    await this.updateRows();
-                    await this.updateSelfRelationships();
+                    // 상세 데이터 주입 시의 미세한 Alpine.js 출렁임으로 인한 필터 오작동 리스트 갱신을 차단하는 락을 작동시킵니다.
+                    this.freezeUpdateRows = true;
+                    
                     this.setData(response.data);
+                    await this.updateSelfRelationships();
+                    
+                    // Alpine.js의 데이터 주입 및 제약조건 실행에 의한 비동기 반응형 $watch 틱 파동이 완전히 잠잠해지도록 락 해제를 50ms간 지연 유예합니다.
+                    setTimeout(async () => {
+                        this.freezeUpdateRows = false;
+                        // 마지막에 단 한 번, 정확히 현재 사용자가 설정해둔 원래의 정렬/필터 조건으로 메인 리스트를 안전하게 갱신합니다.
+                        await this.updateRows();
+                    }, 50);
 
                     setTimeout(() => {
                         if (window.History && window.History.pushState) {
@@ -704,6 +715,8 @@ function adminController() {
                     if (field && field.relationship) {
                         const optKey = field.field_name + '_options';
                         if (data[optKey]) {
+                            // 상세 창 전용 격리 공간인 edit_ 키와 기존 하위 호환성용 키를 동시에 업데이트합니다.
+                            this.listOptions['edit_' + field.field_name] = data[optKey] || [];
                             this.listOptions[field.field_name] = data[optKey] || [];
                             this.listOptions[ind] = data[optKey] || [];
                         }
@@ -839,6 +852,8 @@ function adminController() {
          * 그리드 리스트 갱신 (POST)
          */
         async updateRows() {
+            if (this.freezeUpdateRows) return;
+
             const id = ++this.rowLoadingId;
             const data = {
                 _token: window.csrf || (window.adminData && window.adminData.csrf),
@@ -1007,7 +1022,7 @@ function adminController() {
                             }
                         });
 
-                        this.listOptions[fieldName] = response[fieldName];
+                        this.listOptions['filter_' + fieldName] = response[fieldName];
                     } catch (error) {
                         console.error(error);
                     } finally {
@@ -1035,6 +1050,7 @@ function adminController() {
                             }
                         });
 
+                        this.listOptions['edit_' + fieldName] = response[fieldName];
                         this.listOptions[fieldName] = response[fieldName];
                     } catch (error) {
                         console.error(error);
