@@ -10,13 +10,25 @@
  * 특유의 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 현대적으로 재해석하여 완벽히 복원합니다.
  */
 
-/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트, 텍스트에리어 프리미엄 현대화) */
+/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트 프리미엄 현대화) */
 input[type="text"],
 input[type="password"],
 input[type="date"],
 input[type="time"],
 input[type="datetime-local"],
-select,
+select {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    height: 34px !important; /* 고정 높이 34px를 강제 부여하여 기존 18px 찌그러짐 버그를 해결합니다. */
+    font-size: 12px !important;
+    color: #1f2937 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+}
+
 textarea {
     border: 1px solid #d1d5db !important;
     border-radius: 6px !important;
