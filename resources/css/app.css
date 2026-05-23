@@ -433,3 +433,29 @@ table.results td {
     box-sizing: border-box !important;
 }
 
+/* =========================================================================
+ * 🗂️ 어드민 헤더 대분류 그룹 메뉴 호버 드롭다운(풀다운) 구동 스크립트 복원
+ * =========================================================================
+ * 마우스를 대분류(span)에 올렸을 때 서브 메뉴 목록이 보이도록 구동하고 
+ * 텍스트 필드에 손가락 포인터를 활성화합니다.
+ */
+
+/* 1. 그룹 메뉴 텍스트(span) 및 1레벨 메뉴 아이템에 손가락 커서 장착 */
+#wrapper header ul#menu > li.menu > span {
+    cursor: pointer !important;
+    display: block !important;
+}
+
+/* 2. 마우스 호버 시 풀다운(드롭다운) 서브 메뉴 목록이 보이도록 구동 */
+#wrapper header ul#menu > li.menu:hover > ul,
+#wrapper header ul#lang_menu > li.menu:hover > ul {
+    display: block !important;
+}
+
+/* 3. 2레벨 중첩 그룹 메뉴가 생겼을 경우를 대비한 가로 확장 전개 호버 */
+#wrapper header ul#menu > li ul li.menu:hover > ul,
+#wrapper header ul#lang_menu > li ul li.menu:hover > ul {
+    display: block !important;
+}
+
+
