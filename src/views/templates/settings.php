@@ -128,16 +128,73 @@
 				</div>
 			</template>
 
-			<!-- 6. NUMBER TYPE -->
+			<!-- 6. NUMBER TYPE (Alpine.js & accounting.js 연계형 양방향 포맷터 컴포넌트) -->
 			<template x-if="field.type === 'number'">
-				<div>
+				<div x-data="{
+					displayValue: '',
+					init() {
+						this.updateDisplay();
+						this.$watch('$root.' + field.field_name, (newVal) => {
+							this.updateDisplay();
+						});
+					},
+					updateDisplay() {
+						let raw = $root[field.field_name];
+						if (raw === null || raw === undefined || raw === '') {
+							this.displayValue = '';
+							return;
+						}
+						if (window.accounting) {
+							this.displayValue = accounting.formatMoney(
+								raw, 
+								field.symbol || '', 
+								field.decimals !== undefined ? parseInt(field.decimals) : 0, 
+								field.thousands_separator !== undefined ? field.thousands_separator : ',', 
+								field.decimal_separator !== undefined ? field.decimal_separator : '.'
+							);
+						} else {
+							this.displayValue = raw;
+						}
+					},
+					onFocus() {
+						let raw = $root[field.field_name];
+						this.displayValue = (raw === null || raw === undefined) ? '' : String(raw);
+					},
+					onBlur() {
+						let val = this.displayValue.trim();
+						if (val === '') {
+							$root[field.field_name] = null;
+							this.displayValue = '';
+							return;
+						}
+						let thousandSep = field.thousands_separator || ',';
+						let decimalSep = field.decimal_separator || '.';
+						
+						let parsed = val.split(thousandSep).join('');
+						if (decimalSep !== '.') {
+							parsed = parsed.split(decimalSep).join('.');
+						}
+						let floatVal = parseFloat(parsed);
+						if (isNaN(floatVal)) {
+							$root[field.field_name] = null;
+							this.displayValue = '';
+						} else {
+							$root[field.field_name] = floatVal;
+							this.updateDisplay();
+						}
+					}
+				}" x-init="init()" style="width: 100%;">
 					<template x-if="field.editable">
-						<span class="symbol" x-text="field.symbol"></span>
-						<input type="text" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" />
+						<div style="display: inline-flex; align-items: center; gap: 6px;">
+							<input type="text" :id="field.field_id" :disabled="freezeForm" 
+								   x-model="displayValue" 
+								   @focus="onFocus()" 
+								   @blur="onBlur()" 
+								   style="padding: 3px;" />
+						</div>
 					</template>
 					<template x-if="!field.editable">
-						<span x-text="field.symbol"></span>
-						<span class="uneditable" x-text="$root[field.field_name] || ''"></span>
+						<div class="uneditable" x-text="displayValue || '-'"></div>
 					</template>
 				</div>
 			</template>

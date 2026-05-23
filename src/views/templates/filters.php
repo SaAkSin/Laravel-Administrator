@@ -82,10 +82,28 @@
 				<div class="loader-container" style="position: relative; width: 100%;">
 					<div class="loader" x-show="filter.loadingOptions" style="position: absolute; right: 5px; top: 5px;"></div>
 					<!-- select2 연동을 안전하게 수행하는 hidden input -->
-					<input type="hidden" :id="filter.field_id" x-model="filter.value" :multiple="filter.type === 'belongs_to_many'"
+					<input type="hidden" :id="filter.field_id" :multiple="filter.type === 'belongs_to_many'"
 						   x-init="
 							 $nextTick(() => {
 								let $el = jQuery('#' + filter.field_id);
+								
+								// 1. 값 변화 감시를 설정하여 Select2 UI에 동기화
+								$watch('filter.value', (newVal) => {
+									let currentVal = $el.val();
+									let targetVal = Array.isArray(newVal) ? newVal.join(',') : (newVal || '');
+									if (currentVal !== targetVal) {
+										$el.val(targetVal).trigger('change.select2');
+									}
+								});
+
+								// 2. 초기값 주입
+								let initialVal = filter.value;
+								if (Array.isArray(initialVal)) {
+									initialVal = initialVal.join(',');
+								}
+								$el.val(initialVal || '');
+
+								// 3. Select2 플러그인 마운트
 								if (filter.autocomplete) {
 									$el.select2Remote({
 										field: filter.field_name,
@@ -96,13 +114,18 @@
 										filter.value = $el.val();
 									});
 								} else {
-									let resultsData = listOptions[filter.field_name] || [];
+									let resultsData = $root.listOptions[filter.field_name] || [];
 									$el.select2({
 										data: { results: resultsData },
 										multiple: filter.type === 'belongs_to_many'
 									}).on('change', function(e) {
 										filter.value = $el.val();
 									});
+								}
+								
+								// 4. 초기 마운트 이후 변경 유발
+								if (initialVal) {
+									$el.trigger('change.select2');
 								}
 							 });
 						   " />

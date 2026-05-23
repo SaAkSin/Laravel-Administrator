@@ -224,6 +224,15 @@ function adminController() {
             this.originalEditFields = window.adminData.edit_fields || [];
             this.editFields = this.prepareEditFields(this.originalEditFields);
 
+            // editFields의 필드명이 컨트롤러 속성에 없는 경우 반응형 멤버로 초기화합니다.
+            if (this.editFields) {
+                this.editFields.forEach(field => {
+                    if (field && field.field_name && !(field.field_name in this)) {
+                        this[field.field_name] = field.type === 'belongs_to_many' || field.type === 'has_many' ? [] : '';
+                    }
+                });
+            }
+
             // 4. 연관 관계 리스트 바인딩
             this.initRelationships();
 
@@ -448,6 +457,20 @@ function adminController() {
                 saveData[key] = this[key];
             });
 
+            // editFields 내부의 관계 필드를 포함한 모든 입력 대상 필드의 값을 saveData에 추가 수집합니다.
+            this.editFields.forEach(field => {
+                if (field && field.field_name) {
+                    let val = this[field.field_name];
+                    
+                    // belongs_to_many, has_many 타입 릴레이션이 배열 형태일 경우 쉼표 구분 스트링으로 전처리합니다.
+                    if (Array.isArray(val)) {
+                        val = val.join(',');
+                    }
+                    
+                    saveData[field.field_name] = val;
+                }
+            });
+
             saveData._token = window.csrf || (window.adminData && window.adminData.csrf);
 
             if (!saveData[this.primaryKey]) {
@@ -633,6 +656,15 @@ function adminController() {
             window.adminData.edit_fields = data.administrator_edit_fields || [];
             this.editFields = this.prepareEditFields(window.adminData.edit_fields);
 
+            // 중요: editFields 속성을 컨트롤러 최상위 멤버로 보장하여 반응성을 활성화합니다.
+            if (this.editFields) {
+                this.editFields.forEach(field => {
+                    if (field && field.field_name && !(field.field_name in this)) {
+                        this[field.field_name] = field.type === 'belongs_to_many' || field.type === 'has_many' ? [] : '';
+                    }
+                });
+            }
+
             this.actions = data.administrator_actions || [];
             this.actionPermissions = data.administrator_action_permissions || {};
 
@@ -658,8 +690,10 @@ function adminController() {
                 this[key] = defaultModel[key];
             });
 
+            // 데이터 동기화 루프 수정: defaultModel, editFields 목록, primaryKey 등을 통틀어서 동기화합니다.
             Object.keys(data).forEach(key => {
-                if (key in defaultModel || key === this.primaryKey) {
+                const isField = key in defaultModel || key === this.primaryKey || (this.editFields && this.editFields.some(f => f.field_name === key));
+                if (isField) {
                     this[key] = data[key];
                 }
             });
@@ -1270,4 +1304,103 @@ Alpine.data('adminController', adminController);
 
 // Alpine.js 엔진을 초기화 및 실행합니다.
 Alpine.start();
+
+/**
+ * $.fn.select2Remote jQuery 확장 플러그인 정의
+ * 바닐라 Fetch API 요청 및 전역 adminController 인스턴스와 완벽히 연계하여 작동합니다.
+ */
+(function($) {
+    $.fn.select2Remote = function(options) {
+        var $element = this;
+        var defaults = {
+            minimumInputLength: 1,
+            allowClear: true,
+            ajax: {
+                url: window.base_url + window.adminData.model_name + '/update_options',
+                dataType: 'json',
+                quietMillis: 100,
+                type: 'POST',
+                data: function(term, page) {
+                    var data = {
+                        term: term,
+                        page: page,
+                        field: options.field,
+                        type: options.type,
+                        constraints: {}
+                    };
+
+                    const rootEl = document.querySelector('[x-data]');
+                    const admin = rootEl ? window.Alpine.$data(rootEl) : {};
+
+                    if (data.type === 'edit') {
+                        data.selectedItems = admin[data.field];
+                    } else if (data.type === 'filter') {
+                        data.selectedItems = admin.filters[parseInt(options.filterIndex)].value;
+                    }
+
+                    // 제약조건 파라미터 적재
+                    if (options.constraints) {
+                        $.each(options.constraints, function(ind, el) {
+                            data.constraints[ind] = admin[ind];
+                        });
+                    }
+
+                    return { fields: [data] };
+                },
+                results: function(returndata, page) {
+                    const rootEl = document.querySelector('[x-data]');
+                    const admin = rootEl ? window.Alpine.$data(rootEl) : {};
+                    var data = {},
+                        val = $element.val();
+
+                    if (val) {
+                        $(val.split(',')).each(function(ind, el) {
+                            const autoKey = options.field + '_autocomplete';
+                            const item = admin.autocompleteData[autoKey] && admin.autocompleteData[autoKey][this];
+                            data[this] = { id: this, text: item ? item.text : this };
+                        });
+                    }
+
+                    $.each(returndata[options.field], function(ind, el) {
+                        data[el.id] = el;
+                    });
+
+                    const autoKey = options.field + '_autocomplete';
+                    admin.autocompleteData[autoKey] = data;
+
+                    return {
+                        results: returndata[options.field]
+                    };
+                }
+            },
+            initSelection: function(element, callback) {
+                const rootEl = document.querySelector('[x-data]');
+                const admin = rootEl ? window.Alpine.$data(rootEl) : {};
+                var data = [],
+                    val = $(element).val();
+
+                if (!val || typeof admin === 'undefined' || !admin.autocompleteData)
+                    return callback(null);
+
+                const autoKey = options.field + '_autocomplete';
+                if (options.multiple) {
+                    $(val.split(',')).each(function(ind, el) {
+                        if (admin.autocompleteData[autoKey] && this in admin.autocompleteData[autoKey]) {
+                            data.push({ id: this, text: admin.autocompleteData[autoKey][this].text });
+                        }
+                    });
+                } else {
+                    if (admin.autocompleteData[autoKey] && val in admin.autocompleteData[autoKey]) {
+                        data = { id: val, text: admin.autocompleteData[autoKey][val].text };
+                    }
+                }
+
+                callback(data);
+            }
+        };
+
+        var settings = $.extend(true, {}, defaults, options);
+        return $element.select2(settings);
+    };
+})(jQuery);
 

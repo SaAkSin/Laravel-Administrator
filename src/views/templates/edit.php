@@ -290,25 +290,78 @@
 				</div>
 			</template>
 
-			<!-- 12-2. NUMBER TYPE -->
+			<!-- 12-2. NUMBER TYPE (Alpine.js & accounting.js 연계형 양방향 포맷터 컴포넌트) -->
 			<template x-if="field.type === 'number'">
-				<div>
+				<div x-data="{
+					displayValue: '',
+					init() {
+						this.updateDisplay();
+						this.$watch('$root.' + field.field_name, (newVal) => {
+							this.updateDisplay();
+						});
+					},
+					updateDisplay() {
+						let raw = $root[field.field_name];
+						if (raw === null || raw === undefined || raw === '') {
+							this.displayValue = '';
+							return;
+						}
+						if (window.accounting) {
+							this.displayValue = accounting.formatMoney(
+								raw, 
+								field.symbol || '', 
+								field.decimals !== undefined ? parseInt(field.decimals) : 0, 
+								field.thousands_separator !== undefined ? field.thousands_separator : ',', 
+								field.decimal_separator !== undefined ? field.decimal_separator : '.'
+							);
+						} else {
+							this.displayValue = raw;
+						}
+					},
+					onFocus() {
+						let raw = $root[field.field_name];
+						this.displayValue = (raw === null || raw === undefined) ? '' : String(raw);
+					},
+					onBlur() {
+						let val = this.displayValue.trim();
+						if (val === '') {
+							$root[field.field_name] = null;
+							this.displayValue = '';
+							return;
+						}
+						let thousandSep = field.thousands_separator || ',';
+						let decimalSep = field.decimal_separator || '.';
+						
+						let parsed = val.split(thousandSep).join('');
+						if (decimalSep !== '.') {
+							parsed = parsed.split(decimalSep).join('.');
+						}
+						let floatVal = parseFloat(parsed);
+						if (isNaN(floatVal)) {
+							$root[field.field_name] = null;
+							this.displayValue = '';
+						} else {
+							$root[field.field_name] = floatVal;
+							this.updateDisplay();
+						}
+					}
+				}" x-init="init()" style="width: 100%;">
 					<template x-if="field.editable">
 						<div style="display: inline-flex; align-items: center; gap: 6px;">
-							<span x-show="field.symbol" x-text="field.symbol" style="font-weight: bold;"></span>
-							<input type="number" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" style="padding: 3px;" />
+							<input type="text" :id="field.field_id" :disabled="freezeForm" 
+								   x-model="displayValue" 
+								   @focus="onFocus()" 
+								   @blur="onBlur()" 
+								   style="padding: 3px;" />
 						</div>
 					</template>
 					<template x-if="!field.editable">
-						<div style="display: inline-flex; align-items: center; gap: 6px;">
-							<span x-show="field.symbol" x-text="field.symbol" style="font-weight: bold;"></span>
-							<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
-						</div>
+						<div class="uneditable" x-text="displayValue || '-'"></div>
 					</template>
 				</div>
 			</template>
 
-			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many) -->
+			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many, has_many) -->
 			<template x-if="['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
 				<div class="relative w-full"
 					 x-data="{
@@ -334,10 +387,28 @@
 					 style="position: relative; width: 100%;">
 					
 					<template x-if="field.editable">
-						<input type="text" :id="field.field_id" x-model="$root[field.field_name]"
+						<input type="text" :id="field.field_id"
 							   x-init="
 								 $nextTick(() => {
 									let $el = jQuery('#' + field.field_id);
+									
+									// 1. 값 변화 감시를 설정하여 Select2 UI에 동기화
+									$watch('$root.' + field.field_name, (newVal) => {
+										let currentVal = $el.val();
+										let targetVal = Array.isArray(newVal) ? newVal.join(',') : (newVal || '');
+										if (currentVal !== targetVal) {
+											$el.val(targetVal).trigger('change.select2');
+										}
+									});
+
+									// 2. 초기값 주입
+									let initialVal = $root[field.field_name];
+									if (Array.isArray(initialVal)) {
+										initialVal = initialVal.join(',');
+									}
+									$el.val(initialVal || '');
+
+									// 3. Select2 플러그인 마운트
 									if (field.autocomplete) {
 										$el.select2Remote({
 											field: field.field_name,
@@ -355,6 +426,11 @@
 										}).on('change', function(e) {
 											$root[field.field_name] = $el.val();
 										});
+									}
+									
+									// 4. 초기 마운트 이후 변경 유발
+									if (initialVal) {
+										$el.trigger('change.select2');
 									}
 								 });
 							   " />
