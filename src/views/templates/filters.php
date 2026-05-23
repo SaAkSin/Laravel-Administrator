@@ -108,7 +108,7 @@
 									$el.select2Remote({
 										field: filter.field_name,
 										type: 'filter',
-										multiple: filter.type === 'belongs_to_many',
+										multiple: filter.type === 'belongs_to_many' || filter.type === 'has_many',
 										filterIndex: index
 									}).on('change', function(e) {
 										filter.value = $el.val();
@@ -117,7 +117,7 @@
 									let resultsData = $root.listOptions[filter.field_name] || [];
 									$el.select2({
 										data: { results: resultsData },
-										multiple: filter.type === 'belongs_to_many'
+										multiple: filter.type === 'belongs_to_many' || filter.type === 'has_many'
 									}).on('change', function(e) {
 										filter.value = $el.val();
 									});

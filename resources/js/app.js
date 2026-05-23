@@ -698,6 +698,19 @@ function adminController() {
                 }
             });
 
+            // 상세 아이템에 특화된 개별 릴레이션 옵션 리스트를 동적으로 격리 갱신합니다.
+            if (this.editFields) {
+                this.editFields.forEach((field, ind) => {
+                    if (field && field.relationship) {
+                        const optKey = field.field_name + '_options';
+                        if (data[optKey]) {
+                            this.listOptions[field.field_name] = data[optKey] || [];
+                            this.listOptions[ind] = data[optKey] || [];
+                        }
+                    }
+                });
+            }
+
             this.freezeConstraints = false;
             this.resizePage();
             this.runConstraintsQueue();

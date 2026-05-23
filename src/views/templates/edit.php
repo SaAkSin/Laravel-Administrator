@@ -413,7 +413,7 @@
 										$el.select2Remote({
 											field: field.field_name,
 											type: 'edit',
-											multiple: field.type === 'belongs_to_many',
+											multiple: field.type === 'belongs_to_many' || field.type === 'has_many',
 											filterIndex: index
 										}).on('change', function(e) {
 											$root[field.field_name] = $el.val();
@@ -422,7 +422,7 @@
 										let resultsData = $root.listOptions[field.field_name] || [];
 										$el.select2({
 											data: { results: resultsData },
-											multiple: field.type === 'belongs_to_many'
+											multiple: field.type === 'belongs_to_many' || field.type === 'has_many'
 										}).on('change', function(e) {
 											$root[field.field_name] = $el.val();
 										});
