@@ -9,5 +9,5 @@ nbproject
 .antigravitycli
 .phpunit.result.cache
 /examples/demo/
-/node_modules
+/node_modules/
 /public/dist/
