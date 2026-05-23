@@ -1,8 +1,75 @@
 // Tailwind CSS 엔트리를 포함하여 번들러가 함께 빌드할 수 있도록 임포트합니다.
 import '../css/app.css';
 
+// 모던 의존성 패키지들을 임포트하여 전역 바인딩하고 번들에 통합합니다.
+import { marked } from 'marked';
+import accounting from 'accounting';
+
+// 레거시 호환성을 위해 window 객체에 전역 바인딩
+window.marked = marked;
+window.accounting = accounting;
+
+// 기존 markdown.toHTML 호출 규격을 지원하는 호환 어댑터 탑재
+window.markdown = {
+    toHTML: (str) => marked.parse(str || '')
+};
+
 // Alpine.js 라이브러리를 임포트하고 브라우저 전역 범위(window)에 등록합니다.
 import Alpine from 'alpinejs';
+
+// CKEditor 4 전역 설정 정의 (사용자 기존 연동 옵션 및 CSRF 토큰 자동 이식)
+const applyCKEditorConfig = () => {
+    if (window.CKEDITOR) {
+        CKEDITOR.editorConfig = function( config ) {
+            config.toolbarGroups = [
+                { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+                { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+                { name: 'links' },
+                { name: 'insert' },
+                { name: 'forms' },
+                { name: 'tools' },
+                { name: 'document',    groups: [ 'mode', 'document', 'doctools' ] },
+                { name: 'others' },
+                '/',
+                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+                { name: 'styles' },
+                { name: 'colors' },
+                { name: 'about' }
+            ];
+
+            config.removeButtons = 'Underline,Subscript,Superscript';
+            config.format_tags = 'p;h1;h2;h3;h4;h5;h6;pre';
+
+            // 라라벨 파일매니저 비동기 연동 및 CSRF 토큰 동적 싱크
+            const token = window.csrf || (window.adminData && window.adminData.csrf) || '';
+            config.filebrowserImageBrowseUrl = '/laravel-filemanager?type=Images';
+            config.filebrowserImageUploadUrl = '/laravel-filemanager/upload?type=Images&_token=' + token;
+            config.filebrowserBrowseUrl = '/laravel-filemanager?type=Files';
+            config.filebrowserUploadUrl = '/laravel-filemanager/upload?type=Files&_token=' + token;
+            
+            config.extraPlugins = 'justify,font,colorbutton';
+        };
+    }
+};
+
+// 즉각적인 적용 및 비동기 로딩 대비 감시 장치 기동
+if (window.CKEDITOR) {
+    applyCKEditorConfig();
+} else {
+    let tempCKEDITOR = undefined;
+    Object.defineProperty(window, 'CKEDITOR', {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return tempCKEDITOR;
+        },
+        set(val) {
+            tempCKEDITOR = val;
+            applyCKEditorConfig();
+        }
+    });
+}
 
 /**
  * 중첩된 객체를 x-www-form-urlencoded 쿼리 스트링 포맷으로 직렬화하기 위한 헬퍼 함수
