@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.md or http://ckeditor.com/license
+ Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
 */
-CKEDITOR.plugins.setLang("placeholder","de",{title:"Platzhalter Einstellungen",toolbar:"Platzhalter erstellen",name:"Platzhalter Name",invalidName:"Der Platzhalter darf nicht leer sein und folgende Zeichen nicht enthalten: [, ], <, >",pathName:"Platzhalter"});
+CKEDITOR.plugins.setLang("placeholder","de",{title:"Platzhaltereinstellungen",toolbar:"Platzhalter",name:"Platzhaltername",invalidName:"Der Platzhalter darf nicht leer sein und folgende Zeichen nicht enthalten: [, ], \x3c, \x3e",pathName:"Platzhalter"});

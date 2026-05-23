@@ -357,10 +357,7 @@
   background: url(../img/upload.png) no-repeat;
   padding-left: 25px;
 }
-.editForm > div.image div.upload_container div.plupload,
-.editForm > div.file div.upload_container div.plupload {
-  width: 100% !important;
-}
+
 .editForm > div.image div.image_container,
 .editForm > div.file div.image_container {
   position: relative;
@@ -530,10 +527,7 @@
   background: url(../img/upload.png) no-repeat;
   padding-left: 25px;
 }
-#settings_page form.settings_form > div.image div.upload_container div.plupload,
-#settings_page form.settings_form > div.file div.upload_container div.plupload {
-  width: 100% !important;
-}
+
 #settings_page form.settings_form > div.image div.image_container,
 #settings_page form.settings_form > div.file div.image_container {
   position: relative;
@@ -1858,10 +1852,7 @@ a {
   background: url(../img/upload.png) no-repeat;
   padding-left: 25px;
 }
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.image div.upload_container div.plupload,
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.file div.upload_container div.plupload {
-  width: 100% !important;
-}
+
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.image div.image_container,
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.file div.image_container {
   position: relative;

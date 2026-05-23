@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.md or http://ckeditor.com/license
+ Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
 */
-CKEDITOR.plugins.setLang("uicolor","eu",{title:"EI Kolore Hautatzailea",preview:"Zuzeneko aurreikuspena",config:"Itsatsi karaktere kate hau zure config.js fitxategian.",predefined:"Aurredefinitutako kolore multzoak"});
+CKEDITOR.plugins.setLang("uicolor","eu",{title:"EI kolore-hautatzailea",options:"Kolore aukerak",highlight:"Nabarmendu",selected:"Hautatutako kolorea",predefined:"Aurrez definitutako kolore multzoak",config:"Itsatsi kate hau zure config.js fitxategian"});

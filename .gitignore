@@ -6,3 +6,6 @@ composer.lock
 /nbproject/private/
 nbproject
 .idea
+.antigravitycli
+.phpunit.result.cache
+/examples/demo/

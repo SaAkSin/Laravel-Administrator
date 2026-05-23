@@ -1,8 +1,20 @@
-<div id="admin_page" class="with_sidebar">
+<?php
+/**
+ * 관리자 메인 진입 뷰 (최초 오리지널 디자인 복원 및 Alpine.js 연동 최적화)
+ * 
+ * 최초 오리지널 마크업 구조와 클래스를 100% 보존하면서, 데이터 바인딩만 Alpine.js로 대체하여
+ * 비주얼 무결성과 현대화된 데이터 처리 효율을 동시에 충족시킵니다.
+ */
+?>
+<div id="admin_page" class="with_sidebar" x-data="adminController">
 	<div id="sidebar">
-		<div class="panel sidebar_section" id="filters_sidebar_section" data-bind="template: 'filtersTemplate'"></div>
+		<div class="panel sidebar_section" id="filters_sidebar_section">
+			<?php echo view("administrator::templates.filters")?>
+		</div>
 	</div>
-	<div id="content" data-bind="template: 'adminTemplate'"></div>
+	<div id="content">
+		<?php echo view("administrator::templates.admin", array('config' => $config))?>
+	</div>
 </div>
 
 <script type="text/javascript">
@@ -38,7 +50,6 @@
 </script>
 
 <style type="text/css">
-
 	div.item_edit form.edit_form select, div.item_edit form.edit_form input[type=hidden], div.item_edit form.edit_form .select2-container {
 		width: <?php echo $formWidth - 59 ?>px !important;
 	}
@@ -65,18 +76,9 @@
 		max-width: <?php echo $formWidth - 65 ?>px;
 	}
 
+	#admin_page.with_sidebar #content div.table_container {
+		margin-right: 270px;
+	}
 </style>
 
 <input type="hidden" name="_token" value="<?php echo csrf_token()?>" />
-
-<script id="adminTemplate" type="text/html">
-	<?php echo view("administrator::templates.admin")?>
-</script>
-
-<script id="itemFormTemplate" type="text/html">
-	<?php echo view("administrator::templates.edit", array('config' => $config))?>
-</script>
-
-<script id="filtersTemplate" type="text/html">
-	<?php echo view("administrator::templates.filters")?>
-</script>

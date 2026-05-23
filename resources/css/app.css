@@ -1,0 +1,4 @@
+/* Tailwind CSS의 기본 지시어들을 로드하여 유틸리티 클래스 빌드를 활성화합니다. */
+/* @tailwind base; -> 오리지널 CSS 버튼/인풋 디자인 훼손을 방지하기 위해 base 리셋을 전격 비활성화합니다. */
+@tailwind components;
+@tailwind utilities;

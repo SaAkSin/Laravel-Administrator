@@ -2,6 +2,49 @@
 
 use Illuminate\Support\Facades\View;
 
+/**
+ * Vite 빌드 머니페스트를 읽어 해시가 포함된 에셋 실경로를 동적으로 반환하고,
+ * 연결된 CSS가 존재할 경우 글로벌 CSS 배열에 자동으로 추가합니다.
+ *
+ * @param string $entry
+ * @param array &$cssArray
+ * @return string
+ */
+if (!function_exists('getViteAsset')) {
+	function getViteAsset($entry, &$cssArray = null)
+	{
+		// Vite 5+는 outDir/.vite/manifest.json 경로에 머니페스트를 생성합니다.
+		$manifestPath = __DIR__ . '/../public/dist/.vite/manifest.json';
+		
+		// Vite 4 이하 또는 커스텀 설정 대비 fallback 경로
+		if (!file_exists($manifestPath)) {
+			$manifestPath = __DIR__ . '/../public/dist/manifest.json';
+		}
+		
+		if (file_exists($manifestPath)) {
+			$manifest = json_decode(file_get_contents($manifestPath), true);
+			if (isset($manifest[$entry])) {
+				$entryData = $manifest[$entry];
+				
+				// 연관된 CSS 에셋이 존재하는 경우 자동으로 CSS 배열에 추가
+				if (is_array($cssArray) && isset($entryData['css']) && is_array($entryData['css'])) {
+					foreach ($entryData['css'] as $cssFile) {
+						$cssKey = 'vite-' . basename($cssFile, '.css');
+						$cssArray[$cssKey] = asset('packages/saaksin/administrator/dist/' . $cssFile);
+					}
+				}
+				
+				if (isset($entryData['file'])) {
+					return asset('packages/saaksin/administrator/dist/' . $entryData['file']);
+				}
+			}
+		}
+		
+		// manifest가 존재하지 않는 등의 예외 상황을 대비한 fallback 경로
+		return asset('packages/saaksin/administrator/dist/js/app.js');
+	}
+}
+
 //admin index view
 View::composer('administrator::index', function($view)
 {
@@ -30,7 +73,7 @@ View::composer('administrator::index', function($view)
 	$view->rows = $dataTable->getRows(app('db'), $view->filters);
 	$view->formWidth = $config->getOption('form_width');
 	$view->baseUrl = $baseUrl;
-	$view->assetUrl = url('packages/saaksin/administrator/');
+	$view->assetUrl = asset('packages/saaksin/administrator/');
 	$view->route = $route['path'].'/';
 	$view->itemId = isset($view->itemId) ? $view->itemId : null;
 });
@@ -50,7 +93,7 @@ View::composer('administrator::settings', function($view)
 	$view->arrayFields = $fieldFactory->getEditFieldsArrays();
 	$view->actions = $actionFactory->getActionsOptions();
 	$view->baseUrl = $baseUrl;
-	$view->assetUrl = url('packages/saaksin/administrator/');
+	$view->assetUrl = asset('packages/saaksin/administrator/');
 	$view->route = $route['path'].'/';
 });
 
@@ -66,74 +109,35 @@ View::composer(array('administrator::partials.header'), function($view)
 //the layout view
 View::composer(array('administrator::layouts.default'), function($view)
 {
-	//set up the basic asset arrays
+	// 에셋 배열 초기화
 	$view->css = array();
 	$view->js = array(
-		'jquery' => asset('packages/saaksin/administrator/js/jquery/jquery-1.8.2.min.js'),
-		'jquery-ui' => asset('packages/saaksin/administrator/js/jquery/jquery-ui-1.10.3.custom.min.js'),
-		'customscroll' => asset('packages/saaksin/administrator/js/jquery/customscroll/jquery.customscroll.js'),
+		'jquery' => 'https://code.jquery.com/jquery-1.8.2.min.js',
+		'jquery-ui' => 'https://code.jquery.com/ui/1.10.3/jquery-ui.min.js',
 	);
 
-	//add the non-custom-page css assets
 	if (!$view->page && !$view->dashboard)
 	{
+		// 1. Vite 컴파일 현대화 에셋 등록 (Alpine.js 및 Tailwind CSS) 및 핵심 레이아웃 main.css 로드
 		$view->css += array(
-			'jquery-ui' => asset('packages/saaksin/administrator/css/ui/jquery-ui-1.9.1.custom.min.css'),
-			'jquery-ui-timepicker' => asset('packages/saaksin/administrator/css/ui/jquery.ui.timepicker.css'),
-			'select2' => asset('packages/saaksin/administrator/js/jquery/select2/select2.css'),
-			'jquery-colorpicker' => asset('packages/saaksin/administrator/css/jquery.lw-colorpicker.css'),
+			'main' => asset('packages/saaksin/administrator/css/main.css'),
+			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.css',
 		);
-	}
-
-	//add the package-wide css assets
-	$view->css += array(
-		'customscroll' => asset('packages/saaksin/administrator/js/jquery/customscroll/customscroll.css'),
-		'main' => asset('packages/saaksin/administrator/css/main.css'),
-	);
-
-	//add the non-custom-page js assets
-	if (!$view->page && !$view->dashboard)
-	{
 		$view->js += array(
-			'select2' => asset('packages/saaksin/administrator/js/jquery/select2/select2.js'),
-			'jquery-ui-timepicker' => asset('packages/saaksin/administrator/js/jquery/jquery-ui-timepicker-addon.js'),
+			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js',
+			'vite-app' => getViteAsset('resources/js/app.js', $view->css),
+		);
+
+		// 2. 필수 독립형 바닐라 라이브러리 등록 (jQuery 무관)
+		$view->js += array(
 			'ckeditor' => asset('packages/saaksin/administrator/js/ckeditor/ckeditor.js'),
-			'ckeditor-jquery' => asset('packages/saaksin/administrator/js/ckeditor/adapters/jquery.js'),
 			'markdown' => asset('packages/saaksin/administrator/js/markdown.js'),
-			'plupload' => asset('packages/saaksin/administrator/js/plupload/js/plupload.full.js'),
-		);
-
-		//localization js assets
-		$locale = config('app.locale');
-
-		if ($locale !== 'en')
-		{
-			$view->js += array(
-				'plupload-l18n' => asset('packages/saaksin/administrator/js/plupload/js/i18n/'.$locale.'.js'),
-				'timepicker-l18n' => asset('packages/saaksin/administrator/js/jquery/localization/jquery-ui-timepicker-'.$locale.'.js'),
-				'datepicker-l18n' => asset('packages/saaksin/administrator/js/jquery/i18n/jquery.ui.datepicker-'.$locale.'.js'),
-				'select2-l18n' => asset('packages/saaksin/administrator/js/jquery/select2/select2_locale_'.$locale.'.js'),
-			);
-		}
-
-		//remaining js assets
-		$view->js += array(
-			'knockout' => asset('packages/saaksin/administrator/js/knockout/knockout-2.2.0.js'),
-			'knockout-mapping' => asset('packages/saaksin/administrator/js/knockout/knockout.mapping.js'),
-			'knockout-notification' => asset('packages/saaksin/administrator/js/knockout/KnockoutNotification.knockout.min.js'),
-			'knockout-update-data' => asset('packages/saaksin/administrator/js/knockout/knockout.updateData.js'),
-			'knockout-custom-bindings' => asset('packages/saaksin/administrator/js/knockout/custom-bindings.js'),
 			'accounting' => asset('packages/saaksin/administrator/js/accounting.js'),
-			'colorpicker' => asset('packages/saaksin/administrator/js/jquery/jquery.lw-colorpicker.min.js'),
 			'history' => asset('packages/saaksin/administrator/js/history/native.history.js'),
-			'admin' => asset('packages/saaksin/administrator/js/admin.js'),
-			'settings' => asset('packages/saaksin/administrator/js/settings.js'),
 		);
 	}
 
-	$view->js += array('page' => asset('packages/saaksin/administrator/js/page.js'));
-
-    // 사용자 정의 js 추가
+    // 3. 사용자 정의 js 추가
     $customs = config('administrator.custom_js');
     if ($customs) $view->js += $customs;
 });

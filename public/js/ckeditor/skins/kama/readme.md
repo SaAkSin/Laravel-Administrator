@@ -4,7 +4,7 @@
 "Kama" is the default skin of CKEditor 3.x.
 It's been ported to CKEditor 4 and fully featured.
 
-For more information about skins, please check the [CKEditor Skin SDK](http://docs.cksource.com/CKEditor_4.x/Skin_SDK)
+For more information about skins, please check the [CKEditor Skin SDK](https://ckeditor.com/docs/ckeditor4/latest/guide/skin_sdk_intro.html)
 documentation.
 
 Directory Structure
@@ -33,8 +33,6 @@ Other parts:
 License
 -------
 
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
 
-Licensed under the terms of any of the following licenses at your choice: [GPL](http://www.gnu.org/licenses/gpl.html), [LGPL](http://www.gnu.org/licenses/lgpl.html) and [MPL](http://www.mozilla.org/MPL/MPL-1.1.html).
-
-See LICENSE.md for more information.
+CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.

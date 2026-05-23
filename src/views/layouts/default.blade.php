@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width">
 	<title>{{ config('administrator.title') }}</title>
 
+	<!-- 오리지널 패키지 스타일시트 및 컴파일된 에셋들을 순차적으로 로드합니다. -->
 	@foreach ($css as $url)
 		<link href="{{$url}}" media="all" type="text/css" rel="stylesheet">
 	@endforeach
@@ -23,6 +24,7 @@
 		@include('administrator::partials.footer')
 	</div>
 
+	<!-- 현대적인 Alpine.js 코어와 바닐라 라이브러리 스크립트들을 마운트합니다. -->
 	@foreach ($js as $url)
 		<script src="{{$url}}"></script>
 	@endforeach

@@ -1,369 +1,381 @@
-<div data-bind="visible: loadingItem" class="loading"><?php echo trans('administrator::administrator.loading') ?></div>
+<?php
+/**
+ * 관리자 상세 편집 폼 템플릿 (최초 오리지널 디자인 100% 보존 및 Alpine.js 이식)
+ * 
+ * 테일윈드 클래스를 완전히 걷어내고 패키지 최초의 견고한 연그레이 오리지널 폼 클래스들을 복구한 채
+ * 데이터 바인딩 동작만 Alpine.js 지시어로 안전하게 포팅했습니다.
+ */
+?>
+<div x-show="loadingItem" class="loading_rows">
+	<div><?php echo trans('administrator::administrator.loading') ?></div>
+</div>
 
-<form class="edit_form" data-bind="visible: !loadingItem(), submit: saveItem">
-	<h2 data-bind="text: $root[$root.primaryKey]() ? '<?php echo trans('administrator::administrator.edit') ?>' :
-		'<?php echo trans('administrator::administrator.createnew') ?>'"></h2>
+<form class="edit_form" x-show="!loadingItem" @submit.prevent="saveItem" style="display: none;">
+	<h2 x-text="$root[$root.primaryKey] ? '<?php echo trans('administrator::administrator.edit') ?>' : '<?php echo trans('administrator::administrator.createnew') ?>'"></h2>
 
-	<!-- ko if: $root[$root.primaryKey]() -->
-		<!-- ko if: $root.itemLink() -->
-			<a class="item_link" target="_blank" data-bind="attr: {href: $root.itemLink()},
-							text: '<?php echo trans('administrator::administrator.viewitem', array('single' => $config->getOption('single'))) ?>'"></a>
-		<!-- /ko -->
-	<!-- /ko -->
+	<!-- 외부 아이템 다이렉트 링크 (최초 디자인 복원) -->
+	<template x-if="$root[$root.primaryKey] && itemLink">
+		<a class="item_link" target="_blank" :href="itemLink"
+		   x-text="'<?php echo trans('administrator::administrator.viewitem', array('single' => $config->getOption('single'))) ?>'"></a>
+	</template>
 
-    <?php
-    if($config->checkOption('is_top_actions')) {?>
-        <!-- ko if: $root[$root.primaryKey]() && actions().length -->
-        <div class="custom_buttons">
-            <!-- ko foreach: actions -->
-            <!-- ko if: has_permission && $root.actionPermissions[action_name] !== false -->
-            <input type="button" data-bind="click: function(){$root.customAction(true, action_name, messages, confirmation)}, value: title,
-																	attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-            <!-- /ko -->
-            <!-- /ko -->
-        </div>
-        <!-- /ko -->
-
-        <div class="control_buttons">
-            <!-- ko if: $root[$root.primaryKey]() -->
-            <input type="button" value="<?php echo trans('administrator::administrator.close') ?>"
-                   data-bind="click: closeItem, attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-
-            <!-- ko if: actionPermissions.delete -->
-            <input type="button" value="<?php echo trans('administrator::administrator.delete') ?>"
-                   data-bind="click: deleteItem, attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-            <!-- /ko -->
-
-            <!-- ko if: actionPermissions.update -->
-            <input type="submit" value="<?php echo trans('administrator::administrator.save') ?>"
-                   data-bind="attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-            <!-- /ko -->
-            <!-- /ko -->
-
-            <!-- ko ifnot: $root[$root.primaryKey]() -->
-            <input type="button" value="<?php echo trans('administrator::administrator.cancel') ?>"
-                   data-bind="click: closeItem, attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-            <!-- ko if: actionPermissions.create -->
-            <input type="submit" value="<?php echo trans('administrator::administrator.create') ?>"
-                   data-bind="attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-            <!-- /ko -->
-            <!-- /ko -->
-            <span class="message" data-bind="css: { error: statusMessageType() == 'error', success: statusMessageType() == 'success' },
-										notification: statusMessage "></span>
-        </div>
-
-        <?php
-    }
-    ?>
-
-	<!-- ko foreach: editFields -->
-		<!-- ko if: $data && ( $root[$root.primaryKey]() || editable ) && visible -->
-			<div data-bind="attr: {class: type}">
-				<label data-bind="attr: {for: field_id}, text: title + ':'"></label>
-
-			<!-- ko if: $data.description && type !== 'bool' && type !== 'key' -->
-				<p class="description" data-bind="text: description"></p>
-			<!-- /ko -->
-
-			<!-- ko if: type === 'key' -->
-				<span data-bind="text: $root[$root.primaryKey]"></span>
-			<!-- /ko -->
-
-			<!-- ko if: type === 'text' -->
-				<!-- ko if: editable -->
-					<div class="characters_left" data-bind="charactersLeft: {value: $root[field_name], limit: limit}"></div>
-					<input type="text" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-																			valueUpdate: 'afterkeydown', characterLimit: limit" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="text: $root[field_name]()"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'textarea' -->
-				<!-- ko if: editable -->
-					<div class="characters_left" data-bind="charactersLeft: {value: $root[field_name], limit: limit}"></div>
-					<textarea data-bind="attr: {disabled: $root.freezeForm || !editable, id: field_id}, value: $root[field_name],
-																		valueUpdate: 'afterkeydown', characterLimit: limit,
-																		style: {height: height + 'px'}"></textarea>
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="text: $root[field_name]"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'wysiwyg' -->
-				<textarea class="wysiwyg" data-bind="attr: {disabled: $root.freezeForm, id: field_id},
-							wysiwyg: {value: $root[field_name], id: field_id}"></textarea>
-			<!-- /ko -->
-
-			<!-- ko if: type === 'markdown' -->
-				<!-- ko if: editable -->
-					<div class="markdown_container" data-bind="style: {height: height + 'px'}">
-						<div class="characters_left" data-bind="charactersLeft: {value: $root[field_name], limit: limit}"></div>
-						<textarea data-bind="attr: {disabled: $root.freezeForm, id: field_id}, characterLimit: limit,
-																		value: $root[field_name], valueUpdate: 'afterkeydown'"></textarea>
-						<div class="preview" data-bind="markdown: $root[field_name]"></div>
-					</div>
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="markdown: $root[field_name]"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'password' -->
-				<!-- ko if: editable -->
-					<div class="characters_left" data-bind="charactersLeft: {value: $root[field_name], limit: limit}"></div>
-					<input type="password" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-																		valueUpdate: 'afterkeydown', characterLimit: limit" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="text: '********'"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'belongs_to' -->
-				<!-- ko if: loadingOptions -->
-					<div class="loader"></div>
-				<!-- /ko -->
-
-				<!-- ko if: autocomplete -->
-				<input type="hidden" data-bind="attr: {disabled: $root.freezeForm() || loadingOptions() || constraintLoading() || !editable,
-														id: field_id},
-											value: $root[field_name], select2Remote: {field: field_name, type: 'edit', constraints: constraints}" />
-				<!-- /ko -->
-
-				<!-- ko ifnot: autocomplete -->
-				<input type="hidden" data-bind="attr: {disabled: $root.freezeForm() || loadingOptions() || constraintLoading() || !editable,
-														id: field_id},
-											value: $root[field_name], select2: {data:{results: $root.listOptions[field_name]}}" />
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'belongs_to_many' -->
-				<!-- ko if: loadingOptions -->
-					<div class="loader"></div>
-				<!-- /ko -->
-
-				<!-- ko if: autocomplete -->
-				<input type="hidden" data-bind="attr: {disabled: $root.freezeForm() || loadingOptions() || constraintLoading() || !editable,
-														id: field_id},
-									select2Remote: {field: field_name, type: 'edit', multiple: true, constraints: constraints, sort: sort_field},
-									value: $root[field_name]" />
-				<!-- /ko -->
-
-				<!-- ko ifnot: autocomplete -->
-				<input type="hidden" data-bind="attr: {disabled: $root.freezeForm() || loadingOptions() || constraintLoading() || !editable,
-														id: field_id},
-													select2: {data:{results: $root.listOptions[field_name]}, multiple: true, sort: sort_field},
-													value: $root[field_name]" />
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'has_many' -->
-				<!-- ko if: loadingOptions -->
-					<div class="loader"></div>
-				<!-- /ko -->
-
-				<!-- ko if: autocomplete -->
-				<input type="hidden" data-bind="attr: {disabled: $root.freezeForm() || loadingOptions() || constraintLoading() || !editable,
-														id: field_id},
-									select2Remote: {field: field_name, type: 'edit', multiple: true, constraints: constraints, sort: sort_field},
-									value: $root[field_name]" />
-				<!-- /ko -->
-
-				<!-- ko ifnot: autocomplete -->
-				<input type="hidden" data-bind="attr: {disabled: $root.freezeForm() || loadingOptions() || constraintLoading() || !editable,
-														id: field_id},
-													select2: {data:{results: $root.listOptions[field_name]}, multiple: true, sort: sort_field},
-													value: $root[field_name]" />
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'number' -->
-				<!-- ko if: editable -->
-					<span class="symbol" data-bind="text: symbol"></span>
-					<input type="text" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-												number: {decimals: decimals, key: field_name, thousandsSeparator: thousands_separator,
-														decimalSeparator: decimal_separator}" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<span data-bind="text: symbol"></span>
-					<span class="uneditable" data-bind="value: $root[field_name], number: {decimals: decimals, key: field_name,
-																					thousandsSeparator: thousands_separator,
-																					decimalSeparator: decimal_separator}"></span>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'bool' -->
-				<!-- ko if: editable -->
-					<input type="checkbox" data-bind="attr:{disabled: $root.freezeForm, id: field_id}, bool: field_name, checked: $root[field_name]" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<span data-bind="text: parseInt($root[field_name]()) ? 'yes' : 'no'"></span>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'enum' -->
-				<!-- ko if: editable -->
-					<input type="hidden" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-													select2: {data: {results: options}}"></select>
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="enumText: { value: $root[field_name](), enumOptions: options }"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'date' -->
-				<!-- ko if: editable -->
-					<input type="text" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-																				datepicker: {dateFormat: date_format}" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="formatDate: {dateFormat: date_format, value: $root[field_name]()}"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'time' -->
-				<!-- ko if: editable -->
-					<input type="text" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-																			timepicker: {timeFormat: time_format}" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="formatTime: {timeFormat: time_format, value: $root[field_name]()}"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'datetime' -->
-				<!-- ko if: editable -->
-					<input type="text" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name],
-																		datetimepicker: {dateFormat: date_format, timeFormat: time_format}" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="formatDateTime: {timeFormat: time_format, dateFormat: date_format,
-																		value: $root[field_name]()}"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'image' -->
-				<!-- ko if: editable -->
-					<div class="upload_container" data-bind="attr: {id: field_id}">
-						<div class="uploader" data-bind="attr: {disabled: $root.freezeForm, id: field_name + '_uploader'}, value: $root.activeItem,
-												fileupload: {field: field_name, size_limit: size_limit, uploading: uploading, image: true,
-															upload_percentage: upload_percentage, upload_url: upload_url}">
-																<?php echo trans('administrator::administrator.uploadimage') ?></div>
-						<!-- ko if: uploading -->
-							<div class="uploading"
-							data-bind="text: '<?php echo trans('administrator::administrator.imageuploading') ?>' + upload_percentage() + '%'"></div>
-						<!-- /ko -->
-					</div>
-				<!-- /ko -->
-				<!-- ko if: $root[field_name]() && !$root.loadingItem() -->
-					<div class="image_container">
-						<!-- ko if: display_raw_value && !$root.fieldIsDirty(field_name) -->
-							<img data-bind="attr: {src: $root[field_name]()}" onload="window.admin.resizePage()" />
-						<!-- /ko -->
-						<!-- ko if: !display_raw_value || $root.fieldIsDirty(field_name) -->
-							<img data-bind="attr: {src: file_url + '?path=' + location + $root[field_name]()}" onload="window.admin.resizePage()" />
-						<!-- /ko -->
-
-						<!-- ko if: editable -->
-							<input type="button" class="remove_button" data-bind="click: function() {$root[field_name](null)}" value="x" />
-						<!-- /ko -->
-					</div>
-				<!-- /ko -->
-				<!-- ko if: !$root[field_name]() && !editable -->
-					<div class="uneditable" data-bind="text: '<?php echo trans('administrator::administrator.no_image_uploaded') ?>'"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'file' -->
-				<!-- ko if: editable -->
-					<div class="upload_container" data-bind="attr: {id: field_id}">
-						<div class="uploader" data-bind="attr: {disabled: $root.freezeForm, id: field_name + '_uploader'}, value: $root.activeItem,
-												fileupload: {field: field_name, size_limit: size_limit, uploading: uploading,
-															upload_percentage: upload_percentage, upload_url: upload_url}">
-																<?php echo trans('administrator::administrator.uploadfile') ?></div>
-						<!-- ko if: uploading -->
-							<div class="uploading"
-							data-bind="text: '<?php echo trans('administrator::administrator.fileuploading') ?>' + upload_percentage() + '%'"></div>
-						<!-- /ko -->
-					</div>
-				<!-- /ko -->
-				<!-- ko if: $root[field_name] -->
-					<div class="file_container">
-						<!-- ko if: display_raw_value && $root.fieldIsDirty(field_name) -->
-							<a data-bind="attr: {href: $root[field_name](), title: $root[field_name]}, text: $root[field_name]"></a>
-						<!-- /ko -->
-						<!-- ko if: !display_raw_value || $root.fieldIsDirty(field_name) -->
-							<a data-bind="attr: {href: file_url + '?path=' + location + $root[field_name](), title: $root[field_name]},
-							text: $root[field_name]"></a>
-						<!-- /ko -->
-
-						<!-- ko if: editable -->
-							<input type="button" class="remove_button" data-bind="click: function() {$root[field_name](null)}" value="x" />
-						<!-- /ko -->
-					</div>
-				<!-- /ko -->
-				<!-- ko if: !$root[field_name]() && !editable -->
-					<div class="uneditable" data-bind="text: '<?php echo trans('administrator::administrator.no_file_uploaded') ?>'"></div>
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'color' -->
-				<!-- ko if: editable -->
-					<input type="text" data-type="color" data-bind="attr: {disabled: $root.freezeForm, id: field_id}, value: $root[field_name]" />
-				<!-- /ko -->
-				<!-- ko ifnot: editable -->
-					<div class="uneditable" data-bind="text: $root[field_name]()"></div>
-				<!-- /ko -->
-				<div class="color_preview" data-bind="style: {backgroundColor: $root[field_name]}, visible: $root[field_name]"></div>
-			<!-- /ko -->
-
-			<!-- ko if: $data.description && (type === 'bool' || type === 'key') -->
-				<p class="description_below" data-bind="text: description"></p>
-			<!-- /ko -->
+	<!-- 커스텀 버튼 목록 (상단 액션용) -->
+	<?php if($config->checkOption('is_top_actions')) { ?>
+		<template x-if="$root[$root.primaryKey] && actions && actions.length">
+			<div class="custom_buttons">
+				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
+					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
+						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+							   :value="action.title" :disabled="freezeForm || freezeActions" />
+					</template>
+				</template>
 			</div>
-		<!-- /ko -->
-	<!-- /ko -->
+		</template>
+	<?php } ?>
 
+	<!-- 오리지널 편집 폼 필드 루프 -->
+	<template x-for="(field, index) in editFields" :key="field.field_id || index">
+		<div x-show="field && ($root[$root.primaryKey] || field.editable) && field.visible" 
+			 :class="field.type + ' ' + (field.min_max ? 'min_max' : '')">
+			 
+			<label :for="field.field_id">
+				<span x-text="field.title"></span>
+				<span class="required" x-show="field.required">*</span>:
+			</label>
 
-        <!-- ko if: $root[$root.primaryKey]() && actions().length -->
-        <div class="custom_buttons">
-            <!-- ko foreach: actions -->
-            <!-- ko if: has_permission && $root.actionPermissions[action_name] !== false -->
-            <input type="button" data-bind="click: function(){$root.customAction(true, action_name, messages, confirmation)}, value: title,
-																	attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-            <!-- /ko -->
-            <!-- /ko -->
-        </div>
-        <!-- /ko -->
+			<!-- 필드 디스크립션 -->
+			<template x-if="field.description && field.type !== 'bool' && field.type !== 'key'">
+				<p class="description" x-text="field.description"></p>
+			</template>
 
+			<!-- 1. KEY TYPE -->
+			<template x-if="field.type === 'key'">
+				<div class="uneditable" x-text="$root[$root.primaryKey]"></div>
+			</template>
+
+			<!-- 2. TEXT TYPE -->
+			<template x-if="field.type === 'text'">
+				<div>
+					<template x-if="field.editable">
+						<input type="text" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" :maxlength="field.limit || null" />
+					</template>
+					<template x-if="!field.editable">
+						<div class="uneditable" x-text="$root[field.field_name]"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 3. TEXTAREA TYPE -->
+			<template x-if="field.type === 'textarea'">
+				<div>
+					<template x-if="field.editable">
+						<textarea :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" :maxlength="field.limit || null" :style="{ height: (field.height || 80) + 'px' }"></textarea>
+					</template>
+					<template x-if="!field.editable">
+						<div class="uneditable" x-text="$root[field.field_name]" style="white-space: pre-wrap;"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 4. WYSIWYG TYPE (CKEditor 포팅) -->
+			<template x-if="field.type === 'wysiwyg'">
+				<div x-init="
+					setTimeout(() => {
+						if (window.CKEDITOR) {
+							let textareaEl = $el.querySelector('textarea');
+							if (textareaEl) {
+								if (CKEDITOR.instances[field.field_id]) {
+									CKEDITOR.instances[field.field_id].destroy(true);
+								}
+								let editor = CKEDITOR.replace(textareaEl);
+								editor.on('change', () => {
+									$root[field.field_name] = editor.getData();
+								});
+								$watch('$root.' + field.field_name, (newVal) => {
+									if (editor.getData() !== newVal) {
+										editor.setData(newVal || '');
+									}
+								});
+							}
+						}
+					}, 100);
+				">
+					<textarea :id="field.field_id" :disabled="freezeForm" x-text="$root[field.field_name]"></textarea>
+				</div>
+			</template>
+
+			<!-- 5. MARKDOWN TYPE -->
+			<template x-if="field.type === 'markdown'">
+				<div>
+					<template x-if="field.editable">
+						<div class="markdown_container">
+							<textarea :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" :style="{ height: (field.height || 180) + 'px' }"></textarea>
+							<div class="preview prose dark:prose-invert prose-sm" x-html="window.marked ? marked.parse($root[field.field_name] || '') : ($root[field.field_name] || '')"></div>
+						</div>
+					</template>
+					<template x-if="!field.editable">
+						<div class="uneditable prose dark:prose-invert prose-sm" x-html="window.marked ? marked.parse($root[field.field_name] || '') : ($root[field.field_name] || '')"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 6. PASSWORD TYPE -->
+			<template x-if="field.type === 'password'">
+				<div>
+					<template x-if="field.editable">
+						<input type="password" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" />
+					</template>
+					<template x-if="!field.editable">
+						<div class="uneditable" x-text="'********'"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 7. BOOL TYPE -->
+			<template x-if="field.type === 'bool'">
+				<div>
+					<template x-if="field.editable">
+						<input type="checkbox" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" />
+					</template>
+					<template x-if="!field.editable">
+						<span x-text="parseInt($root[field.field_name]) ? 'yes' : 'no'"></span>
+					</template>
+				</div>
+			</template>
+
+			<!-- 8. ENUM TYPE -->
+			<template x-if="field.type === 'enum'">
+				<div>
+					<template x-if="field.editable">
+						<select x-model="$root[field.field_name]" :id="field.field_id" style="width: 100%;"
+								x-init="
+									$nextTick(() => {
+										jQuery($el).select2().on('change', function() {
+											$root[field.field_name] = jQuery($el).val();
+										});
+									});
+								">
+							<option value="">-- 선택 --</option>
+							<template x-for="opt in field.options" :key="opt.id">
+								<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == $root[field.field_name]"></option>
+							</template>
+						</select>
+					</template>
+					<template x-if="!field.editable">
+						<div class="uneditable" x-text="(field.options.find(x => String(x.id) === String($root[field.field_name])) || {}).text || $root[field.field_name] || '-'"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 9. DATE, TIME, DATETIME -->
+			<template x-if="['date', 'time', 'datetime'].includes(field.type)">
+				<div>
+					<template x-if="field.editable">
+						<input :type="field.type === 'date' ? 'date' : (field.type === 'time' ? 'time' : 'datetime-local')" 
+							   :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" style="padding: 3px;" />
+					</template>
+					<template x-if="!field.editable">
+						<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 10. IMAGE TYPE -->
+			<template x-if="field.type === 'image'">
+				<div>
+					<template x-if="field.editable">
+						<div class="upload_container" :id="field.field_id">
+							<input type="file" :id="field.field_name + '_uploader'" 
+								   @change="uploadFile($event, field)" :disabled="freezeForm" style="display: none;" />
+							<button type="button" @click="$event.target.parentElement.querySelector('input[type=file]').click()"
+									:disabled="freezeForm" class="remove_button" style="padding: 4px 10px; font-size: 11px;">
+								<?php echo trans('administrator::administrator.uploadimage') ?>
+							</button>
+							<div class="uploading" x-show="field.uploading"
+								 x-text="'<?php echo trans('administrator::administrator.imageuploading') ?>' + field.upload_percentage + '%'"></div>
+						</div>
+					</template>
+					<template x-if="$root[field.field_name] && !loadingItem">
+						<div class="image_container" style="margin-top: 8px;">
+							<template x-if="field.display_raw_value">
+								<img :src="$root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px;" />
+							</template>
+							<template x-if="!field.display_raw_value">
+								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px;" />
+							</template>
+							<template x-if="field.editable">
+								<input type="button" class="remove_button" @click="$root[field.field_name] = null" value="x" style="margin-left: 5px; vertical-align: top;" />
+							</template>
+						</div>
+					</template>
+					<template x-if="!$root[field.field_name] && !field.editable">
+						<div class="uneditable"><?php echo trans('administrator::administrator.no_image_uploaded') ?></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 11. FILE TYPE -->
+			<template x-if="field.type === 'file'">
+				<div>
+					<template x-if="field.editable">
+						<div class="upload_container" :id="field.field_id">
+							<input type="file" :id="field.field_name + '_uploader'" 
+								   @change="uploadFile($event, field)" :disabled="freezeForm" style="display: none;" />
+							<button type="button" @click="$event.target.parentElement.querySelector('input[type=file]').click()"
+									:disabled="freezeForm" class="remove_button" style="padding: 4px 10px; font-size: 11px;">
+								<?php echo trans('administrator::administrator.uploadfile') ?>
+							</button>
+							<div class="uploading" x-show="field.uploading"
+								 x-text="'<?php echo trans('administrator::administrator.fileuploading') ?>' + field.upload_percentage + '%'"></div>
+						</div>
+					</template>
+					<template x-if="$root[field.field_name]">
+						<div class="file_container" style="margin-top: 8px;">
+							<template x-if="field.display_raw_value">
+								<a :href="$root[field.field_name]" :title="$root[field.field_name]" x-text="$root[field.field_name]"></a>
+							</template>
+							<template x-if="!field.display_raw_value">
+								<a :href="$root.file_url + '?path=' + field.location + $root[field.field_name]" :title="$root[field.field_name]" x-text="$root[field.field_name]"></a>
+							</template>
+							<template x-if="field.editable">
+								<input type="button" class="remove_button" @click="$root[field.field_name] = null" value="x" style="margin-left: 5px;" />
+							</template>
+						</div>
+					</template>
+					<template x-if="!$root[field.field_name] && !field.editable">
+						<div class="uneditable"><?php echo trans('administrator::administrator.no_file_uploaded') ?></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 12. COLOR TYPE -->
+			<template x-if="field.type === 'color'">
+				<div>
+					<template x-if="field.editable">
+						<div style="display: inline-flex; align-items: center; gap: 6px;">
+							<input type="text" x-model="$root[field.field_name]" :id="field.field_id" style="width: 80px !important; display: inline-block;" />
+							<input type="color" x-model="$root[field.field_name]" style="width: 30px; height: 26px; border: 1px solid #ccc; border-radius: 4px; padding: 0; cursor: pointer; background: none;" />
+						</div>
+					</template>
+					<template x-if="!field.editable">
+						<div style="display: inline-flex; align-items: center; gap: 6px;">
+							<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
+							<div class="color_preview" :style="{ backgroundColor: $root[field.field_name] }" x-show="$root[field.field_name]" style="width: 24px; height: 24px; border: 1px solid #ccc; border-radius: 4px;"></div>
+						</div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many) -->
+			<template x-if="['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
+				<div class="relative w-full"
+					 x-data="{
+						open: false,
+						search: '',
+						options: [],
+						loading: false,
+						
+						init() {
+							if (field.autocomplete) {
+								const autoKey = field.field_name + '_autocomplete';
+								const autoData = $root.autocompleteData[autoKey] || {};
+								this.options = Object.values(autoData);
+							} else {
+								this.options = $root.listOptions[field.field_name] || [];
+								this.$watch('$root.listOptions.' + field.field_name, (newVal) => {
+									this.options = newVal || [];
+								});
+							}
+						}
+					 }"
+					 x-init="init()"
+					 style="position: relative; width: 100%;">
+					
+					<template x-if="field.editable">
+						<input type="hidden" :id="field.field_id" x-model="$root[field.field_name]" :multiple="field.type === 'belongs_to_many'"
+							   x-init="
+								 $nextTick(() => {
+									let $el = jQuery('#' + field.field_id);
+									if (field.autocomplete) {
+										$el.select2Remote({
+											field: field.field_name,
+											type: 'edit',
+											multiple: field.type === 'belongs_to_many',
+											filterIndex: index
+										}).on('change', function(e) {
+											$root[field.field_name] = $el.val();
+										});
+									} else {
+										let resultsData = listOptions[field.field_name] || [];
+										$el.select2({
+											data: { results: resultsData },
+											multiple: field.type === 'belongs_to_many'
+										}).on('change', function(e) {
+											$root[field.field_name] = $el.val();
+										});
+									}
+								 });
+							   " />
+					</template>
+
+					<template x-if="!field.editable">
+						<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
+					</template>
+				</div>
+			</template>
+
+			<!-- 설명 추가형 필드 (bool, key 타입 아래 추가 묘사) -->
+			<template x-if="field.description && (field.type === 'bool' || field.type === 'key')">
+				<p class="description_below" x-text="field.description"></p>
+			</template>
+		</div>
+	</template>
+
+	<!-- 커스텀 하단 버튼 그룹 -->
+	<?php if(!$config->checkOption('is_top_actions')) { ?>
+		<template x-if="$root[$root.primaryKey] && actions && actions.length">
+			<div class="custom_buttons">
+				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
+					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
+						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+							   :value="action.title" :disabled="freezeForm || freezeActions" />
+					</template>
+				</template>
+			</div>
+		</template>
+	<?php } ?>
+
+	<!-- 제어 및 액션 버튼 세트 (최초 디자인 복원) -->
 	<div class="control_buttons">
-		<!-- ko if: $root[$root.primaryKey]() -->
+		<template x-if="$root[$root.primaryKey]">
 			<input type="button" value="<?php echo trans('administrator::administrator.close') ?>"
-				data-bind="click: closeItem, attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
+				   @click="closeItem()" :disabled="freezeForm || freezeActions" />
+		</template>
 
-			<!-- ko if: actionPermissions.delete -->
-				<input type="button" value="<?php echo trans('administrator::administrator.delete') ?>"
-					data-bind="click: deleteItem, attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-			<!-- /ko -->
+		<template x-if="$root[$root.primaryKey] && actionPermissions.delete">
+			<input type="button" value="<?php echo trans('administrator::administrator.delete') ?>"
+				   @click="deleteItem()" :disabled="freezeForm || freezeActions" class="remove_button" />
+		</template>
 
-			<!-- ko if: actionPermissions.update -->
-				<input type="submit" value="<?php echo trans('administrator::administrator.save') ?>"
-					data-bind="attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-			<!-- /ko -->
-		<!-- /ko -->
+		<template x-if="$root[$root.primaryKey] && actionPermissions.update">
+			<input type="submit" value="<?php echo trans('administrator::administrator.save') ?>"
+				   :disabled="freezeForm || freezeActions" />
+		</template>
 
-		<!-- ko ifnot: $root[$root.primaryKey]() -->
+		<template x-if="!$root[$root.primaryKey]">
 			<input type="button" value="<?php echo trans('administrator::administrator.cancel') ?>"
-				data-bind="click: closeItem, attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-			<!-- ko if: actionPermissions.create -->
-				<input type="submit" value="<?php echo trans('administrator::administrator.create') ?>"
-					data-bind="attr: {disabled: $root.freezeForm() || $root.freezeActions()}" />
-			<!-- /ko -->
-		<!-- /ko -->
-		<span class="message" data-bind="css: { error: statusMessageType() == 'error', success: statusMessageType() == 'success' },
-										notification: statusMessage "></span>
+				   @click="closeItem()" :disabled="freezeForm || freezeActions" />
+		</template>
+
+		<template x-if="!$root[$root.primaryKey] && actionPermissions.create">
+			<input type="submit" value="<?php echo trans('administrator::administrator.create') ?>"
+				   :disabled="freezeForm || freezeActions" />
+		</template>
+		
+		<!-- 트랜잭션 진행률 및 알림 -->
+		<span class="message" 
+			  x-show="statusMessage"
+			  :class="{ error: statusMessageType === 'error', success: statusMessageType === 'success' }"
+			  x-text="statusMessage"></span>
 	</div>
 </form>

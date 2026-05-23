@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.md or http://ckeditor.com/license
+ Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
 */
-CKEDITOR.plugins.setLang("placeholder","eu",{title:"Leku-marka Aukerak",toolbar:"Leku-marka sortu",name:"Placeholder Name",invalidName:"The placeholder can not be empty and can not contain any of following characters: [, ], <, >",pathName:"placeholder"});
+CKEDITOR.plugins.setLang("placeholder","eu",{title:"Leku-marka propietateak",toolbar:"Leku-marka",name:"Leku-markaren izena",invalidName:"Leku-markak ezin du hutsik egon eta ezin ditu karaktere hauek eduki: [, ], \x3c, \x3e",pathName:"leku-marka"});

@@ -1,0 +1,1253 @@
+// Tailwind CSS 엔트리를 포함하여 번들러가 함께 빌드할 수 있도록 임포트합니다.
+import '../css/app.css';
+
+// Alpine.js 라이브러리를 임포트하고 브라우저 전역 범위(window)에 등록합니다.
+import Alpine from 'alpinejs';
+
+/**
+ * 중첩된 객체를 x-www-form-urlencoded 쿼리 스트링 포맷으로 직렬화하기 위한 헬퍼 함수
+ * jQuery.param()의 직렬화 로직과 호환되도록 설계되었습니다.
+ */
+function buildParams(prefix, obj, add) {
+    if (Array.isArray(obj)) {
+        obj.forEach((v, i) => {
+            if (/\[\]$/.test(prefix)) {
+                add(prefix, v);
+            } else {
+                buildParams(
+                    prefix + "[" + (typeof v === "object" && v !== null ? i : "") + "]",
+                    v,
+                    add
+                );
+            }
+        });
+    } else if (typeof obj === "object" && obj !== null) {
+        for (const name in obj) {
+            buildParams(prefix + "[" + name + "]", obj[name], add);
+        }
+    } else {
+        add(prefix, obj);
+    }
+}
+
+function serializeData(obj) {
+    const s = [];
+    const add = (key, value) => {
+        const val = value == null ? "" : value;
+        s.push(encodeURIComponent(key) + "=" + encodeURIComponent(val));
+    };
+
+    for (const prefix in obj) {
+        buildParams(prefix, obj[prefix], add);
+    }
+    return s.join("&");
+}
+
+/**
+ * Fetch API 기반 비동기 통신을 지원하는 공통 요청 유틸리티 함수
+ * CSRF 토큰 검증(X-CSRF-TOKEN) 및 JSON 응답 파싱을 일관되게 처리합니다.
+ */
+async function request(url, { method = 'GET', data = null, headers = {} } = {}) {
+    const options = {
+        method,
+        headers: {
+            'X-CSRF-TOKEN': window.csrf || (window.adminData && window.adminData.csrf) || '',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            ...headers
+        }
+    };
+
+    if (data) {
+        if (method === 'POST') {
+            options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+            options.body = serializeData(data);
+        } else {
+            const queryString = serializeData(data);
+            if (queryString) {
+                url += (url.includes('?') ? '&' : '?') + queryString;
+            }
+        }
+    }
+
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+}
+
+/**
+ * Alpine.js 전역 컨트롤러: adminController
+ * 글로벌 adminData 객체를 읽고, Alpine.js 반응형 상태 구조에 완전히 매핑합니다.
+ */
+function adminController() {
+    // data_model의 기본 키/값 쌍을 미리 추출하여 Alpine.js가 초기 렌더링 시 반응형으로 추적할 수 있도록 구성합니다.
+    const defaultModel = (window.adminData && window.adminData.data_model) || {};
+
+    return {
+        // 기존 Laravel Administrator 데이터 모델의 속성들을 최상위에 바인딩
+        ...defaultModel,
+
+        // 코어 제어 변수 및 상태 필드
+        initialized: false,
+        modelName: '',
+        modelTitle: '',
+        modelSingle: '',
+        baseUrl: '',
+        primaryKey: 'id',
+        expandWidth: null,
+        rows: [],
+        rowsPerPage: 20,
+        rowsPerPageOptions: [],
+        boolOptions: [
+            { id: 'true', text: 'Yes' },
+            { id: 'false', text: 'No' }
+        ],
+        file_url: '',
+        columns: [],
+        listOptions: {},
+        sortOptions: {
+            field: null,
+            direction: null
+        },
+        pagination: {
+            page: 1,
+            last: 1,
+            total: 0,
+            per_page: 20
+        },
+        filters: [],
+        editFields: [],
+        originalEditFields: [],
+        originalData: {},
+        activeItem: null,
+        lastItem: null,
+        loadingItem: false,
+        itemLoadingId: null,
+        loadingRows: false,
+        rowLoadingId: 0,
+        freezeForm: false,
+        freezeActions: false,
+        freezeConstraints: false,
+        constraintsQueue: {},
+        holdConstraintsQueue: true,
+        actions: [],
+        globalActions: [],
+        actionPermissions: {},
+        languages: {},
+        statusMessage: '',
+        statusMessageType: '',
+        globalStatusMessage: '',
+        globalStatusMessageType: '',
+        itemLink: null,
+        autocompleteData: {},
+        columnHidePoints: {},
+        dataTableScrollable: false,
+        historyStarted: false,
+        showFilters: true,
+
+        // 계산된 속성 (Getters)
+        get isFirstPage() {
+            return this.pagination.page === 1;
+        },
+        get isLastPage() {
+            return this.pagination.page === this.pagination.last;
+        },
+
+        /**
+         * Alpine.js 컴포넌트가 초기화될 때 실행되는 부트스트랩 함수
+         */
+        init() {
+            if (!window.adminData) {
+                console.error('글로벌 adminData 객체를 찾을 수 없습니다.');
+                return;
+            }
+
+            // 1. 기본 프로퍼티 바인딩
+            this.modelName = window.adminData.model_name || '';
+            this.modelTitle = window.adminData.model_title || '';
+            this.modelSingle = window.adminData.model_single || '';
+            this.baseUrl = window.base_url || '';
+            this.primaryKey = window.adminData.primary_key || 'id';
+            this.expandWidth = window.adminData.expand_width || null;
+            this.rows = window.adminData.rows ? window.adminData.rows.results : [];
+            this.rowsPerPage = window.adminData.rows_per_page || 20;
+            this.file_url = window.file_url || '';
+
+            if (window.adminData.rows) {
+                this.pagination.page = window.adminData.rows.page || 1;
+                this.pagination.last = window.adminData.rows.last || 1;
+                this.pagination.total = window.adminData.rows.total || 0;
+                this.pagination.per_page = window.adminData.rows_per_page || 20;
+            }
+
+            if (window.adminData.sortOptions) {
+                this.sortOptions.field = window.adminData.sortOptions.field;
+                this.sortOptions.direction = window.adminData.sortOptions.direction;
+            }
+
+            this.actions = window.adminData.actions || [];
+            this.globalActions = window.adminData.global_actions || [];
+            this.actionPermissions = window.adminData.action_permissions || {};
+            this.languages = window.adminData.languages || {};
+
+            // 2. 1부터 100까지의 rowsPerPageOptions 채우기
+            this.rowsPerPageOptions = [];
+            for (let i = 1; i <= 100; i++) {
+                this.rowsPerPageOptions.push({ id: i, text: String(i) });
+            }
+
+            // 3. columns, filters, editFields 속성 변환 및 전처리
+            this.columns = this.prepareColumns();
+            this.filters = this.prepareFilters();
+            this.originalEditFields = window.adminData.edit_fields || [];
+            this.editFields = this.prepareEditFields(this.originalEditFields);
+
+            // 4. 연관 관계 리스트 바인딩
+            this.initRelationships();
+
+            // 5. history.js 히스토리 상태 및 브라우저 이벤트 리스너 바인딩
+            this.initHistory();
+            this.initEvents();
+
+            // 6. 상태 변화 감시자(Watchers) 등록
+            this.$watch('pagination.page', (value) => {
+                this.page(value);
+            });
+
+            this.$watch('rowsPerPage', (value) => {
+                this.updateRowsPerPage(parseInt(value));
+            });
+
+            // 필터 데이터 변경 감시
+            this.filters.forEach((filter, index) => {
+                this.$watch(`filters[${index}].value`, (val) => {
+                    if (filter.type === 'key') {
+                        const intVal = isNaN(parseInt(val)) ? '' : parseInt(val);
+                        this.filters[index].value = intVal;
+                    }
+                    this.updateRows();
+                });
+
+                if ('min_value' in filter) {
+                    this.$watch(`filters[${index}].min_value`, () => this.updateRows());
+                }
+                if ('max_value' in filter) {
+                    this.$watch(`filters[${index}].max_value`, () => this.updateRows());
+                }
+            });
+
+            // 제약 조건 필드 변경 감시
+            this.editFields.forEach((field) => {
+                if (field.constraints && Object.keys(field.constraints).length > 0) {
+                    this.establishFieldConstraints(field);
+                }
+            });
+
+            // 레이아웃 높이 및 데이터 테이블 크기 초기 조정
+            this.resizePage();
+
+            // 컴포넌트 활성화 대기 시간 적용
+            setTimeout(() => {
+                this.initialized = true;
+                // 엘리먼트 오프셋이 확실히 확보된 활성화 시점에 리사이즈를 재호출하여 렌더링 오차를 보정합니다.
+                this.resizePage();
+            }, 1000);
+
+            // 문서 로딩이 완전히 완료된 온로드 시점에 한 번 더 레이아웃을 보정합니다.
+            window.addEventListener('load', () => {
+                this.resizePage();
+            });
+        },
+
+        // columns visible 속성 래핑
+        prepareColumns() {
+            const columns = [];
+            const colModel = window.adminData.column_model || [];
+            colModel.forEach(column => {
+                columns.push({
+                    ...column,
+                    visible: !!column.visible
+                });
+            });
+            return columns;
+        },
+
+        // filters 전처리 및 loading 상태 맵핑
+        prepareFilters() {
+            const filters = [];
+            const rawFilters = window.adminData.filters || {};
+            const filterItems = Array.isArray(rawFilters) ? rawFilters : Object.values(rawFilters);
+            
+            filterItems.forEach(filter => {
+                const prepared = { ...filter };
+                prepared.value = filter.value !== undefined ? filter.value : null;
+                if ('min_value' in filter) prepared.min_value = filter.min_value !== undefined ? filter.min_value : null;
+                if ('max_value' in filter) prepared.max_value = filter.max_value !== undefined ? filter.max_value : null;
+                
+                if (filter.relationship) {
+                    prepared.loadingOptions = false;
+                }
+                prepared.field_id = 'filter_field_' + filter.field_name;
+                filters.push(prepared);
+            });
+            return filters;
+        },
+
+        // editFields 준비 및 미디어 업로드 상태 정의
+        prepareEditFields(editFieldsSrc) {
+            const fields = [];
+            const srcList = Array.isArray(editFieldsSrc) ? editFieldsSrc : Object.values(editFieldsSrc);
+            
+            srcList.forEach((field, ind) => {
+                const prepared = { ...field };
+                if (field.relationship) {
+                    prepared.loadingOptions = false;
+                    prepared.constraintLoading = false;
+                }
+                if (field.type === 'image' || field.type === 'file') {
+                    prepared.uploading = false;
+                    prepared.upload_percentage = 0;
+                }
+                prepared.field_id = 'edit_field_' + ind;
+                fields.push(prepared);
+            });
+            return fields;
+        },
+
+        // relationships 옵션 및 autocomplete 데이터 초기화
+        initRelationships() {
+            this.filters.forEach((filter, ind) => {
+                if (filter.relationship) {
+                    this.listOptions[ind] = filter.options || [];
+                }
+            });
+
+            this.editFields.forEach((field, ind) => {
+                if (field.relationship) {
+                    this.listOptions[ind] = field.options || [];
+                }
+                if (field.autocomplete) {
+                    const autoKey = field.field_name + '_autocomplete';
+                    if (!(autoKey in this.autocompleteData)) {
+                        this.autocompleteData[autoKey] = {};
+                    }
+                    if (field.options) {
+                        field.options.forEach(option => {
+                            this.autocompleteData[autoKey][option.id] = option;
+                        });
+                    }
+                }
+            });
+        },
+
+        /**
+         * 파일 및 이미지 비동기 업로드 처리 (Fetch 및 XHR 연계형)
+         */
+        async uploadFile(event, field) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 파일 크기 제한 검증
+            if (field.size_limit && file.size > field.size_limit * 1024 * 1024) {
+                alert((this.languages['file_too_large'] || '파일 용량이 너무 큽니다. 제한: ') + field.size_limit + 'MB');
+                event.target.value = ''; // input 초기화
+                return;
+            }
+
+            field.uploading = true;
+            field.upload_percentage = 0;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('_token', window.csrf || (window.adminData && window.adminData.csrf) || '');
+
+            const url = `${window.base_url}${this.modelName}/${field.field_name}/file_upload`;
+
+            try {
+                // XHR을 사용하여 업로드 퍼센트 진행률 추적
+                const response = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url);
+                    
+                    xhr.setRequestHeader('X-CSRF-TOKEN', window.csrf || (window.adminData && window.adminData.csrf) || '');
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.setRequestHeader('Accept', 'application/json');
+
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            field.upload_percentage = percent;
+                        }
+                    };
+
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                resolve(JSON.parse(xhr.responseText));
+                            } catch (err) {
+                                reject(new Error('JSON 파싱 오류'));
+                            }
+                        } else {
+                            reject(new Error(`HTTP 오류! 상태코드: ${xhr.status}`));
+                        }
+                    };
+
+                    xhr.onerror = () => reject(new Error('네트워크 오류'));
+                    xhr.send(formData);
+                });
+
+                field.uploading = false;
+                event.target.value = ''; // input 초기화
+
+                if (response.filename && (!response.errors || Object.keys(response.errors).length === 0)) {
+                    // 모델 상태 변수에 파일명 실시간 매핑
+                    this[field.field_name] = response.filename;
+                } else {
+                    alert(response.errors ? JSON.stringify(response.errors) : '업로드 실패');
+                }
+            } catch (error) {
+                field.uploading = false;
+                event.target.value = '';
+                console.error('[어드민 에러] 파일 업로드 실패:', error);
+                alert('파일 업로드 중 네트워크 오류가 발생했습니다.');
+            }
+        },
+
+        /**
+         * 항목 저장 (POST)
+         */
+        async saveItem() {
+            const saveData = {};
+            const modelKeys = Object.keys(window.adminData.data_model || {});
+            
+            modelKeys.forEach(key => {
+                saveData[key] = this[key];
+            });
+
+            saveData._token = window.csrf || (window.adminData && window.adminData.csrf);
+
+            if (!saveData[this.primaryKey]) {
+                delete saveData[this.primaryKey];
+            }
+
+            this.editFields.forEach(field => {
+                if (field.relationship && !field.external && saveData[field.field_name] === '') {
+                    saveData[field.field_name] = false;
+                }
+            });
+
+            this.statusMessage = this.languages['saving'] || '저장 중...';
+            this.statusMessageType = '';
+            this.freezeForm = true;
+
+            const url = `${window.base_url}${this.modelName}/${this[this.primaryKey] || 0}/save`;
+
+            try {
+                const response = await request(url, {
+                    method: 'POST',
+                    data: saveData
+                });
+
+                this.freezeForm = false;
+                this.resizePage();
+
+                if (response.success) {
+                    this.statusMessage = this.languages['saved'] || '저장되었습니다.';
+                    this.statusMessageType = 'success';
+                    
+                    await this.updateRows();
+                    await this.updateSelfRelationships();
+                    this.setData(response.data);
+
+                    setTimeout(() => {
+                        if (window.History && window.History.pushState) {
+                            window.History.pushState({ modelName: this.modelName }, null, window.route + this.modelName);
+                        }
+                    }, 200);
+                } else {
+                    this.statusMessage = response.errors || '저장 실패';
+                    this.statusMessageType = 'error';
+                }
+            } catch (error) {
+                this.freezeForm = false;
+                this.statusMessage = '네트워크 오류가 발생했습니다.';
+                this.statusMessageType = 'error';
+                this.resizePage();
+            }
+        },
+
+        /**
+         * 항목 삭제 (POST)
+         */
+        async deleteItem() {
+            const conf = confirm(this.languages['delete_active_item'] || '정말 이 항목을 삭제하시겠습니까?');
+            if (!conf) return false;
+
+            this.statusMessage = this.languages['deleting'] || '삭제 중...';
+            this.statusMessageType = '';
+            this.freezeForm = true;
+
+            const url = `${window.base_url}${this.modelName}/${this[this.primaryKey]}/delete`;
+
+            try {
+                const response = await request(url, {
+                    method: 'POST',
+                    data: { _token: window.csrf || (window.adminData && window.adminData.csrf) }
+                });
+
+                this.freezeForm = false;
+                this.resizePage();
+
+                if (response.success) {
+                    this.statusMessage = this.languages['deleted'] || '삭제되었습니다.';
+                    this.statusMessageType = 'success';
+                    
+                    await this.updateRows();
+                    await this.updateSelfRelationships();
+
+                    setTimeout(() => {
+                        this.clearItem(); // 📌 물리적인 상세 서랍 닫기를 강제로 보장합니다.
+                        if (window.History && window.History.pushState) {
+                            window.History.pushState({ modelName: this.modelName }, null, window.route + this.modelName);
+                        }
+                    }, 500);
+                } else {
+                    this.statusMessage = response.error || '삭제 실패';
+                    this.statusMessageType = 'error';
+                }
+            } catch (error) {
+                this.freezeForm = false;
+                this.statusMessage = '네트워크 오류가 발생했습니다.';
+                this.statusMessageType = 'error';
+                this.resizePage();
+            }
+        },
+
+        /**
+         * 그리드 행 클릭 이벤트 콜백
+         */
+        clickItem(id) {
+            console.log('[디버그] clickItem 호출됨 - id:', id, 'loadingItem:', this.loadingItem, 'activeItem:', this.activeItem, 'viewPermission:', this.actionPermissions.view);
+            if (!this.loadingItem && this.activeItem !== id && this.actionPermissions.view) {
+                // 히스토리 어댑터 유실/오작동 여부와 전혀 무관하게 즉각 상세 조회를 다이렉트로 가동
+                this.getItem(id);
+
+                if (window.History && window.History.pushState) {
+                    window.History.pushState({ modelName: this.modelName, id: id }, null, window.route + this.modelName + '/' + id);
+                }
+            }
+        },
+
+        /**
+         * 상세 항목 로딩 (GET)
+         */
+        async getItem(id) {
+            this.loadingItem = true;
+
+            window.adminData.edit_fields = this.originalEditFields;
+            this.editFields = this.prepareEditFields(this.originalEditFields);
+
+            this.holdConstraintsQueue = true;
+
+            const defaultModel = window.adminData.data_model || {};
+            Object.keys(defaultModel).forEach(key => {
+                this[key] = defaultModel[key];
+            });
+            this.originalData = {};
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (!id) {
+                this.setUpNewItem();
+                return;
+            }
+
+            this.freezeConstraints = true;
+            this.itemLoadingId = id;
+
+            const url = `${window.base_url}${this.modelName}/${id}`;
+
+            try {
+                const data = await request(url);
+
+                if (data.success === false && data.errors) {
+                    alert(data.errors);
+                    return;
+                }
+
+                if (this.itemLoadingId !== id) {
+                    if (this.itemLoadingId === null) {
+                        this.loadingItem = false;
+                        this.clearItem();
+                    }
+                } else {
+                    this.setData(data);
+                }
+            } catch (error) {
+                this.loadingItem = false;
+                console.error('[어드민 에러] 상세 조회 실패:', error);
+                alert('데이터를 가져오는 중 오류가 발생했습니다.');
+            }
+        },
+
+        setUpNewItem() {
+            this.itemLoadingId = null;
+            this.activeItem = 0;
+            this.lastItem = 0;
+            this.loadingItem = false;
+            
+            // 신규 아이템 생성 시 글로벌 기본 권한을 주입하여 Create 버튼 활성화
+            this.actionPermissions = (window.adminData && window.adminData.action_permissions) || {};
+
+            this.runConstraintsQueue();
+        },
+
+        setData(data) {
+            this.activeItem = data[this.primaryKey];
+            this.loadingItem = false;
+
+            window.adminData.edit_fields = data.administrator_edit_fields || [];
+            this.editFields = this.prepareEditFields(window.adminData.edit_fields);
+
+            this.actions = data.administrator_actions || [];
+            this.actionPermissions = data.administrator_action_permissions || {};
+
+            this.originalData = data;
+
+            const fields = window.adminData.edit_fields || [];
+            const fieldsArray = Array.isArray(fields) ? fields : Object.values(fields);
+            fieldsArray.forEach(el => {
+                if (el && el.relationship && el.autocomplete) {
+                    const autoKey = el.field_name + '_autocomplete';
+                    this.autocompleteData[autoKey] = data[autoKey] || {};
+                }
+            });
+
+            if (data.admin_item_link) {
+                this.itemLink = data.admin_item_link;
+            }
+
+            this.lastItem = data[this.primaryKey];
+
+            const defaultModel = window.adminData.data_model || {};
+            Object.keys(defaultModel).forEach(key => {
+                this[key] = defaultModel[key];
+            });
+
+            Object.keys(data).forEach(key => {
+                if (key in defaultModel || key === this.primaryKey) {
+                    this[key] = data[key];
+                }
+            });
+
+            this.freezeConstraints = false;
+            this.resizePage();
+            this.runConstraintsQueue();
+        },
+
+        closeItem() {
+            // 히스토리 어댑터 오작동 여부와 무관하게 즉각 상세 서랍 닫기를 보장하기 위해 직접 클리어 호출
+            this.clearItem();
+
+            if (window.History && window.History.pushState) {
+                window.History.pushState({ modelName: this.modelName }, null, window.route + this.modelName);
+            }
+        },
+
+        clearItem() {
+            this.freezeForm = false;
+            this.statusMessage = '';
+            this.statusMessageType = '';
+            this.itemLink = null;
+            this.itemLoadingId = null;
+            this.activeItem = null;
+            this.lastItem = null;
+        },
+
+        addNewItem() {
+            this.getItem(0);
+        },
+
+        /**
+         * 커스텀 액션 처리 (POST)
+         */
+        async customAction(isItem, action, messages, confirmation, reload) {
+            const data = {
+                _token: window.csrf || (window.adminData && window.adminData.csrf),
+                action_name: action
+            };
+            let url;
+
+            if (confirmation) {
+                if (!confirm(confirmation)) return false;
+            }
+
+            if (isItem) {
+                url = `${window.base_url}${this.modelName}/${this[this.primaryKey]}/custom_action`;
+                this.statusMessage = messages.active || '작업을 수행 중입니다...';
+                this.statusMessageType = '';
+            } else {
+                url = `${window.base_url}${this.modelName}/custom_action`;
+                data.sortOptions = this.sortOptions;
+                data.filters = this.getFilters();
+                data.page = this.pagination.page;
+                this.globalStatusMessage = messages.active || '작업을 수행 중입니다...';
+                this.globalStatusMessageType = '';
+            }
+
+            this.freezeForm = true;
+
+            try {
+                const response = await request(url, {
+                    method: 'POST',
+                    data: data
+                });
+
+                this.freezeForm = false;
+
+                if (response.success) {
+                    if (isItem) {
+                        this.statusMessage = messages.success || '작업 완료';
+                        this.statusMessageType = 'success';
+                        this.setData(response.data);
+                    } else {
+                        this.globalStatusMessage = messages.success || '작업 완료';
+                        this.globalStatusMessageType = 'success';
+                    }
+
+                    if (response.redirect) {
+                        window.location.href = response.redirect;
+                    }
+
+                    if (response.download) {
+                        this.downloadFile(response.download);
+                    }
+
+                    await this.updateRows();
+
+                    if (reload) {
+                        this.page(this.pagination.page);
+                    }
+                } else {
+                    if (isItem) {
+                        this.statusMessage = response.error || '작업 실패';
+                        this.statusMessageType = 'error';
+                    } else {
+                        this.globalStatusMessage = response.error || '작업 실패';
+                        this.globalStatusMessageType = 'error';
+                    }
+                }
+            } catch (error) {
+                this.freezeForm = false;
+                const errText = '오류가 발생했습니다.';
+                if (isItem) {
+                    this.statusMessage = errText;
+                    this.statusMessageType = 'error';
+                } else {
+                    this.globalStatusMessage = errText;
+                    this.globalStatusMessageType = 'error';
+                }
+            }
+        },
+
+        downloadFile(url) {
+            const hiddenIFrameId = 'hiddenDownloader';
+            let iframe = document.getElementById(hiddenIFrameId);
+
+            if (iframe === null) {
+                iframe = document.createElement('iframe');
+                iframe.id = hiddenIFrameId;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            iframe.src = url;
+        },
+
+        /**
+         * 그리드 리스트 갱신 (POST)
+         */
+        async updateRows() {
+            const id = ++this.rowLoadingId;
+            const data = {
+                _token: window.csrf || (window.adminData && window.adminData.csrf),
+                sortOptions: this.sortOptions,
+                filters: this.getFilters(),
+                page: this.pagination.page
+            };
+
+            if (!this.initialized) return;
+
+            if (!data.page) {
+                data.page = 1;
+            }
+
+            this.loadingRows = true;
+
+            const url = `${window.base_url}${this.modelName}/results`;
+
+            try {
+                const response = await request(url, {
+                    method: 'POST',
+                    data: data
+                });
+
+                if (this.rowLoadingId !== id) {
+                    return;
+                }
+
+                this.pagination.page = response.last ? response.page : response.last;
+                this.pagination.last = response.last;
+                this.pagination.total = response.total;
+                this.rows = response.results || [];
+                this.loadingRows = false;
+            } catch (error) {
+                if (this.rowLoadingId === id) {
+                    this.loadingRows = false;
+                }
+            }
+        },
+
+        /**
+         * 정렬 칼럼 및 방향 업데이트
+         */
+        setSortOptions(field) {
+            let found = false;
+
+            this.columns.forEach(col => {
+                if (field === col.sort_field || field === col.column_name) {
+                    found = true;
+                }
+            });
+
+            if (!found) return false;
+
+            if (field === this.sortOptions.field) {
+                this.sortOptions.direction = this.sortOptions.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortOptions.direction = 'asc';
+            }
+
+            this.sortOptions.field = field;
+            this.updateRows();
+        },
+
+        /**
+         * 페이지 네비게이션
+         */
+        page(page) {
+            const currPage = parseInt(this.pagination.page);
+            let newPage = 1;
+            const lastPage = parseInt(this.pagination.last);
+
+            if (page === 'prev') {
+                if (currPage > 1) {
+                    newPage = currPage - 1;
+                }
+            } else if (page === 'next') {
+                if (currPage < lastPage) {
+                    newPage = currPage + 1;
+                } else {
+                    newPage = lastPage;
+                }
+            } else if (!isNaN(parseInt(page))) {
+                if (page > lastPage) {
+                    newPage = lastPage;
+                } else {
+                    newPage = page;
+                }
+            }
+
+            this.pagination.page = newPage;
+            this.updateRows();
+        },
+
+        /**
+         * 페이지당 노출 행 수 업데이트 (POST)
+         */
+        async updateRowsPerPage(rows) {
+            const url = window.rows_per_page_url;
+            try {
+                await request(url, {
+                    method: 'POST',
+                    data: {
+                        _token: window.csrf || (window.adminData && window.adminData.csrf),
+                        rows: rows
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.updateRows();
+            }
+        },
+
+        getFilters() {
+            const filters = [];
+            const observables = ['value', 'min_value', 'max_value'];
+
+            this.filters.forEach(el => {
+                const filter = {
+                    field_name: el.field_name,
+                    type: el.type,
+                    value: el.value ? el.value : null
+                };
+
+                observables.forEach(obs => {
+                    if (obs in el) {
+                        filter[obs] = el[obs] ? el[obs] : null;
+
+                        if (obs === 'value' && filter[obs] && el.type === 'belongs_to_many' && typeof filter[obs] === 'string') {
+                            filter.value = filter.value.split(',');
+                        }
+                    }
+                });
+
+                filters.push(filter);
+            });
+
+            return filters;
+        },
+
+        fieldIsDirty(field) {
+            return this.originalData[field] !== this[field];
+        },
+
+        /**
+         * 셀프 릴레이션 관계 정보 갱신 (POST)
+         */
+        async updateSelfRelationships() {
+            const filterPromises = this.filters.map(async (filter, ind) => {
+                const fieldName = filter.field_name;
+
+                if ((!filter.constraints || !filter.constraints.length) && filter.self_relationship) {
+                    this.filters[ind].loadingOptions = true;
+
+                    const url = `${window.base_url}${this.modelName}/update_options`;
+                    try {
+                        const response = await request(url, {
+                            method: 'POST',
+                            data: {
+                                fields: [{
+                                    type: 'filter',
+                                    field: fieldName,
+                                    selectedItems: filter.value
+                                }]
+                            }
+                        });
+
+                        this.listOptions[fieldName] = response[fieldName];
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        this.filters[ind].loadingOptions = false;
+                    }
+                }
+            });
+
+            const fieldPromises = this.editFields.map(async (field, ind) => {
+                const fieldName = field.field_name;
+
+                if ((!field.constraints || !field.constraints.length) && field.self_relationship) {
+                    this.editFields[ind].loadingOptions = true;
+
+                    const url = `${window.base_url}${this.modelName}/update_options`;
+                    try {
+                        const response = await request(url, {
+                            method: 'POST',
+                            data: {
+                                fields: [{
+                                    type: 'edit',
+                                    field: fieldName,
+                                    selectedItems: this[fieldName]
+                                }]
+                            }
+                        });
+
+                        this.listOptions[fieldName] = response[fieldName];
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        this.editFields[ind].loadingOptions = false;
+                    }
+                }
+            });
+
+            await Promise.all([...filterPromises, ...fieldPromises]);
+        },
+
+        establishFieldConstraints(field) {
+            const fieldName = field.field_name;
+            const constraintsLength = this.getFieldConstraintsLength(field.field_name);
+
+            Object.keys(field.constraints).forEach(key => {
+                this.$watch(key, (val) => {
+                    if (this.freezeConstraints || field.loadingOptions) return;
+
+                    if (!this.constraintsQueue[key]) {
+                        this.constraintsQueue[key] = {};
+                    }
+
+                    this.constraintsQueue[key][fieldName] = field;
+
+                    const currentQueueLength = Object.keys(this.constraintsQueue[key]).length;
+
+                    if (!this.holdConstraintsQueue && (currentQueueLength === constraintsLength)) {
+                        this.runConstraintsQueue();
+                    }
+                });
+            });
+        },
+
+        getFieldConstraintsLength(key) {
+            let length = 0;
+            this.editFields.forEach(field => {
+                if (field.constraints && field.constraints[key]) {
+                    length++;
+                }
+            });
+            return length;
+        },
+
+        setConstrainerFreeze(key, freeze) {
+            this.editFields.forEach((field, ind) => {
+                if (field.field_name === key) {
+                    this.editFields[ind].constraintLoading = freeze;
+                }
+            });
+        },
+
+        setFieldLoadingOptions(fieldName, type) {
+            this.editFields.forEach((field, ind) => {
+                if (field.field_name === fieldName) {
+                    this.editFields[ind].loadingOptions = type;
+                }
+            });
+        },
+
+        /**
+         * 연관 관계 제약 조건 큐 처리 (POST)
+         */
+        async runConstraintsQueue() {
+            const fields = this.buildConstraintsFromQueue();
+
+            if (!fields.length) return;
+
+            this.freezeActions = true;
+
+            const url = `${window.base_url}${this.modelName}/update_options`;
+
+            try {
+                const response = await request(url, {
+                    method: 'POST',
+                    data: { fields: fields }
+                });
+
+                Object.keys(response).forEach(fieldName => {
+                    const el = response[fieldName] || [];
+                    const data = {};
+
+                    el.forEach(e => {
+                        data[e.id] = e;
+                    });
+
+                    const autoKey = fieldName + '_autocomplete';
+                    this.autocompleteData[autoKey] = data;
+                    this.listOptions[fieldName] = el;
+                });
+            } catch (error) {
+                console.error(error);
+            } finally {
+                this.freezeActions = false;
+
+                Object.keys(this.constraintsQueue).forEach(key => {
+                    const fieldConstraints = this.constraintsQueue[key];
+                    Object.keys(fieldConstraints).forEach(fieldName => {
+                        this.setFieldLoadingOptions(fieldName, false);
+                        this.setConstrainerFreeze(key, false);
+                    });
+                });
+
+                this.constraintsQueue = {};
+                this.holdConstraintsQueue = false;
+            }
+        },
+
+        buildConstraintsFromQueue() {
+            const allConstraints = [];
+
+            Object.keys(this.constraintsQueue).forEach(key => {
+                const fieldConstraints = this.constraintsQueue[key];
+                Object.keys(fieldConstraints).forEach(fieldName => {
+                    const field = fieldConstraints[fieldName];
+                    const constraints = {};
+
+                    this.setFieldLoadingOptions(fieldName, true);
+                    this.setConstrainerFreeze(key, true);
+
+                    Object.keys(field.constraints).forEach(ckey => {
+                        constraints[ckey] = this[ckey];
+                    });
+
+                    allConstraints.push({
+                        constraints: constraints,
+                        type: 'edit',
+                        field: fieldName,
+                        selectedItems: this[fieldName]
+                    });
+                });
+            });
+
+            return allConstraints;
+        },
+
+        initEvents() {
+            // 바닐라 자바스크립트 기반 동적 이벤트 위임 및 리스너 바인딩
+            document.addEventListener('click', (e) => {
+                const target = e.target.closest('div.results_header a.new_item');
+                if (target) {
+                    e.preventDefault();
+                    if (window.History && window.History.pushState) {
+                        window.History.pushState({ modelName: this.modelName, id: 0 }, null, window.route + this.modelName + '/new');
+                    }
+                }
+            });
+
+            window.addEventListener('resize', this.resizePage.bind(this));
+            document.body.addEventListener('mouseup', this.resizePage.bind(this));
+            document.body.addEventListener('keypress', this.resizePage.bind(this));
+
+            if (window.History && window.History.Adapter) {
+                window.History.Adapter.bind(window, 'statechange', () => {
+                    const state = window.History.getState();
+                    console.log('[디버그] statechange 발생 - state.data:', state.data);
+
+                    if (state.data.ignore || (state.data.init && !this.historyStarted)) return;
+
+                    if ('modelName' in state.data) {
+                        if (state.data.modelName !== this.modelName) {
+                            window.location.reload();
+                        }
+                    }
+
+                    if ('id' in state.data) {
+                        if (state.data.id !== this.activeItem) {
+                            console.log('[디버그] getItem 비동기 패치 시작 - id:', state.data.id);
+                            this.getItem(state.data.id);
+                        }
+                    } else {
+                        console.log('[디버그] id 속성 없음. clearItem() 기동');
+                        this.clearItem();
+                    }
+                });
+            }
+        },
+
+        initHistory() {
+            const historyData = {
+                modelName: this.modelName,
+                init: true
+            };
+            let uri = window.route + this.modelName;
+
+            if (window.adminData && 'id' in window.adminData) {
+                const timer = setInterval(() => {
+                    if (window.Alpine) {
+                        this.getItem(window.adminData.id);
+                        historyData.id = window.adminData.id;
+                        uri += '/' + (historyData.id ? historyData.id : 'new');
+
+                        if (window.History && window.History.pushState) {
+                            window.History.pushState(historyData, null, uri);
+                        }
+
+                        clearInterval(timer);
+                    }
+                }, 100);
+            }
+
+            this.historyStarted = true;
+        },
+
+        resizePage() {
+            setTimeout(() => {
+                const winHeight = window.innerHeight;
+                const itemEdit = document.querySelector('div.item_edit');
+                const itemEditHeight = itemEdit ? itemEdit.offsetHeight + 50 : 0;
+                const usedHeight = winHeight > itemEditHeight ? winHeight - 45 : itemEditHeight;
+
+                const adminPage = document.getElementById('admin_page');
+                if (adminPage) {
+                    adminPage.style.minHeight = `${usedHeight}px`;
+                }
+
+                if (!this.dataTableScrollable) {
+                    this.resizeDataTable();
+                } else {
+                    this.scrollDataTable();
+                }
+            }, 50);
+        },
+
+        scrollDataTable() {
+            const tableContainer = document.querySelector('div.table_container');
+            const dataTable = tableContainer ? tableContainer.querySelector('table.results') : null;
+
+            if (!dataTable) return;
+            if (dataTable.parentElement.classList.contains('table_scrollable')) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('table_scrollable');
+            dataTable.parentNode.insertBefore(wrapper, dataTable);
+            wrapper.appendChild(dataTable);
+        },
+
+        resizeDataTable() {
+            const winWidth = window.innerWidth;
+            const tableContainer = document.querySelector('div.table_container');
+            const dataTable = tableContainer ? tableContainer.querySelector('table.results') : null;
+
+            if (!dataTable || !tableContainer) return;
+
+            this.columns.forEach((col, i) => {
+                const hidePoint = this.columnHidePoints[i];
+                if (hidePoint && hidePoint < winWidth) {
+                    col.visible = true;
+                }
+            });
+
+            for (let i = this.columns.length - 1; i >= 2; i--) {
+                const containerWidth = tableContainer.offsetWidth;
+                const tableWidth = dataTable.offsetWidth;
+
+                if (this.columns.length >= 2 && dataTable.offsetWidth > 0 && containerWidth < tableWidth) {
+                    if (i <= 1) return;
+                    if (this.columns[i].visible) {
+                        this.columns[i].visible = false;
+                        this.columnHidePoints[i] = winWidth;
+                        break;
+                    }
+                }
+            }
+        }
+    };
+}
+
+window.adminController = adminController;
+
+// Alpine.js의 $root 매직 프로퍼티를 오버라이드하여, 루트 DOM 노드 자체가 아니라 최상위 x-data 반응성 상태 프록시를 리턴하도록 패치합니다.
+Alpine.magic('root', (el) => {
+    const rootEl = el.closest('[x-data]');
+    return rootEl ? Alpine.$data(rootEl) : {};
+});
+
+// Alpine.js에 전역 컨트롤러 등록
+Alpine.data('adminController', adminController);
+
+// Alpine.js 엔진을 초기화 및 실행합니다.
+Alpine.start();
+

@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.md or http://ckeditor.com/license
+ Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
 */
-CKEDITOR.plugins.setLang("placeholder","sl",{title:"Lastnosti Ograde",toolbar:"Ustvari Ogrado",name:"Placeholder Ime",invalidName:"Placeholder ne more biti prazen in ne sme vsebovati katerega od naslednjih znakov: [, ], <, >",pathName:"placeholder"});
+CKEDITOR.plugins.setLang("placeholder","sl",{title:"Lastnosti ograde",toolbar:"Ograda",name:"Ime ograde",invalidName:"Ograda ne more biti prazna in ne sme vsebovati katerega od naslednjih znakov: [, ], \x3c, \x3e",pathName:"ograda"});

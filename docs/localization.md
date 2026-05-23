@@ -97,5 +97,4 @@ Used in date field type. Directory in Administrator: `/public/js/jquery/i18n/`
 **[jQuery TimePicker](http://jonthornton.github.com/jquery-timepicker/)**
 Used in time field type. Directory in Administrator: `/public/js/jquery/localization/`
 
-**[Plupload](http://www.plupload.com/)**
-Used for file/image uploads. Directory in Administrator: `/public/js/plupload/js/i18n/`
+

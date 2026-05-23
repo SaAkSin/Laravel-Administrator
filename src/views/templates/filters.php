@@ -1,99 +1,115 @@
+<?php
+/**
+ * 관리자 필터 템플릿 (최초 오리지널 디자인 100% 보존 및 Alpine.js 이식)
+ * 
+ * 인위적인 테일윈드 클래스를 완전히 걷어내고 원래 최초의 오리지널 CSS와 격자 구조를 복구한 채
+ * 데이터 바인딩 동작만 Alpine.js 지시어로 안전하게 포팅했습니다.
+ */
+?>
 <h2><?php echo trans('administrator::administrator.filters') ?></h2>
 <div class="filters">
 
-	<!-- ko foreach: $root.filters -->
-		<!-- ko if: visible -->
-			<div data-bind="attr: {class: type + ' ' + (min_max ? 'min_max' : '')}">
-				<label data-bind="attr: {for: field_id}, text: title + ':'"></label>
+	<template x-for="(filter, index) in filters" :key="filter.field_id">
+		<div x-show="filter.visible" :class="filter.type + ' ' + (filter.min_max ? 'min_max' : '')">
+			<label :for="filter.field_id" x-text="filter.title + ':'"></label>
 
-				<!-- ko if: $data.description -->
-					<p class="description" data-bind="text: description"></p>
-				<!-- /ko -->
+			<template x-if="filter.description">
+				<p class="description" x-text="filter.description"></p>
+			</template>
 
-			<!-- ko if: type === 'key' -->
-				<input type="text" data-bind="value: value, valueUpdate: 'afterkeydown', attr: {id: field_id}" />
-			<!-- /ko -->
+			<!-- 1. key, text, text_quick, fulltext_mysql, color -->
+			<template x-if="['key', 'text', 'text_quick', 'fulltext_mysql', 'color'].includes(filter.type)">
+				<input type="text" x-model="filter.value" :id="filter.field_id" />
+			</template>
 
-			<!-- ko if: type === 'text' -->
-				<input type="text" data-bind="value: value, valueUpdate: 'afterkeydown', attr: {id: field_id}" />
-			<!-- /ko -->
+			<!-- 2. number -->
+			<template x-if="filter.type === 'number'">
+				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px;">
+					<span class="symbol" x-text="filter.symbol"></span>
+					<input type="text" x-model="filter.min_value" :id="filter.field_id + '_min'" style="width: 70px;" />
+					<span>-</span>
+					<input type="text" x-model="filter.max_value" :id="filter.field_id + '_max'" style="width: 70px;" />
+				</div>
+			</template>
 
-            <!-- ko if: type === 'text_quick' -->
-            <input type="text" data-bind="value: value, attr: {id: field_id}" />
-            <!-- /ko -->
+			<!-- 3. bool -->
+			<template x-if="filter.type === 'bool'">
+				<select x-model="filter.value" :id="filter.field_id" style="width: 100%;"
+						x-init="
+							$nextTick(() => {
+								jQuery($el).select2({minimumResultsForSearch: -1}).on('change', function() {
+									filter.value = jQuery($el).val();
+								});
+							});
+						">
+					<option value="">-- 전체 --</option>
+					<template x-for="opt in boolOptions" :key="opt.id">
+						<option :value="opt.id" x-text="opt.text" :selected="opt.id == filter.value"></option>
+					</template>
+				</select>
+			</template>
 
-            <!-- ko if: type === 'fulltext_mysql' -->
-                <input type="text" data-bind="value: value, valueUpdate: 'afterkeydown', attr: {id: field_id}" />
-            <!-- /ko -->
+			<!-- 4. enum -->
+			<template x-if="filter.type === 'enum'">
+				<select x-model="filter.value" :id="filter.field_id" style="width: 100%;"
+						x-init="
+							$nextTick(() => {
+								jQuery($el).select2().on('change', function() {
+									filter.value = jQuery($el).val();
+								});
+							});
+						">
+					<option value="">-- 전체 --</option>
+					<template x-for="opt in filter.options" :key="opt.id">
+						<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == filter.value"></option>
+					</template>
+				</select>
+			</template>
 
-			<!-- ko if: type === 'color' -->
-				<input type="text" data-bind="value: value, valueUpdate: 'afterkeydown', attr: {id: field_id}" />
-			<!-- /ko -->
+			<!-- 5. date, time, datetime (네이티브 피커 혹은 슬림 플랫) -->
+			<template x-if="['date', 'time', 'datetime'].includes(filter.type)">
+				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px;">
+					<input :type="filter.type === 'date' ? 'date' : (filter.type === 'time' ? 'time' : 'datetime-local')" 
+						   x-model="filter.min_value" :id="filter.field_id + '_min'" style="width: 100px; padding: 2px;" />
+					<span>-</span>
+					<input :type="filter.type === 'date' ? 'date' : (filter.type === 'time' ? 'time' : 'datetime-local')" 
+						   x-model="filter.max_value" :id="filter.field_id + '_max'" style="width: 100px; padding: 2px;" />
+				</div>
+			</template>
 
-			<!-- ko if: type === 'number' -->
-				<span class="symbol" data-bind="text: symbol"></span>
+			<!-- 6. belongs_to, belongs_to_many -->
+			<template x-if="['belongs_to', 'belongs_to_many'].includes(filter.type)">
+				<div class="loader-container" style="position: relative; width: 100%;">
+					<div class="loader" x-show="filter.loadingOptions" style="position: absolute; right: 5px; top: 5px;"></div>
+					<!-- select2 연동을 안전하게 수행하는 hidden input -->
+					<input type="hidden" :id="filter.field_id" x-model="filter.value" :multiple="filter.type === 'belongs_to_many'"
+						   x-init="
+							 $nextTick(() => {
+								let $el = jQuery('#' + filter.field_id);
+								if (filter.autocomplete) {
+									$el.select2Remote({
+										field: filter.field_name,
+										type: 'filter',
+										multiple: filter.type === 'belongs_to_many',
+										filterIndex: index
+									}).on('change', function(e) {
+										filter.value = $el.val();
+									});
+								} else {
+									let resultsData = listOptions[filter.field_name] || [];
+									$el.select2({
+										data: { results: resultsData },
+										multiple: filter.type === 'belongs_to_many'
+									}).on('change', function(e) {
+										filter.value = $el.val();
+									});
+								}
+							 });
+						   " />
+				</div>
+			</template>
 
-				<input type="text" data-bind="value: min_value, attr: {id: field_id + '_min'}, number: {decimals: decimals, key: field_name,
-																						thousandsSeparator: thousands_separator,
-																						decimalSeparator: decimal_separator}" />
-				<span>-</span>
-				<input type="text" data-bind="value: max_value, attr: {id: field_id + '_max'}, number: {decimals: decimals, key: field_name,
-																						thousandsSeparator: thousands_separator,
-																						decimalSeparator: decimal_separator}" />
-			<!-- /ko -->
+		</div>
+	</template>
 
-			<!-- ko if: type === 'bool' -->
-				<input type="hidden" data-bind="value: value, attr: {id: field_id}, select2: {data: {results: $root.boolOptions}}" />
-			<!-- /ko -->
-
-			<!-- ko if: type === 'enum' -->
-				<input type="hidden" data-bind="value: value, attr: {id: field_id}, select2: {data: {results: options}}" />
-			<!-- /ko -->
-
-			<!-- ko if: type === 'date' -->
-				<input type="text" data-bind="value: min_value, attr: {id: field_id + '_min'}, datepicker: {dateFormat: date_format}" />
-				<span>-</span>
-				<input type="text" data-bind="value: max_value, attr: {id: field_id + '_max'}, datepicker: {dateFormat: date_format}" />
-			<!-- /ko -->
-
-			<!-- ko if: type === 'time' -->
-				<input type="text" data-bind="value: min_value, attr: {id: field_id + '_min'}, timepicker: {timeFormat: time_format}" />
-				<span>-</span>
-				<input type="text" data-bind="value: max_value, attr: {id: field_id + '_max'}, timepicker: {timeFormat: time_format}" />
-			<!-- /ko -->
-
-			<!-- ko if: type === 'datetime' -->
-				<input type="text" data-bind="value: min_value, attr: {id: field_id + '_min'},
-																		datetimepicker: {dateFormat: date_format, timeFormat: time_format}" />
-				<span>-</span>
-				<input type="text" data-bind="value: max_value, attr: {id: field_id + '_max'},
-																		datetimepicker: {dateFormat: date_format, timeFormat: time_format}" />
-			<!-- /ko -->
-
-			<!-- ko if: type === 'belongs_to' -->
-				<div class="loader" data-bind="visible: loadingOptions"></div>
-
-				<!-- ko if: autocomplete -->
-				<input type="hidden" data-bind="value: value, attr: {id: field_id}, select2Remote: {field: field_name, type: 'filter', filterIndex: $index()}"/>
-				<!-- /ko -->
-				<!-- ko ifnot: autocomplete -->
-				<input type="hidden" data-bind="value: value, attr: {id: field_id}, select2: {data: {results: $root.listOptions[field_name]}}" />
-				<!-- /ko -->
-			<!-- /ko -->
-
-			<!-- ko if: type === 'belongs_to_many' -->
-				<div class="loader" data-bind="visible: loadingOptions"></div>
-
-				<!-- ko if: autocomplete -->
-				<input type="hidden" size="7" data-bind="select2Remote: {field: field_name, type: 'filter', multiple: true, filterIndex: $index()},
-														attr: {id: field_id}, value: value" />
-				<!-- /ko -->
-				<!-- ko ifnot: autocomplete -->
-				<input type="hidden" size="7" multiple="true" data-bind="select2: {data:{results: $root.listOptions[field_name]}, multiple: true},
-														attr: {id: field_id}, value: value" />
-				<!-- /ko -->
-			<!-- /ko -->
-			</div>
-		<!-- /ko -->
-	<!-- /ko -->
 </div>

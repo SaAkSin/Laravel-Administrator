@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.md or http://ckeditor.com/license
+ Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
 */
-CKEDITOR.plugins.setLang("uicolor","lv",{title:"UI krāsas izvēle",preview:"Priekšskatījums",config:"Ielīmējiet šo rindu jūsu config.js failā",predefined:"Predefinēti krāsu komplekti"});
+CKEDITOR.plugins.setLang("uicolor","lv",{title:"UI krāsas izvēle",options:"Krāsu opcijas",highlight:"Izcelt",selected:"Izvēlētā krāsa",predefined:"Predefinēti krāsu komplekti",config:"Ielīmējiet šo rindu jūsu config.js failā"});

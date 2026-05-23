@@ -40,5 +40,9 @@
 			"if [ -d \"vendor/ckeditor/\" ] \nthen \nrm -R vendor/ckeditor/ \nfi"
 		]
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
+	"require-dev": {
+		"phpunit/phpunit": "^9.6",
+		"mockery/mockery": "2.0.x-dev"
+	}
 }

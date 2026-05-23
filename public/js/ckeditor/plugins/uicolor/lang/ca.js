@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
- For licensing, see LICENSE.md or http://ckeditor.com/license
+ Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extended Support Model.
 */
-CKEDITOR.plugins.setLang("uicolor","ca",{title:"UI Color Picker",preview:"Vista prèvia",config:"Enganxa aquest text dins el fitxer config.js",predefined:"Conjunts de colors predefinits"});
+CKEDITOR.plugins.setLang("uicolor","ca",{title:"UI Color Picker",options:"Color Options",highlight:"Highlight",selected:"Selected Color",predefined:"Conjunts de colors predefinits",config:"Enganxa aquest text dins el fitxer config.js"});
