@@ -167,18 +167,11 @@
 				</div>
 			</template>
 
-			<!-- 8. ENUM TYPE -->
+			<!-- 8. ENUM TYPE (Zero-jQuery 순수 Alpine.js 셀렉트) -->
 			<template x-if="field.type === 'enum'">
 				<div>
 					<template x-if="field.editable">
-						<select x-model="$root[field.field_name]" :id="field.field_id" style="width: 100%;"
-								x-init="
-									$nextTick(() => {
-										jQuery($el).select2().on('change', function() {
-											$root[field.field_name] = jQuery($el).val();
-										});
-									});
-								">
+						<select x-model="$root[field.field_name]" :id="field.field_id" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
 							<option value="">-- 선택 --</option>
 							<template x-for="opt in field.options" :key="opt.id">
 								<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == $root[field.field_name]"></option>
@@ -362,82 +355,70 @@
 			</template>
 
 			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many, has_many) -->
-			<template x-if="['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
+			<template x-if="initialized && ['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
 				<div class="relative w-full"
-					 x-data="{
-						open: false,
-						search: '',
-						options: [],
-						loading: false,
-						
-						init() {
-							if (field.autocomplete) {
-								const autoKey = field.field_name + '_autocomplete';
-								const autoData = $root.autocompleteData[autoKey] || {};
-								this.options = Object.values(autoData);
-							} else {
-								this.options = $root.listOptions[field.field_name] || [];
-								this.$watch('$root.listOptions.' + field.field_name, (newVal) => {
-									this.options = newVal || [];
-								});
-							}
-						}
-					 }"
-					 x-init="init()"
+					 x-data="relationSelect({ field: field, type: 'edit', multiple: ['belongs_to_many', 'has_many'].includes(field.type), autocomplete: field.autocomplete })"
 					 style="position: relative; width: 100%;">
 					
 					<template x-if="field.editable">
-						<input type="text" :id="field.field_id"
-							   x-init="
-								 $nextTick(() => {
-									let $el = jQuery('#' + field.field_id);
-									
-									// 1. 값 변화 감시를 설정하여 Select2 UI에 동기화
-									$watch('$root.' + field.field_name, (newVal) => {
-										let currentVal = $el.val();
-										let targetVal = Array.isArray(newVal) ? newVal.join(',') : (newVal || '');
-										if (currentVal !== targetVal) {
-											$el.val(targetVal).trigger('change.select2');
-										}
-									});
+						<div class="relation-combobox-wrapper" style="position: relative; width: 100%;">
+							<!-- 1) 다중 선택 배지 목록 (belongs_to_many, has_many일 경우 노출) -->
+							<template x-if="['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0">
+								<div class="selected-badges" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
+									<template x-for="item in selectedItems" :key="item.id">
+										<span class="badge-item" style="display: inline-flex; align-items: center; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-size: 12px; gap: 4px;">
+											<span x-text="item.text"></span>
+											<button type="button" @click="removeItem(item)" style="background: none; border: none; color: #4338ca; cursor: pointer; font-weight: bold; font-size: 11px;">×</button>
+										</span>
+									</template>
+								</div>
+							</template>
 
-									// 2. 초기값 주입
-									let initialVal = $root[field.field_name];
-									if (Array.isArray(initialVal)) {
-										initialVal = initialVal.join(',');
-									}
-									$el.val(initialVal || '');
+							<!-- 2) 단일/다중 통합 콤보박스 입력 컨트롤러 -->
+							<div class="combobox-trigger-container" style="position: relative; display: flex; align-items: center; width: 100%;">
+								<input type="text" 
+									   placeholder="-- 검색 또는 선택 --"
+									   x-model="search"
+									   @focus="open = true"
+									   @click.away="setTimeout(() => open = false, 200)"
+									   @input="if (field.autocomplete) fetchAutocomplete()"
+									   style="width: 100%; padding: 6px 30px 6px 10px; border: 1px solid #d1d5db; border-radius: 4px; box-sizing: border-box;"
+									   :value="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && !search ? selectedItems[0].text : search" />
+								
+								<!-- 로딩 인디케이터 및 트리거 화살표 -->
+								<div class="icons" style="position: absolute; right: 8px; display: flex; align-items: center; gap: 4px;">
+									<div class="spinner" x-show="loading" style="width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+									<span style="font-size: 10px; color: #9ca3af; cursor: pointer;" @click="open = !open">▼</span>
+								</div>
+							</div>
 
-									// 3. Select2 플러그인 마운트
-									if (field.autocomplete) {
-										$el.select2Remote({
-											field: field.field_name,
-											type: 'edit',
-											multiple: field.type === 'belongs_to_many' || field.type === 'has_many',
-											filterIndex: index
-										}).on('change', function(e) {
-											$root[field.field_name] = $el.val();
-										});
-									} else {
-										let resultsData = $root.listOptions[field.field_name] || [];
-										$el.select2({
-											data: { results: resultsData },
-											multiple: field.type === 'belongs_to_many' || field.type === 'has_many'
-										}).on('change', function(e) {
-											$root[field.field_name] = $el.val();
-										});
-									}
+							<!-- 3) 모던 드롭다운 옵션 보드 -->
+							<div class="combobox-dropdown" 
+								 x-show="open" 
+								 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; margin-top: 2px; box-sizing: border-box;">
+								
+								<div class="options-list">
+									<!-- 검색 결과 없음 표출 -->
+									<template x-if="filteredOptions.length === 0 && !loading">
+										<div style="padding: 8px; color: #9ca3af; font-size: 13px; text-align: center;">검색 결과가 없습니다.</div>
+									</template>
 									
-									// 4. 초기 마운트 이후 변경 유발
-									if (initialVal) {
-										$el.trigger('change.select2');
-									}
-								 });
-							   " />
+									<template x-for="opt in filteredOptions" :key="opt.id">
+										<div @click="selectItem(opt)" 
+											 style="padding: 8px 12px; cursor: pointer; font-size: 13px; transition: background 0.1s;"
+											 :style="selectedItems.some(item => String(item.id) === String(opt.id)) ? 'background: #f3f4f6; font-weight: bold; color: #4f46e5;' : 'color: #374151;'"
+											 @mouseenter="$el.style.background = '#e0f2fe'"
+											 @mouseleave="$el.style.background = selectedItems.some(item => String(item.id) === String(opt.id)) ? '#f3f4f6' : 'transparent'"
+											 x-text="opt.text || opt.name">
+										</div>
+									</template>
+								</div>
+							</div>
+						</div>
 					</template>
 
 					<template x-if="!field.editable">
-						<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
+						<div class="uneditable" style="padding: 6px 10px; background: #f3f4f6; border-radius: 4px; color: #6b7280;" x-text="selectedItems.map(item => item.text).join(', ') || '-'"></div>
 					</template>
 				</div>
 			</template>

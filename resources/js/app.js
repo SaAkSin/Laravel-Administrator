@@ -1337,101 +1337,206 @@ Alpine.data('adminController', adminController);
 Alpine.start();
 
 /**
- * $.fn.select2Remote jQuery 확장 플러그인 정의
- * 바닐라 Fetch API 요청 및 전역 adminController 인스턴스와 완벽히 연계하여 작동합니다.
+ * Alpine.js 전역 컴포넌트 함수: relationSelect
+ * 기존 jQuery 및 Select2 의존성을 완전히 걷어내고, 100% 순수 바닐라 자바스크립트와 Alpine.js 반응성
+ * 엔진만을 활용하여 제작된 초경량 프리미엄 Combobox 및 Multi-Select 컴포넌트입니다.
  */
-(function($) {
-    $.fn.select2Remote = function(options) {
-        var $element = this;
-        var defaults = {
-            minimumInputLength: 1,
-            allowClear: true,
-            ajax: {
-                url: window.base_url + window.adminData.model_name + '/update_options',
-                dataType: 'json',
-                quietMillis: 100,
-                type: 'POST',
-                data: function(term, page) {
-                    var data = {
-                        term: term,
-                        page: page,
-                        field: options.field,
-                        type: options.type,
-                        constraints: {}
-                    };
+function relationSelect(config) {
+    return {
+        // config: { field: field, type: 'edit'|'filter', multiple: true|false, autocomplete: true|false, filterIndex: index }
+        open: false,
+        search: '',
+        options: [],
+        selectedItems: [], // { id, text } 배지 목록 객체의 배열
+        loading: false,
 
-                    const rootEl = document.querySelector('[x-data]');
-                    const admin = rootEl ? window.Alpine.$data(rootEl) : {};
+        init() {
+            // 1. 초기 모델 값 동기화 및 렌더링 배지 구성
+            this.syncValueFromModel();
 
-                    if (data.type === 'edit') {
-                        data.selectedItems = admin[data.field];
-                    } else if (data.type === 'filter') {
-                        data.selectedItems = admin.filters[parseInt(options.filterIndex)].value;
-                    }
+            // 2. 일반 관계 필드(autocomplete가 아님)의 경우 listOptions 데이터 변경 와칭 동기화
+            if (!config.autocomplete) {
+                const optKey = config.type === 'filter' ? 'filter_' + config.field.field_name : 'edit_' + config.field.field_name;
+                this.options = this.$root.listOptions[optKey] || config.field.options || [];
 
-                    // 제약조건 파라미터 적재
-                    if (options.constraints) {
-                        $.each(options.constraints, function(ind, el) {
-                            data.constraints[ind] = admin[ind];
-                        });
-                    }
-
-                    return { fields: [data] };
-                },
-                results: function(returndata, page) {
-                    const rootEl = document.querySelector('[x-data]');
-                    const admin = rootEl ? window.Alpine.$data(rootEl) : {};
-                    var data = {},
-                        val = $element.val();
-
-                    if (val) {
-                        $(val.split(',')).each(function(ind, el) {
-                            const autoKey = options.field + '_autocomplete';
-                            const item = admin.autocompleteData[autoKey] && admin.autocompleteData[autoKey][this];
-                            data[this] = { id: this, text: item ? item.text : this };
-                        });
-                    }
-
-                    $.each(returndata[options.field], function(ind, el) {
-                        data[el.id] = el;
-                    });
-
-                    const autoKey = options.field + '_autocomplete';
-                    admin.autocompleteData[autoKey] = data;
-
-                    return {
-                        results: returndata[options.field]
-                    };
-                }
-            },
-            initSelection: function(element, callback) {
-                const rootEl = document.querySelector('[x-data]');
-                const admin = rootEl ? window.Alpine.$data(rootEl) : {};
-                var data = [],
-                    val = $(element).val();
-
-                if (!val || typeof admin === 'undefined' || !admin.autocompleteData)
-                    return callback(null);
-
-                const autoKey = options.field + '_autocomplete';
-                if (options.multiple) {
-                    $(val.split(',')).each(function(ind, el) {
-                        if (admin.autocompleteData[autoKey] && this in admin.autocompleteData[autoKey]) {
-                            data.push({ id: this, text: admin.autocompleteData[autoKey][this].text });
-                        }
-                    });
-                } else {
-                    if (admin.autocompleteData[autoKey] && val in admin.autocompleteData[autoKey]) {
-                        data = { id: val, text: admin.autocompleteData[autoKey][val].text };
-                    }
-                }
-
-                callback(data);
+                this.$watch('$root.listOptions.' + optKey, (newVal) => {
+                    this.options = newVal || [];
+                    this.syncValueFromModel();
+                });
             }
-        };
 
-        var settings = $.extend(true, {}, defaults, options);
-        return $element.select2(settings);
+            // 3. 부모 스코프($root) 내 원래 모델의 상태 데이터 변화 와칭 동기화
+            const watchPath = config.type === 'filter' 
+                ? `filters[${config.filterIndex}].value` 
+                : config.field.field_name;
+
+            this.$watch('$root.' + watchPath, (newVal) => {
+                this.syncValueFromModel();
+            });
+        },
+
+        // 입력값에 맞게 로컬 옵션을 실시간 필터링합니다. (Case-insensitive)
+        get filteredOptions() {
+            if (config.autocomplete) {
+                return this.options;
+            }
+            if (!this.search) {
+                return this.options;
+            }
+            const q = this.search.toLowerCase();
+            return this.options.filter(opt => {
+                const nameStr = opt.text || opt.name || '';
+                return nameStr.toLowerCase().includes(q);
+            });
+        },
+
+        // 부모 모델에 엮여 있는 실제 ID 데이터를 바탕으로 상세 배지 목록(selectedItems)을 정밀 싱크합니다.
+        syncValueFromModel() {
+            const modelVal = config.type === 'filter'
+                ? this.$root.filters[config.filterIndex].value
+                : this.$root[config.field.field_name];
+
+            let ids = [];
+            if (Array.isArray(modelVal)) {
+                ids = modelVal.map(String);
+            } else if (modelVal !== undefined && modelVal !== null && modelVal !== '') {
+                ids = String(modelVal).split(',').map(s => s.trim()).filter(Boolean);
+            }
+
+            const autoKey = config.field.field_name + '_autocomplete';
+            const autoData = this.$root.autocompleteData[autoKey] || {};
+
+            this.selectedItems = ids.map(id => {
+                // 1. 자동완성 맵(autocompleteData)에서 먼저 매핑 복원 시도
+                if (autoData[id]) {
+                    return { id: id, text: autoData[id].text || autoData[id].name || id };
+                }
+                // 2. 로컬 옵션 목록(options)에서 찾아서 복원 시도
+                const found = this.options.find(opt => String(opt.id) === id);
+                if (found) {
+                    return { id: id, text: found.text || found.name || id };
+                }
+                // 3. 최종 예외 폴백: id 그대로 배지에 표출
+                return { id: id, text: id };
+            });
+        },
+
+        // 사용자가 Autocomplete 타이핑 시 백엔드 API로 비동기 자동완성 옵션을 요청합니다.
+        async fetchAutocomplete() {
+            if (!config.autocomplete) return;
+            this.loading = true;
+
+            const data = {
+                term: this.search,
+                page: 1,
+                field: config.field.field_name,
+                type: config.type,
+                constraints: {},
+                selectedItems: config.type === 'filter'
+                    ? this.$root.filters[config.filterIndex].value
+                    : this.$root[config.field.field_name]
+            };
+
+            // 관계 필드의 제약 조건이 묶여 있다면 값 적재
+            if (config.field.constraints) {
+                Object.keys(config.field.constraints).forEach(key => {
+                    data.constraints[key] = this.$root[key];
+                });
+            }
+
+            const url = `${window.base_url}${this.$root.modelName}/update_options`;
+
+            try {
+                const response = await request(url, {
+                    method: 'POST',
+                    data: { fields: [data] }
+                });
+
+                const results = response[config.field.field_name] || [];
+                this.options = results;
+
+                // 자동완성 맵(autocompleteData) 전역 최신화
+                const autoKey = config.field.field_name + '_autocomplete';
+                if (!this.$root.autocompleteData[autoKey]) {
+                    this.$root.autocompleteData[autoKey] = {};
+                }
+                results.forEach(item => {
+                    this.$root.autocompleteData[autoKey][item.id] = item;
+                });
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // 드롭다운에서 특정 옵션을 선택 시 실행됩니다.
+        selectItem(item) {
+            const fieldName = config.field.field_name;
+            
+            if (config.multiple) {
+                let currentVal = config.type === 'filter'
+                    ? this.$root.filters[config.filterIndex].value
+                    : this.$root[fieldName];
+
+                let ids = [];
+                if (Array.isArray(currentVal)) {
+                    ids = currentVal.map(String);
+                } else if (currentVal !== undefined && currentVal !== null && currentVal !== '') {
+                    ids = String(currentVal).split(',').map(s => s.trim()).filter(Boolean);
+                }
+
+                const idStr = String(item.id);
+                if (!ids.includes(idStr)) {
+                    ids.push(idStr);
+                }
+
+                // 부모 상태 데이터 갱신
+                if (config.type === 'filter') {
+                    this.$root.filters[config.filterIndex].value = config.field.type === 'belongs_to_many' ? ids : ids.join(',');
+                } else {
+                    this.$root[fieldName] = config.field.type === 'belongs_to_many' || config.field.type === 'has_many' ? ids : ids.join(',');
+                }
+            } else {
+                // 단일 선택의 경우 값을 즉시 넣고 드롭다운을 닫습니다.
+                if (config.type === 'filter') {
+                    this.$root.filters[config.filterIndex].value = item.id;
+                } else {
+                    this.$root[fieldName] = item.id;
+                }
+                this.open = false;
+            }
+            this.search = '';
+        },
+
+        // 다중 선택 배지 목록에서 X 마크를 눌러 특정 선택 값을 제거합니다.
+        removeItem(item) {
+            const fieldName = config.field.field_name;
+            
+            let currentVal = config.type === 'filter'
+                ? this.$root.filters[config.filterIndex].value
+                : this.$root[fieldName];
+
+            let ids = [];
+            if (Array.isArray(currentVal)) {
+                ids = currentVal.map(String);
+            } else if (currentVal !== undefined && currentVal !== null && currentVal !== '') {
+                ids = String(currentVal).split(',').map(s => s.trim()).filter(Boolean);
+            }
+
+            ids = ids.filter(id => String(id) !== String(item.id));
+
+            // 부모 상태 데이터 갱신
+            if (config.type === 'filter') {
+                this.$root.filters[config.filterIndex].value = config.field.type === 'belongs_to_many' ? ids : ids.join(',');
+            } else {
+                this.$root[fieldName] = config.field.type === 'belongs_to_many' || config.field.type === 'has_many' ? ids : ids.join(',');
+            }
+        }
     };
-})(jQuery);
+}
+
+// 글로벌 윈도우 스코프 및 Alpine 전역 컴포넌트 레지스트리에 이중으로 안전 노출
+window.relationSelect = relationSelect;
+Alpine.data('relationSelect', relationSelect);
 

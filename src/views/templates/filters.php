@@ -32,16 +32,9 @@
 				</div>
 			</template>
 
-			<!-- 3. bool -->
+			<!-- 3. bool (Zero-jQuery 순수 Alpine.js 셀렉트) -->
 			<template x-if="filter.type === 'bool'">
-				<select x-model="filter.value" :id="filter.field_id" style="width: 100%;"
-						x-init="
-							$nextTick(() => {
-								jQuery($el).select2({minimumResultsForSearch: -1}).on('change', function() {
-									filter.value = jQuery($el).val();
-								});
-							});
-						">
+				<select x-model="filter.value" :id="filter.field_id" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
 					<option value="">-- 전체 --</option>
 					<template x-for="opt in boolOptions" :key="opt.id">
 						<option :value="opt.id" x-text="opt.text" :selected="opt.id == filter.value"></option>
@@ -49,16 +42,9 @@
 				</select>
 			</template>
 
-			<!-- 4. enum -->
+			<!-- 4. enum (Zero-jQuery 순수 Alpine.js 셀렉트) -->
 			<template x-if="filter.type === 'enum'">
-				<select x-model="filter.value" :id="filter.field_id" style="width: 100%;"
-						x-init="
-							$nextTick(() => {
-								jQuery($el).select2().on('change', function() {
-									filter.value = jQuery($el).val();
-								});
-							});
-						">
+				<select x-model="filter.value" :id="filter.field_id" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
 					<option value="">-- 전체 --</option>
 					<template x-for="opt in filter.options" :key="opt.id">
 						<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == filter.value"></option>
@@ -78,59 +64,75 @@
 			</template>
 
 			<!-- 6. belongs_to, belongs_to_many -->
-			<template x-if="['belongs_to', 'belongs_to_many'].includes(filter.type)">
-				<div class="loader-container" style="position: relative; width: 100%;">
-					<div class="loader" x-show="filter.loadingOptions" style="position: absolute; right: 5px; top: 5px;"></div>
-					<!-- select2 연동을 안전하게 수행하는 hidden input -->
-					<input type="hidden" :id="filter.field_id" :multiple="filter.type === 'belongs_to_many'"
-						   x-init="
-							 $nextTick(() => {
-								let $el = jQuery('#' + filter.field_id);
-								
-								// 1. 값 변화 감시를 설정하여 Select2 UI에 동기화
-								$watch('filter.value', (newVal) => {
-									let currentVal = $el.val();
-									let targetVal = Array.isArray(newVal) ? newVal.join(',') : (newVal || '');
-									if (currentVal !== targetVal) {
-										$el.val(targetVal).trigger('change.select2');
-									}
-								});
+			<template x-if="initialized && ['belongs_to', 'belongs_to_many'].includes(filter.type)">
+				<div class="relative w-full"
+					 x-data="relationSelect({ field: filter, type: 'filter', multiple: filter.type === 'belongs_to_many', autocomplete: filter.autocomplete, filterIndex: index })"
+					 style="position: relative; width: 100%;">
+					
+					<div class="relation-combobox-wrapper" style="position: relative; width: 100%;">
+						<!-- 1) 다중 선택 배지 목록 (belongs_to_many일 경우 노출) -->
+						<template x-if="filter.type === 'belongs_to_many' && selectedItems.length > 0">
+							<div class="selected-badges" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; width: 100%;">
+								<template x-for="item in selectedItems" :key="item.id">
+									<span class="badge-item" style="display: inline-flex; align-items: center; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-size: 11px; gap: 4px;">
+										<span x-text="item.text"></span>
+										<button type="button" @click="removeItem(item)" style="background: none; border: none; color: #4338ca; cursor: pointer; font-weight: bold; font-size: 10px;">×</button>
+									</span>
+								</template>
+							</div>
+						</template>
 
-								// 2. 초기값 주입
-								let initialVal = filter.value;
-								if (Array.isArray(initialVal)) {
-									initialVal = initialVal.join(',');
-								}
-								$el.val(initialVal || '');
+						<!-- 2) 단일/다중 통합 콤보박스 입력 컨트롤러 -->
+						<div class="combobox-trigger-container" style="position: relative; display: flex; align-items: center; width: 100%;">
+							<input type="text" 
+								   placeholder="-- 전체 --"
+								   x-model="search"
+								   @focus="open = true"
+								   @click.away="setTimeout(() => open = false, 200)"
+								   @input="if (filter.autocomplete) fetchAutocomplete()"
+								   style="width: 100%; padding: 4px 26px 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; box-sizing: border-box;"
+								   :value="filter.type !== 'belongs_to_many' && selectedItems[0] && !search ? selectedItems[0].text : search" />
+							
+							<!-- 로딩 및 트리거 화살표 -->
+							<div class="icons" style="position: absolute; right: 6px; display: flex; align-items: center; gap: 2px;">
+								<div class="spinner" x-show="loading" style="width: 10px; height: 10px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+								<span style="font-size: 8px; color: #9ca3af; cursor: pointer;" @click="open = !open">▼</span>
+							</div>
+						</div>
 
-								// 3. Select2 플러그인 마운트
-								if (filter.autocomplete) {
-									$el.select2Remote({
-										field: filter.field_name,
-										type: 'filter',
-										multiple: filter.type === 'belongs_to_many' || filter.type === 'has_many',
-										filterIndex: index
-									}).on('change', function(e) {
-										filter.value = $el.val();
-									});
-								} else {
-									// 필터 전용 격리 공간인 filter_ 키 데이터를 바라보며, 차선책으로 filter.options를 사용합니다.
-									let resultsData = $root.listOptions['filter_' + filter.field_name] || filter.options || [];
-									$el.select2({
-										data: { results: resultsData },
-										multiple: filter.type === 'belongs_to_many' || filter.type === 'has_many'
-									}).on('change', function(e) {
-										filter.value = $el.val();
-									});
-								}
+						<!-- 3) 모던 드롭다운 옵션 보드 -->
+						<div class="combobox-dropdown" 
+							 x-show="open" 
+							 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 180px; overflow-y: auto; margin-top: 2px; box-sizing: border-box; width: 100%;">
+							
+							<div class="options-list">
+								<!-- 검색 결과 없음 -->
+								<template x-if="filteredOptions.length === 0 && !loading">
+									<div style="padding: 6px; color: #9ca3af; font-size: 12px; text-align: center;">결과 없음</div>
+								</template>
 								
-								// 4. 초기 마운트 이후 변경 유발
-								if (initialVal) {
-									$el.trigger('change.select2');
-								}
-							 });
-						   " />
-				</div>
+								<!-- '전체' 옵션 추가 (단일 선택 필터에만 표출) -->
+								<template x-if="filter.type !== 'belongs_to_many'">
+									<div @click="selectItem({ id: '', text: '-- 전체 --' })"
+										 style="padding: 6px 10px; cursor: pointer; font-size: 12px; color: #6b7280; font-style: italic; border-bottom: 1px solid #f3f4f6;"
+										 @mouseenter="$el.style.background = '#f3f4f6'"
+										 @mouseleave="$el.style.background = 'transparent'">
+										-- 전체 --
+									</div>
+								</template>
+								
+								<template x-for="opt in filteredOptions" :key="opt.id">
+									<div @click="selectItem(opt)" 
+										 style="padding: 6px 10px; cursor: pointer; font-size: 12px; transition: background 0.1s;"
+										 :style="selectedItems.some(item => String(item.id) === String(opt.id)) ? 'background: #f3f4f6; font-weight: bold; color: #4f46e5;' : 'color: #374151;'"
+										 @mouseenter="$el.style.background = '#e0f2fe'"
+										 @mouseleave="$el.style.background = selectedItems.some(item => String(item.id) === String(opt.id)) ? '#f3f4f6' : 'transparent'"
+										 x-text="opt.text || opt.name">
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
 			</template>
 
 		</div>
