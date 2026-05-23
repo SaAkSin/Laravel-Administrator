@@ -25,8 +25,12 @@
 	</div>
 
 	<!-- 현대적인 Alpine.js 코어와 바닐라 라이브러리 스크립트들을 마운트합니다. -->
-	@foreach ($js as $url)
-		<script src="{{$url}}"></script>
+	@foreach ($js as $key => $url)
+		@if ($key === 'vite-app' || strpos($url, '/dist/js/app') !== false)
+			<script type="module" src="{{$url}}"></script>
+		@else
+			<script src="{{$url}}"></script>
+		@endif
 	@endforeach
 </body>
 </html>

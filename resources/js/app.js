@@ -17,62 +17,10 @@ window.markdown = {
 // Alpine.js 라이브러리를 임포트하고 브라우저 전역 범위(window)에 등록합니다.
 import Alpine from 'alpinejs';
 
-// CKEditor 4 전역 설정 정의 (사용자 기존 연동 옵션 및 CSRF 토큰 자동 이식)
-const applyCKEditorConfig = () => {
-    if (window.CKEDITOR) {
-        CKEDITOR.editorConfig = function( config ) {
-            config.toolbarGroups = [
-                { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
-                { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
-                { name: 'links' },
-                { name: 'insert' },
-                { name: 'forms' },
-                { name: 'tools' },
-                { name: 'document',    groups: [ 'mode', 'document', 'doctools' ] },
-                { name: 'others' },
-                '/',
-                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-                { name: 'styles' },
-                { name: 'colors' },
-                { name: 'about' }
-            ];
-
-            config.removeButtons = 'Underline,Subscript,Superscript';
-            config.format_tags = 'p;h1;h2;h3;h4;h5;h6;pre';
-
-            // 라라벨 파일매니저 비동기 연동 및 CSRF 토큰 동적 싱크
-            const token = window.csrf || (window.adminData && window.adminData.csrf) || '';
-            config.filebrowserImageBrowseUrl = '/laravel-filemanager?type=Images';
-            config.filebrowserImageUploadUrl = '/laravel-filemanager/upload?type=Images&_token=' + token;
-            config.filebrowserBrowseUrl = '/laravel-filemanager?type=Files';
-            config.filebrowserUploadUrl = '/laravel-filemanager/upload?type=Files&_token=' + token;
-            
-            config.extraPlugins = 'justify,font,colorbutton';
-
-            // 비보안 경고 팝업 배너 비활성화
-            config.versionCheck = false;
-        };
-    }
-};
-
-// 즉각적인 적용 및 비동기 로딩 대비 감시 장치 기동
-if (window.CKEDITOR) {
-    applyCKEditorConfig();
-} else {
-    let tempCKEDITOR = undefined;
-    Object.defineProperty(window, 'CKEDITOR', {
-        configurable: true,
-        enumerable: true,
-        get() {
-            return tempCKEDITOR;
-        },
-        set(val) {
-            tempCKEDITOR = val;
-            applyCKEditorConfig();
-        }
-    });
-}
+// Quill 에디터 코어 모듈 및 테마 CSS를 임포트하여 Vite 번들에 병합합니다.
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
+window.Quill = Quill;
 
 /**
  * 중첩된 객체를 x-www-form-urlencoded 쿼리 스트링 포맷으로 직렬화하기 위한 헬퍼 함수

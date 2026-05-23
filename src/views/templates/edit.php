@@ -77,30 +77,54 @@
 				</div>
 			</template>
 
-			<!-- 4. WYSIWYG TYPE (CKEditor 포팅) -->
+			<!-- 4. WYSIWYG TYPE (Quill Editor 모던 포팅) -->
 			<template x-if="field.type === 'wysiwyg'">
-				<div x-init="
-					setTimeout(() => {
-						if (window.CKEDITOR) {
-							let textareaEl = $el.querySelector('textarea');
-							if (textareaEl) {
-								if (CKEDITOR.instances[field.field_id]) {
-									CKEDITOR.instances[field.field_id].destroy(true);
+				<div x-data="{ editor: null }"
+					 x-init="
+						$nextTick(() => {
+							if (window.Quill) {
+								let container = $el.querySelector('.quill-editor-container');
+								if (container) {
+									editor = new Quill(container, {
+										theme: 'snow',
+										modules: {
+											toolbar: [
+												[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+												['bold', 'italic', 'underline', 'strike'],
+												[{ 'list': 'ordered'}, { 'list': 'bullet' }],
+												[{ 'color': [] }, { 'background': [] }],
+												[{ 'align': [] }],
+												['link', 'image'],
+												['clean']
+											]
+										}
+									});
+
+									// 초기 데이터 장착
+									editor.root.innerHTML = $root[field.field_name] || '';
+
+									// 에디팅 수정 시 Alpine 상태 모델에 즉각 싱크
+									editor.on('text-change', () => {
+										let html = editor.root.innerHTML;
+										if (html === '<p><br></p>') html = '';
+										$root[field.field_name] = html;
+									});
+
+									// 외부 모델 강제 변경 시 화면에 동기화
+									$watch('$root.' + field.field_name, (newVal) => {
+										let currentHTML = editor.root.innerHTML;
+										if (currentHTML === '<p><br></p>') currentHTML = '';
+										if (newVal !== currentHTML) {
+											editor.root.innerHTML = newVal || '';
+										}
+									});
 								}
-								let editor = CKEDITOR.replace(textareaEl);
-								editor.on('change', () => {
-									$root[field.field_name] = editor.getData();
-								});
-								$watch('$root.' + field.field_name, (newVal) => {
-									if (editor.getData() !== newVal) {
-										editor.setData(newVal || '');
-									}
-								});
 							}
-						}
-					}, 100);
-				">
-					<textarea :id="field.field_id" :disabled="freezeForm" x-text="$root[field.field_name]"></textarea>
+						});
+					 "
+					 class="quill-wrapper"
+					 style="margin-top: 6px;">
+					<div class="quill-editor-container" :id="field.field_id" style="min-height: 150px; background: #fff; border: 1px solid #ccc; border-radius: 4px; color: #333;"></div>
 				</div>
 			</template>
 

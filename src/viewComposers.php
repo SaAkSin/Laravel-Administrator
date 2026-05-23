@@ -128,10 +128,7 @@ View::composer(array('administrator::layouts.default'), function($view)
 			'vite-app' => getViteAsset('resources/js/app.js', $view->css),
 		);
 
-		// 2. 필수 독립형 바닐라 라이브러리 등록 (jQuery 무관)
-		$view->js += array(
-			'ckeditor' => 'https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js',
-		);
+
 	}
 
     // 3. 사용자 정의 js 추가
