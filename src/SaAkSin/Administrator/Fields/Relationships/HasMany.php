@@ -42,8 +42,13 @@ class HasMany extends HasOneOrMany {
 		// first we "forget all the related models" (by setting their foreign key to null)
 		foreach($relationship->get() as $related)
 		{
-			$related->$fkey = null; // disassociate
-			$related->save();
+			try {
+				$related->$fkey = null; // disassociate
+				$related->save();
+			} catch (\Exception $e) {
+				// 만약 외래키 컬럼이 NOT NULL 제약 등으로 null 갱신이 불가능할 경우 관계 해제를 위해 해당 모델을 직접 데이터베이스에서 강제 삭제 처리합니다.
+				$related->delete();
+			}
 		}
 
 		// now associate new ones: (setting the correct order as well)
