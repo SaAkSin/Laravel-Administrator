@@ -290,6 +290,24 @@
 				</div>
 			</template>
 
+			<!-- 12-2. NUMBER TYPE -->
+			<template x-if="field.type === 'number'">
+				<div>
+					<template x-if="field.editable">
+						<div style="display: inline-flex; align-items: center; gap: 6px;">
+							<span x-show="field.symbol" x-text="field.symbol" style="font-weight: bold;"></span>
+							<input type="number" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" style="padding: 3px;" />
+						</div>
+					</template>
+					<template x-if="!field.editable">
+						<div style="display: inline-flex; align-items: center; gap: 6px;">
+							<span x-show="field.symbol" x-text="field.symbol" style="font-weight: bold;"></span>
+							<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
+						</div>
+					</template>
+				</div>
+			</template>
+
 			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many) -->
 			<template x-if="['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
 				<div class="relative w-full"

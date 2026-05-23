@@ -341,12 +341,14 @@ function adminController() {
             this.filters.forEach((filter, ind) => {
                 if (filter.relationship) {
                     this.listOptions[ind] = filter.options || [];
+                    this.listOptions[filter.field_name] = filter.options || [];
                 }
             });
 
             this.editFields.forEach((field, ind) => {
                 if (field.relationship) {
                     this.listOptions[ind] = field.options || [];
+                    this.listOptions[field.field_name] = field.options || [];
                 }
                 if (field.autocomplete) {
                     const autoKey = field.field_name + '_autocomplete';
