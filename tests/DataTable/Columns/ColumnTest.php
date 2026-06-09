@@ -90,8 +90,9 @@ class ColumnTest extends \PHPUnit\Framework\TestCase {
 		$grammar->shouldReceive('wrap')->once()->andReturn('');
 		$this->db->shouldReceive('raw')->once()->andReturn('foo')
 					->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$selects = array();
-		$this->column->filterQuery($selects);
+		$this->column->filterQuery($query, $selects);
 		$this->assertEquals($selects, array('foo'));
 	}
 
@@ -100,8 +101,9 @@ class ColumnTest extends \PHPUnit\Framework\TestCase {
 		$this->column->shouldReceive('getOption')->once();
 		$this->db->shouldReceive('raw')->never()
 					->shouldReceive('getQueryGrammar')->never();
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
 		$selects = array();
-		$this->column->filterQuery($selects);
+		$this->column->filterQuery($query, $selects);
 		$this->assertEquals($selects, array());
 	}
 

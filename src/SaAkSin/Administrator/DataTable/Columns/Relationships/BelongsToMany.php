@@ -12,25 +12,28 @@ class BelongsToMany extends Relationship {
 		'belongs_to_many' => true
 	);
 
+
 	/**
 	 * Adds selects to a query
 	 *
-	 * @param array 	$selects
+	 * @param \Illuminate\Database\Eloquent\Builder	$query
+	 * @param array 								$selects
 	 *
 	 * @return void
 	 */
-	public function filterQuery(&$selects)
+	public function filterQuery($query, &$selects)
 	{
 		$model = $this->config->getDataModel();
-		$joins = $where = '';
 		$columnName = $this->getOption('column_name');
 
-		$relationship = $model->{$this->getOption('relationship')}();
+		$relationship = \Illuminate\Database\Eloquent\Relations\Relation::noConstraints(function() use ($model) {
+			return $model->{$this->getOption('relationship')}();
+		});
 		$from_table = $this->tablePrefix . $model->getTable();
 		$field_table = $columnName . '_' . $from_table;
-		$other_table = $this->tablePrefix . $relationship->getRelated()->getTable();
-		$other_alias = $columnName . '_' . $other_table;
 		$other_model = $relationship->getRelated();
+		$other_table = $this->tablePrefix . $other_model->getTable();
+		$other_alias = $columnName . '_' . $other_table;
 		$other_key = $other_model->getKeyName();
 		$int_table = $this->tablePrefix . $relationship->getTable();
 		$int_alias = $columnName . '_' . $int_table;
@@ -38,18 +41,36 @@ class BelongsToMany extends Relationship {
 		$column1 = $column1[1];
 		$column2 = explode('.', $relationship->getQualifiedRelatedPivotKeyName());
 		$column2 = $column2[1];
-		$joins .= ' LEFT JOIN '.$int_table.' AS '.$int_alias.' ON '.$int_alias.'.'.$column1.' = '.$field_table.'.'.$model->getKeyName()
-				.' LEFT JOIN '.$other_table.' AS '.$other_alias.' ON '.$other_alias.'.'.$other_key.' = '.$int_alias.'.'.$column2;
 
 		//grab the existing where clauses that the user may have set on the relationship
-		$relationshipWheres = $this->getRelationshipWheres($relationship, $other_alias, $int_alias, $int_table);
+		list($relationshipWheres, $whereBindings) = $this->getRelationshipWheres($relationship, $other_alias, $int_alias, $int_table);
 
-		$where = $this->tablePrefix . $model->getTable() . '.' . $model->getKeyName() . ' = ' . $int_alias . '.' . $column1
-					. ($relationshipWheres ? ' AND ' . $relationshipWheres : '');
+		$subQuery = $model->newQuery();
+		$subQuery->from($from_table . ' AS ' . $field_table);
+		$subQuery->select($this->db->raw($this->getOption('select')));
 
-		$selects[] = $this->db->raw("(SELECT " . $this->getOption('select') . "
-										FROM " . $from_table." AS " . $field_table . ' ' . $joins . "
-										WHERE " . $where . ") AS " . $this->db->getQueryGrammar()->wrap($columnName));
+		$subQuery->leftJoin($int_table . ' AS ' . $int_alias, $int_alias . '.' . $column1, '=', $field_table . '.' . $model->getKeyName());
+
+		$subQuery->leftJoin($other_table . ' AS ' . $other_alias, function($join) use ($other_alias, $other_key, $int_alias, $column2, $other_model) {
+			$join->on($other_alias . '.' . $other_key, '=', $int_alias . '.' . $column2);
+			if (method_exists($other_model, 'getDeletedAtColumn')) {
+				$join->whereNull($other_alias . '.' . $other_model->getDeletedAtColumn());
+			}
+		});
+
+		$subQuery->whereRaw($this->tablePrefix . $model->getTable() . '.' . $model->getKeyName() . ' = ' . $int_alias . '.' . $column1);
+
+		if ($relationshipWheres) {
+			$subQuery->whereRaw($relationshipWheres, $whereBindings);
+		}
+
+		if (method_exists($model, 'getDeletedAtColumn')) {
+			$subQuery->whereNull($field_table . '.' . $model->getDeletedAtColumn());
+		}
+
+		list($sql, $bindings) = $query->getQuery()->createSub($subQuery);
+		$selects[] = $this->db->raw("({$sql}) AS " . $this->db->getQueryGrammar()->wrap($columnName));
+		$query->addBinding($bindings, 'select');
 	}
 
 	/**

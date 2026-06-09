@@ -36,7 +36,9 @@ class BelongsTo extends Relationship {
 		$relevantModel = $nested['models'][Util::count($nested['models'])-2];
 		$options['nested'] = $nested;
 
-		$relationship = $relevantModel->{$relevantName}();
+		$relationship = \Illuminate\Database\Eloquent\Relations\Relation::noConstraints(function() use ($relevantModel, $relevantName) {
+			return $relevantModel->{$relevantName}();
+		});
 		$selectTable = $options['column_name'] . '_' . $this->tablePrefix . $relationship->getRelated()->getTable();
 
 		//set the relationship object so we can use it later
@@ -87,17 +89,29 @@ class BelongsTo extends Relationship {
 	/**
 	 * Adds selects to a query
 	 *
-	 * @param array 	$selects
+	 * @param \Illuminate\Database\Eloquent\Builder	$query
+	 * @param array 								$selects
 	 *
 	 * @return void
 	 */
-	public function filterQuery(&$selects)
+	public function filterQuery($query, &$selects)
 	{
-		$model = $this->config->getDataModel();
-		$joins = $where = '';
 		$columnName = $this->getOption('column_name');
 		$nested = $this->getOption('nested');
 		$num_pieces = Util::count($nested['pieces']);
+
+		$first_model = $nested['models'][0];
+		$first_piece = $nested['pieces'][0];
+		$first_relationship = \Illuminate\Database\Eloquent\Relations\Relation::noConstraints(function() use ($first_model, $first_piece) {
+			return $first_model->{$first_piece}();
+		});
+		$relationship_model = $first_relationship->getRelated();
+		$from_table = $this->tablePrefix . $relationship_model->getTable();
+		$field_table = $columnName . '_' . $from_table;
+
+		$subQuery = $relationship_model->newQuery();
+		$subQuery->from($from_table . ' AS ' . $field_table);
+		$subQuery->select($this->db->raw($this->getOption('select')));
 
 		//if there is more than one nested relationship, we need to join all the tables
 		if ($num_pieces > 1)
@@ -105,31 +119,35 @@ class BelongsTo extends Relationship {
 			for ($i = 1; $i < $num_pieces; $i++)
 			{
 				$model = $nested['models'][$i];
-				$relationship = $model->{$nested['pieces'][$i]}();
-				$relationship_model = $relationship->getRelated();
-				$table = $this->tablePrefix . $relationship_model->getTable();
+				$relationship = \Illuminate\Database\Eloquent\Relations\Relation::noConstraints(function() use ($model, $nested, $i) {
+					return $model->{$nested['pieces'][$i]}();
+				});
+				$relModel = $relationship->getRelated();
+				$table = $this->tablePrefix . $relModel->getTable();
 				$alias = $columnName . '_' . $table;
 				$last_alias = $columnName . '_' . $this->tablePrefix . $model->getTable();
-				$joins .= ' LEFT JOIN ' . $table . ' AS ' . $alias .
-							' ON ' . $alias . '.' . $relationship->getOwnerKeyName() .
-								' = ' . $last_alias . '.' . $relationship->getForeignKeyName();
+
+				$subQuery->leftJoin($table . ' AS ' . $alias, function($join) use ($alias, $relationship, $last_alias, $relModel) {
+					$join->on($alias . '.' . $relationship->getOwnerKeyName(), '=', $last_alias . '.' . $relationship->getForeignKeyName());
+					if (method_exists($relModel, 'getDeletedAtColumn')) {
+						$join->whereNull($alias . '.' . $relModel->getDeletedAtColumn());
+					}
+				});
 			}
 		}
 
-		$first_model = $nested['models'][0];
-		$first_piece = $nested['pieces'][0];
-		$first_relationship = $first_model->{$first_piece}();
-		$relationship_model = $first_relationship->getRelated();
-		$from_table = $this->tablePrefix . $relationship_model->getTable();
-		$field_table = $columnName . '_' . $from_table;
-
-		$where = $this->tablePrefix . $first_model->getTable() . '.' . $first_relationship->getForeignKeyName() .
+		$subQuery->whereRaw($this->tablePrefix . $first_model->getTable() . '.' . $first_relationship->getForeignKeyName() .
 					' = ' .
-					$field_table . '.' . $first_relationship->getOwnerKeyName();
+					$field_table . '.' . $first_relationship->getOwnerKeyName());
 
-		$selects[] = $this->db->raw("(SELECT " . $this->getOption('select') . "
-										FROM " . $from_table." AS " . $field_table . ' ' . $joins . "
-										WHERE " . $where . ") AS " . $this->db->getQueryGrammar()->wrap($columnName));
+		// SoftDeletes check for first relationship model
+		if (method_exists($relationship_model, 'getDeletedAtColumn')) {
+			$subQuery->whereNull($field_table . '.' . $relationship_model->getDeletedAtColumn());
+		}
+
+		list($sql, $bindings) = $query->getQuery()->createSub($subQuery);
+		$selects[] = $this->db->raw("({$sql}) AS " . $this->db->getQueryGrammar()->wrap($columnName));
+		$query->addBinding($bindings, 'select');
 	}
 
 	/**
