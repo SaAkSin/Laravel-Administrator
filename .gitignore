@@ -7,7 +7,7 @@ composer.lock
 nbproject
 .idea
 .antigravitycli
+.agents
 .phpunit.result.cache
 /examples
 /node_modules/
-/public

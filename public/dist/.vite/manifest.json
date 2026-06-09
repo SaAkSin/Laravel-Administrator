@@ -1,0 +1,58 @@
+{
+  "resources/css/fonts/Oxygen/oxygen-bold-webfont.eot": {
+    "file": "eot/oxygen-bold-webfont-f7X5u_eh.eot",
+    "src": "resources/css/fonts/Oxygen/oxygen-bold-webfont.eot"
+  },
+  "resources/css/fonts/Oxygen/oxygen-bold-webfont.svg": {
+    "file": "svg/oxygen-bold-webfont-B-MRSXRq.svg",
+    "src": "resources/css/fonts/Oxygen/oxygen-bold-webfont.svg"
+  },
+  "resources/css/fonts/Oxygen/oxygen-bold-webfont.ttf": {
+    "file": "ttf/oxygen-bold-webfont-D4iz2j1v.ttf",
+    "src": "resources/css/fonts/Oxygen/oxygen-bold-webfont.ttf"
+  },
+  "resources/css/fonts/Oxygen/oxygen-bold-webfont.woff": {
+    "file": "woff/oxygen-bold-webfont-CzBCNens.woff",
+    "src": "resources/css/fonts/Oxygen/oxygen-bold-webfont.woff"
+  },
+  "resources/css/fonts/Oxygen/oxygen-regular-webfont.eot": {
+    "file": "eot/oxygen-regular-webfont-lbYjdCSB.eot",
+    "src": "resources/css/fonts/Oxygen/oxygen-regular-webfont.eot"
+  },
+  "resources/css/fonts/Oxygen/oxygen-regular-webfont.svg": {
+    "file": "svg/oxygen-regular-webfont-DCBSuEL9.svg",
+    "src": "resources/css/fonts/Oxygen/oxygen-regular-webfont.svg"
+  },
+  "resources/css/fonts/Oxygen/oxygen-regular-webfont.ttf": {
+    "file": "ttf/oxygen-regular-webfont-BTkr4NUr.ttf",
+    "src": "resources/css/fonts/Oxygen/oxygen-regular-webfont.ttf"
+  },
+  "resources/css/fonts/Oxygen/oxygen-regular-webfont.woff": {
+    "file": "woff/oxygen-regular-webfont-6iKgAd8C.woff",
+    "src": "resources/css/fonts/Oxygen/oxygen-regular-webfont.woff"
+  },
+  "resources/img/loader.gif": {
+    "file": "gif/loader-S2xpefX9.gif",
+    "src": "resources/img/loader.gif"
+  },
+  "resources/js/app.js": {
+    "file": "js/app-DxFOnpv2.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "css/app-C5MvBjhQ.css"
+    ],
+    "assets": [
+      "eot/oxygen-regular-webfont-lbYjdCSB.eot",
+      "woff/oxygen-regular-webfont-6iKgAd8C.woff",
+      "ttf/oxygen-regular-webfont-BTkr4NUr.ttf",
+      "svg/oxygen-regular-webfont-DCBSuEL9.svg",
+      "eot/oxygen-bold-webfont-f7X5u_eh.eot",
+      "woff/oxygen-bold-webfont-CzBCNens.woff",
+      "ttf/oxygen-bold-webfont-D4iz2j1v.ttf",
+      "svg/oxygen-bold-webfont-B-MRSXRq.svg",
+      "gif/loader-S2xpefX9.gif"
+    ]
+  }
+}
