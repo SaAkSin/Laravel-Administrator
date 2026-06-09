@@ -1705,9 +1705,8 @@ a {
   bottom: 0;
   background-color: rgba(255, 255, 255, 0.75);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding-top: 80px;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   z-index: 1000;
