@@ -101,11 +101,14 @@
 
 	<!-- 로딩창 -->
 	<div class="loading_rows" x-show="loadingRows">
-		<div><?php echo trans('administrator::administrator.loading') ?></div>
+		<div class="loading_spinner_wrapper">
+			<div class="loading_spinner"></div>
+			<div class="loading_text"><?php echo trans('administrator::administrator.loading') ?></div>
+		</div>
 	</div>
 
 	<!-- 빈 상태 가이드 -->
-	<div class="no_results" x-show="pagination.last === 0">
+	<div class="no_results" x-show="pagination.last === 0 && !loadingRows">
 		<div><?php echo trans('administrator::administrator.noresults') ?></div>
 	</div>
 </div>
