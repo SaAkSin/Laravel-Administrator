@@ -100,7 +100,7 @@
 	</table>
 
 	<!-- 로딩창 -->
-	<div class="loading_rows" x-show="loadingRows">
+	<div class="loading_rows" x-show="loadingRows" style="display: none;">
 		<div class="loading_spinner_wrapper">
 			<div class="loading_spinner"></div>
 			<div class="loading_text"><?php echo trans('administrator::administrator.loading') ?></div>
@@ -108,7 +108,7 @@
 	</div>
 
 	<!-- 빈 상태 가이드 -->
-	<div class="no_results" x-show="pagination.last === 0 && !loadingRows">
+	<div class="no_results" x-show="initialized && pagination.last === 0 && !loadingRows" style="display: none;">
 		<div><?php echo trans('administrator::administrator.noresults') ?></div>
 	</div>
 </div>
