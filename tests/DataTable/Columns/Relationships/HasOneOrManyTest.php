@@ -3,6 +3,10 @@ namespace SaAkSin\Administrator\Tests\DataTable\Columns\Relationships;
 
 use Mockery as m;
 
+class HasOneOrManySoftDeleteModelStub extends \Illuminate\Database\Eloquent\Model {
+	use \Illuminate\Database\Eloquent\SoftDeletes;
+}
+
 class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 
 	/**
@@ -36,7 +40,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -50,24 +54,92 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
 
 	public function testFilterQuery()
 	{
-		$relationship = m::mock(array('getPlainForeignKey' => '', 'getQualifiedParentKeyName' => 'table.column', 'getRelated' => m::mock(array('getTable' => 'table'))));
+		$dbQuery = m::mock('Illuminate\Database\Query\Builder');
+		$dbQuery->shouldReceive('toSql')->once()->andReturn('sql')
+				->shouldReceive('getBindings')->once()->andReturn(array('binding_val'));
+
+		$subQuery = m::mock('Illuminate\Database\Eloquent\Builder');
+		$subQuery->shouldReceive('from')->once()->andReturnSelf()
+				 ->shouldReceive('select')->once()->andReturnSelf()
+				 ->shouldReceive('whereRaw')->twice()->andReturnSelf()
+				 ->shouldReceive('getQuery')->once()->andReturn($dbQuery);
+
+		$relatedModel = m::mock('Illuminate\Database\Eloquent\Model');
+		$relatedModel->shouldReceive('getTable')->once()->andReturn('table');
+		$relatedModel->shouldReceive('newQuery')->once()->andReturn($subQuery);
+
+		$relationship = m::mock(array(
+			'getPlainForeignKey' => '',
+			'getForeignKeyName' => '',
+			'getQualifiedParentKeyName' => 'table.column',
+			'getRelated' => $relatedModel
+		));
+
 		$model = m::mock(array('getTable' => 'table', 'getKeyName' => '', 'method' => $relationship));
 		$grammar = m::mock('Illuminate\Database\Query\Grammars');
 		$grammar->shouldReceive('wrap')->once()->andReturn('');
+
 		$this->config->shouldReceive('getDataModel')->once()->andReturn($model);
 		$this->column->shouldReceive('getOption')->times(3)->andReturn('column_name', 'method', 'select')
-						->shouldReceive('getRelationshipWheres')->once()->andReturn('');
-		$this->db->shouldReceive('raw')->once()->andReturn('foo')
+						->shouldReceive('getRelationshipWheres')->once()->andReturn(array('where_sql', array()));
+		$this->db->shouldReceive('raw')->twice()->andReturn('foo')
 					->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
+
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('addBinding')->once()->with(array('binding_val'), 'select');
+
 		$selects = array();
-		$this->column->filterQuery($selects);
+		$this->column->filterQuery($query, $selects);
+		$this->assertEquals($selects, array('foo'));
+	}
+
+	public function testFilterQueryWithSoftDeletes()
+	{
+		$dbQuery = m::mock('Illuminate\Database\Query\Builder');
+		$dbQuery->shouldReceive('toSql')->once()->andReturn('sql')
+				->shouldReceive('getBindings')->once()->andReturn(array('binding_val'));
+
+		$subQuery = m::mock('Illuminate\Database\Eloquent\Builder');
+		$subQuery->shouldReceive('from')->once()->andReturnSelf()
+				 ->shouldReceive('select')->once()->andReturnSelf()
+				 ->shouldReceive('whereRaw')->twice()->andReturnSelf()
+				 ->shouldReceive('whereNull')->once()->with('test_table_table.deleted_at')->andReturnSelf()
+				 ->shouldReceive('getQuery')->once()->andReturn($dbQuery);
+
+		$relatedModel = m::mock('SaAkSin\Administrator\Tests\DataTable\Columns\Relationships\HasOneOrManySoftDeleteModelStub');
+		$relatedModel->shouldReceive('getTable')->once()->andReturn('table');
+		$relatedModel->shouldReceive('newQuery')->once()->andReturn($subQuery);
+		$relatedModel->shouldReceive('getDeletedAtColumn')->once()->andReturn('deleted_at');
+
+		$relationship = m::mock(array(
+			'getPlainForeignKey' => '',
+			'getForeignKeyName' => '',
+			'getQualifiedParentKeyName' => 'table.column',
+			'getRelated' => $relatedModel
+		));
+
+		$model = m::mock(array('getTable' => 'table', 'getKeyName' => '', 'method' => $relationship));
+		$grammar = m::mock('Illuminate\Database\Query\Grammars');
+		$grammar->shouldReceive('wrap')->once()->andReturn('');
+
+		$this->config->shouldReceive('getDataModel')->once()->andReturn($model);
+		$this->column->shouldReceive('getOption')->times(3)->andReturn('test_table', 'method', 'select')
+						->shouldReceive('getRelationshipWheres')->once()->andReturn(array('where_sql', array()));
+		$this->db->shouldReceive('raw')->twice()->andReturn('foo')
+					->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
+
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('addBinding')->once()->with(array('binding_val'), 'select');
+
+		$selects = array();
+		$this->column->filterQuery($query, $selects);
 		$this->assertEquals($selects, array('foo'));
 	}
 

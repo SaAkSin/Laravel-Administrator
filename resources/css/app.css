@@ -1,0 +1,481 @@
+/* 오리지널 어드민 레이아웃 및 베이스 CSS 병합 번들링 */
+@import "./main.css";
+
+/* Tailwind CSS의 기본 지시어들을 로드하여 유틸리티 클래스 빌드를 활성화합니다. */
+@tailwind components;
+@tailwind utilities;
+
+/* 
+ * =========================================================================
+ * 🌿 Zero-jQuery 모던 어드민: 클래식 jQuery UI 실버/연그레이 테마 CSS 복원 명세서
+ * =========================================================================
+ * 제이쿼리 의존성 없이 순수 CSS3를 사용하여, 과거 jQuery UI가 입혀주던 
+ * 특유의 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 현대적으로 재해석하여 완벽히 복원합니다.
+ */
+
+/* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트 프리미엄 현대화 및 30px 보정) */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+select {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    height: 30px !important; /* 높이를 시각적으로 더욱 콤팩트하고 단정한 30px로 낮춥니다. */
+    font-size: 12px !important;
+    color: #1f2937 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+}
+
+/* 1-2. 날짜/시간 컨트롤러 정밀 보정 (HTML5 네이티브 위젯 모던 정합) */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+    position: relative !important;
+    cursor: pointer !important;
+    font-family: Oxygen, sans-serif !important;
+}
+
+/* 내장 달력/시계 호출 지시어(Indicator) 아이콘 디자인 세련되게 격상 */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    background-color: transparent !important;
+    color: #64748b !important; /* 부드러운 슬레이트 그레이 계열 */
+    cursor: pointer !important;
+    padding: 2px !important;
+    border-radius: 4px !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    opacity: 0.75 !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    background-color: #f1f5f9 !important; /* 호버 시 슬레이트 투명 배경 */
+    color: #475569 !important; /* 차분하고 세련된 슬레이트 그레이 포인트 */
+    opacity: 1 !important;
+}
+
+/* 브라우저 기본 제공 리셋 버튼(x) 및 내장 위젯 스핀 여백 강제 제거 */
+input[type="date"]::-webkit-clear-button,
+input[type="date"]::-webkit-inner-spin-button,
+input[type="time"]::-webkit-clear-button,
+input[type="time"]::-webkit-inner-spin-button,
+input[type="datetime-local"]::-webkit-clear-button,
+input[type="datetime-local"]::-webkit-inner-spin-button {
+    display: none !important;
+}
+
+
+textarea {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    color: #1f2937 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #94a3b8 !important; /* 포커스 시 쨍하지 않고 차분한 미디움 슬레이트 그레이 적용 */
+    outline: 0 !important;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15) !important; /* 은은하고 고급스러운 실버-그레이 포커스 링 장착 */
+}
+
+/* 수정 불가능한 비활성화 상태 표현 (배경을 부모 배경색과 일치하는 투명으로 변경하고 보더 제거) */
+.uneditable {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 6px 0 !important;
+    color: #374151 !important;
+    font-size: 12px !important;
+    font-weight: 550 !important;
+    box-sizing: border-box !important;
+    display: inline-block !important;
+    width: 100% !important;
+}
+
+/* 2. 어드민 버튼 명세서 (그라데이션 실버 스타일) */
+input[type="button"],
+input[type="submit"],
+button,
+.control_buttons input,
+.custom_buttons input,
+a.new_item {
+    display: inline-block !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    background-image: linear-gradient(to bottom, #ffffff 0%, #e6e6e6 100%) !important;
+    background-repeat: repeat-x !important;
+    border: 1px solid #cccccc !important;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf !important;
+    border-bottom-color: #b3b3b3 !important;
+    border-radius: 4px !important;
+    color: #333333 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    text-decoration: none !important;
+    transition: background-image 0.15s ease-in-out, border-color 0.15s ease-in-out !important;
+}
+
+input[type="button"]:hover,
+input[type="submit"]:hover,
+button:hover,
+.control_buttons input:hover,
+.custom_buttons input:hover,
+a.new_item:hover {
+    color: #222222 !important;
+    text-decoration: none !important;
+    background-image: linear-gradient(to bottom, #f2f2f2 0%, #dcdcdc 100%) !important;
+    border-color: #b3b3b3 !important;
+}
+
+input[type="button"]:disabled,
+input[type="submit"]:disabled,
+button:disabled {
+    cursor: not-allowed !important;
+    background-image: none !important;
+    background-color: #eeeeee !important;
+    color: #999999 !important;
+    border-color: #dddddd !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* 삭제 전용 붉은 톤의 조화로운 연실버 그라데이션 */
+.remove_button,
+input.remove_button {
+    background-image: linear-gradient(to bottom, #fff5f5 0%, #fcdede 100%) !important;
+    border-color: #f5c2c2 !important;
+    color: #9c2a2a !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+.remove_button:hover,
+input.remove_button:hover {
+    background-image: linear-gradient(to bottom, #fde4e4 0%, #f7c5c5 100%) !important;
+    border-color: #f1a3a3 !important;
+    color: #9c2a2a !important;
+}
+
+/* 3. 격자 테이블 헤더 명세서 (실버 톤 입체 헤더) */
+table.results th {
+    background-image: linear-gradient(to bottom, #fcfcfc 0%, #ededed 100%) !important;
+    border-bottom: 2px solid #d3d3d3 !important;
+    border-right: 1px solid #dcdcdc !important;
+    color: #444444 !important;
+    font-weight: 650 !important;
+    text-shadow: 0 1px 0 #ffffff !important;
+    padding: 10px 12px !important;
+    font-size: 11px !important;
+    box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+table.results th.sortable:hover {
+    background-image: linear-gradient(to bottom, #f3f3f3 0%, #e0e0e0 100%) !important;
+    cursor: pointer !important;
+}
+
+/* 테이블 바디 행 하이라이트 효과 */
+table.results tbody tr.result:hover td {
+    background-color: #f0f7fc !important; /* jQuery UI 클래식 스카이블루 하이라이트 복원 */
+    cursor: pointer !important;
+}
+
+table.results tbody tr.result.selected td {
+    background-color: #d4e8f7 !important; /* 선택된 행 포커스 컬러 */
+}
+
+table.results td {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-right: 1px solid #edf2f7 !important;
+}
+
+/* 4. Combobox 및 Multi-Select 배지 명세서 (모던 파스텔 칩 디자인 개편) */
+.badge-item {
+    background-color: #e0e7ff !important; /* 인디고 파스텔 배경 */
+    background-image: none !important;
+    border: 1px solid #c7d2fe !important;
+    color: #3730a3 !important; /* 진한 인디고 텍스트 */
+    border-radius: 9999px !important; /* 둥근 알약 모양 칩 스타일 */
+    padding: 3px 10px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    text-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.badge-item:hover {
+    background-color: #c7d2fe !important;
+    border-color: #a5b4fc !important;
+}
+
+.badge-item button {
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #475569 !important;
+    text-shadow: none !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: color 0.15s ease, transform 0.15s ease !important;
+}
+
+.badge-item button:hover {
+    color: #dc2626 !important; /* 호버 시 세련된 레드 컬러 */
+    transform: scale(1.15) !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* 관계형 콤보박스 전용 인풋 스타일 (네이티브 select 스타일과 수치 100% 매칭 및 우측 다중 아이콘 공간 확보) */
+.relation-combobox-input {
+    width: 100% !important;
+    padding: 6px 48px 6px 10px !important; /* 우측 끝 아이콘 공간 48px 확보 (돋보기, chevron, 스피너) */
+    height: 30px !important; /* select와 완전히 동일한 30px 높이 */
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    color: #1f2937 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.relation-combobox-input:focus {
+    border-color: #94a3b8 !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15) !important;
+}
+
+/* 프리미엄 콤보박스 드롭다운 (enum 타입 셀렉트 박스 느낌의 플랫하고 단정한 디자인) */
+.combobox-dropdown {
+    border: 1px solid #cbd5e1 !important; /* 슬레이트 그레이로 더 얇고 정밀하게 변경 */
+    border-radius: 6px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important; /* 가벼운 플랫 섀도우 */
+    background-color: #ffffff !important; /* 순수 단색 화이트 배경 복귀 (Glassmorphism 제거) */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    animation: comboboxFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; /* 부드러운 드롭다운 페이드인 모션 */
+    padding: 4px 0 !important; /* 상하에 4px 패딩을 부여하여 첫/마지막 옵션이 테두리에 붙는 현상 해결 */
+}
+
+/* 콤보박스 드롭다운 내 개별 옵션 아이템 스타일 정의 (행간 패딩 10px로 전폭 개선) */
+.combobox-option-item {
+    padding: 10px 14px !important; /* 상하 10px, 좌우 14px로 여유롭고 쾌적한 행간 간격 보장 */
+    cursor: pointer !important;
+    font-size: 12px !important; /* select와 정합성 매칭 */
+    color: #1f2937 !important;
+    transition: background-color 0.12s cubic-bezier(0.4, 0, 0.2, 1), color 0.12s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+/* 옵션 항목 마우스 호버 스타일 (순수 CSS 처리로 Alpine 마크업 최소화) */
+.combobox-option-item:hover {
+    background-color: #f0f7fc !important; /* jQuery 클래식 스카이블루 계열 호버 스킨 */
+    color: #0284c7 !important; /* 맑은 블루 포커스 HSL 이식 */
+}
+
+/* 선택된 활성 옵션에 대한 시각적 하이라이팅 스킨 */
+.combobox-option-item.selected-active {
+    background-color: #e0e7ff !important; /* 은은한 파스텔 인디고 */
+    font-weight: 600 !important;
+    color: #4f46e5 !important;
+}
+
+/* 콤보박스 모던 라운드 그레이 스크롤바 코딩 */
+.combobox-dropdown::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.combobox-dropdown::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 9999px !important;
+}
+
+.combobox-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+}
+
+/* 드롭다운 개방 페이드인 애니메이션 키프레임 정의 */
+@keyframes comboboxFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 콤보박스 개방 시 화살표 아이콘 회전 효과 */
+.rotate-180 {
+    transform: rotate(180deg) !important;
+}
+
+/* =========================================================================
+ * 🖋️ WYSIWYG Quill Editor 디자인 정합성 보정 (여백 및 플랫 버튼 일관성 복원)
+ * =========================================================================
+ * 전역 button 태그에 먹여둔 입체 그라데이션이 Quill 에디터의 툴바 내부 버튼들을 
+ * 오염시키는 문제를 차단하고, 우측 여백을 다른 폼 필드와 정확히 매칭시킵니다.
+ */
+
+/* 1. 에디터 우측 여백을 다른 폼 컨트롤(width: 98%)과 부드럽게 정합시킵니다. */
+.quill-wrapper {
+    width: 98% !important;
+    max-width: 98% !important;
+    box-sizing: border-box !important;
+    margin-right: 2% !important;
+}
+
+/* 2. 전역 button 클래스가 툴바 내부 아이콘 버튼들을 입체 버튼으로 침범하는 현상 차단 및 플랫화 */
+.ql-toolbar button,
+.ql-toolbar .ql-formats button,
+.ql-toolbar button.ql-active {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    padding: 3px !important;
+    background-image: none !important; /* 입체 그라데이션 완벽 제거 */
+    background-color: transparent !important; /* 플랫 배경 투명화 */
+    border: none !important; /* 불필요한 입체 테두리 제거 */
+    border-radius: 4px !important;
+    box-shadow: none !important; /* 그림자 완전 제거 */
+    text-shadow: none !important;
+    cursor: pointer !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+/* 툴바 내 아이콘 클리어 버튼(Tx) 전용 디자인 복구 */
+.ql-toolbar button.ql-clean {
+    width: auto !important;
+    min-width: 24px !important;
+}
+
+/* 툴바 버튼 호버 및 활성화 상태 디자인 정의 */
+.ql-toolbar button:hover,
+.ql-toolbar button.ql-active,
+.ql-toolbar .ql-picker-label:hover,
+.ql-toolbar .ql-picker-label.ql-active {
+    background-color: #e2e8f0 !important; /* 단정하고 은은한 그레이 호버 효과 */
+    color: #475569 !important; /* 차분한 그레이 하이라이트 */
+}
+
+/* SVG 아이콘들의 정렬 및 크기 고정 */
+.ql-toolbar button svg {
+    width: 14px !important;
+    height: 14px !important;
+    display: block !important;
+}
+
+/* 3. Quill 툴바 및 에디터 컨테이너 테두리 보더 콤팩트 라운딩 */
+.ql-toolbar.ql-snow {
+    border: 1px solid #d1d5db !important;
+    border-top-left-radius: 6px !important;
+    border-top-right-radius: 6px !important;
+    background-color: #f8fafc !important; /* 미려한 백그라운드 칼라 */
+    padding: 6px 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.ql-container.ql-snow {
+    border: 1px solid #d1d5db !important;
+    border-top: none !important;
+    border-bottom-left-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+    font-family: Oxygen, sans-serif !important;
+    font-size: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* =========================================================================
+ * 🗂️ 어드민 헤더 대분류 그룹 메뉴 호버 드롭다운(풀다운) 구동 스크립트 복원
+ * =========================================================================
+ * 마우스를 대분류(span)에 올렸을 때 서브 메뉴 목록이 보이도록 구동하고 
+ * 텍스트 필드에 손가락 포인터를 활성화합니다.
+ */
+
+/* 1. 그룹 메뉴 텍스트(span) 및 1레벨 메뉴 아이템에 손가락 커서 장착 */
+#wrapper header ul#menu > li.menu > span {
+    cursor: pointer !important;
+    display: block !important;
+}
+
+/* 2. 마우스 호버 시 풀다운(드롭다운) 서브 메뉴 목록이 보이도록 구동 */
+#wrapper header ul#menu > li.menu:hover > ul,
+#wrapper header ul#lang_menu > li.menu:hover > ul {
+    display: block !important;
+}
+
+/* 3. 2레벨 중첩 그룹 메뉴가 생겼을 경우를 대비한 가로 확장 전개 호버 (z-index 및 레이아웃 오염 해소) */
+#wrapper header ul#menu > li ul li.menu:hover > ul,
+#wrapper header ul#lang_menu > li ul li.menu:hover > ul {
+    display: block !important;
+    z-index: 9999 !important; /* 레거시 z-index: -1 오염 차단 및 100% 최상단 레이어 보장 */
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25) !important; /* 가벼운 플랫 섀도우 */
+}
+
+/* 4. 2레벨 중첩 그룹 메뉴 텍스트(span) 마우스 커서 및 패딩 정합 */
+#wrapper header ul#menu > li ul li.menu > span,
+#wrapper header ul#lang_menu > li ul li.menu > span {
+    cursor: pointer !important;
+    display: block !important;
+    padding: 8px 15px !important; /* 서브 드롭다운 레이아웃과 딱 들어맞는 패딩 정의 */
+    color: #ccc !important;
+    font-size: 12px !important;
+    transition: color 0.15s ease, background-color 0.15s ease !important;
+}
+
+#wrapper header ul#menu > li ul li.menu > span:hover,
+#wrapper header ul#lang_menu > li ul li.menu > span:hover {
+    background-color: #444 !important;
+    color: #fff !important;
+}
+
+
+

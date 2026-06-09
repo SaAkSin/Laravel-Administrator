@@ -152,7 +152,7 @@ class DataTable {
 		foreach ($columns as $column)
 		{
 			//if this is a related column, we'll need to add some selects
-			$column->filterQuery($selects);
+			$column->filterQuery($query, $selects);
 
 			//if this is a related field or
 			if ( ($column->getOption('is_related') || $column->getOption('select')) && $column->getOption('column_name') === $sort['field'])
@@ -239,7 +239,7 @@ class DataTable {
         foreach ($columns as $column)
         {
             //if this is a related column, we'll need to add some selects
-            $column->filterQuery($selects);
+            $column->filterQuery($query, $selects);
 
             //if this is a related field or
             if ( ($column->getOption('is_related') || $column->getOption('select')) && $column->getOption('column_name') === $sort['field'])

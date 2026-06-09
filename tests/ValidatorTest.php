@@ -24,7 +24,7 @@ class ValidatorTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->url = m::mock('Illuminate\Routing\UrlGenerator');
 		$this->validator = m::mock('SaAkSin\Administrator\Validator')->makePartial();
@@ -33,7 +33,7 @@ class ValidatorTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}

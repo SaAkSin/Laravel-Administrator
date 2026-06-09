@@ -37,7 +37,9 @@ class Relationship extends Column {
 		$options = $this->suppliedOptions;
 		$this->tablePrefix = $this->db->getTablePrefix();
 
-		$relationship = $model->{$options['relationship']}();
+		$relationship = \Illuminate\Database\Eloquent\Relations\Relation::noConstraints(function() use ($model, $options) {
+			return $model->{$options['relationship']}();
+		});
 		$relevant_model = $model;
 		$selectTable = $options['column_name'] . '_' . $this->tablePrefix . $relationship->getRelated()->getTable();
 
@@ -90,25 +92,34 @@ class Relationship extends Column {
 		//get the query instance
 		$query = $relationship->getQuery()->getQuery();
 
-		//get the connection instance
-		$connection = $query->getConnection();
+		// Relation::noConstraints()로 제약을 해제하여 가져왔으나, 
+		// 추가적인 Null 조건 등을 명시적으로 필터링하도록 array_filter를 적용합니다.
+		$wheres = array_filter($query->wheres, function($where) {
+			if (isset($where['type']) && $where['type'] === 'Null') {
+				if (strpos($where['column'], 'deleted_at') === false) {
+					return false;
+				}
+			}
+			return true;
+		});
 
-		//one element of the relationship query's wheres is always useless (it will say pivot_table.other_id is null)
-		//depending on whether or not softdeletes are enabled on the other model, this will be in either position 0
-		//or 1 of the wheres array
-		array_splice($query->wheres, (method_exists($relationshipModel, 'getDeletedAtColumn') ? 1 : 0), 1);
+		$query->wheres = array_values($wheres);
 
 		//iterate over the wheres to properly alias the columns
 		foreach ($query->wheres as &$where)
 		{
 			//alias the where columns
-			$where['column'] = $this->aliasRelationshipWhere($where['column'], $tableAlias, $pivotAlias, $pivot);
+			if (isset($where['column'])) {
+				$where['column'] = $this->aliasRelationshipWhere($where['column'], $tableAlias, $pivotAlias, $pivot);
+			}
 		}
 
 		$sql = $query->toSql();
-		$fullQuery = $this->interpolateQuery($sql, $connection->prepareBindings($query->getBindings()));
-		$split = explode(' where ', $fullQuery);
-		return isset($split[1]) ? $split[1] : '';
+		$bindings = $query->getRawBindings()['where'] ?? [];
+		$split = explode(' where ', $sql);
+		
+		$whereSql = isset($split[1]) ? $split[1] : '';
+		return array($whereSql, $bindings);
 	}
 
 	/**
@@ -144,42 +155,6 @@ class Relationship extends Column {
 		{
 			return $tableAlias . '.' . $column;
 		}
-	}
-
-	/**
-	 * Replaces any parameter placeholders in a query with the value of that
-	 * parameter.
-	 *
-	 * @param string	$query		//The sql query with parameter placeholders
-	 * @param array		$params		//The array of substitution parameters
-	 *
-	 * @return string 	//The interpolated query
-	 */
-	public function interpolateQuery($query, array $params) {
-		$keys = array();
-		$values = $params;
-
-		//build a regular expression for each parameter
-		foreach ($params as $key => $value) {
-			if (is_string($key)) {
-				$keys[] = "/:" . $key . "/";
-			} else {
-				$keys[] = '/[?]/';
-			}
-
-			if (is_string($value))
-				$values[$key] = "'" . $value . "'";
-
-			if (is_array($value))
-				$values[$key] = implode(',', $value);
-
-			if (is_null($value))
-				$values[$key] = 'NULL';
-		}
-
-		$query = preg_replace($keys, $values, $query, 1, $count);
-
-		return $query;
 	}
 
 }

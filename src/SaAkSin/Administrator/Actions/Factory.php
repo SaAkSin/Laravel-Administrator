@@ -118,9 +118,17 @@ class Factory {
 		//set the action name
 		$options['action_name'] = $name;
 
-		//set the permission
+		// 권한 검증 설정
 		$permission = $this->validator->arrayGet($options, 'permission', false);
-		$options['has_permission'] = is_callable($permission) ? $permission($model) : true;
+		if (is_string($permission) && !is_callable($permission)) {
+			// 문자열 형식의 Laravel DI 호출에만 app()->call 사용
+			$options['has_permission'] = (bool) app()->call($permission, ['model' => $model]);
+		} elseif (is_callable($permission)) {
+			// 클로저는 직접 호출하여 하위 호환성 유지 ($model을 첫 번째 인자로 직접 주입)
+			$options['has_permission'] = (bool) call_user_func($permission, $model);
+		} else {
+			$options['has_permission'] = true;
+		}
 
 		//check if the messages array exists
 		$options['messages'] = $this->validator->arrayGet($options, 'messages', array());
@@ -281,12 +289,18 @@ class Factory {
 			//merge the user-supplied action permissions into the defaults
 			$permissions = array_merge($defaults, $options);
 
-			//loop over the actions to build the list
+			// 루프를 돌며 각 액션의 권한을 확인합니다.
 			foreach ($permissions as $action => $callback)
 			{
-				if (is_callable($callback))
+				if (is_string($callback) && !is_callable($callback))
 				{
-					$this->actionPermissions[$action] = (bool) $callback($model);
+					// 문자열 형식의 Laravel DI 호출에만 app()->call 사용
+					$this->actionPermissions[$action] = (bool) app()->call($callback, ['model' => $model]);
+				}
+				elseif (is_callable($callback))
+				{
+					// 클로저는 직접 호출하여 하위 호환성 유지 ($model을 첫 번째 인자로 직접 주입)
+					$this->actionPermissions[$action] = (bool) call_user_func($callback, $model);
 				}
 				else
 				{

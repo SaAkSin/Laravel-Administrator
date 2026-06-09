@@ -622,4 +622,62 @@ class AdminController extends Controller
 		}
 		return null;
 	}
+
+	/**
+	 * 안전하게 에셋 파일을 로드하여 올바른 Content-Type 및 캐시 정책과 함께 스트리밍 반환합니다.
+	 * (Directory Traversal 방지 설계가 적용되어 있습니다.)
+	 *
+	 * @param string $path
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function serveAsset($path)
+	{
+		// 1. 에셋이 보관된 안전한 Base Path 정의 (디렉토리 구분자 추가)
+		$basePath = realpath(__DIR__ . '/../../public/dist');
+		if (!$basePath) {
+			abort(500, '에셋 기본 경로가 잘못 지정되었습니다.');
+		}
+		$basePath .= DIRECTORY_SEPARATOR;
+
+		// 2. 요청 경로와 Base Path 결합 후 realpath 획득
+		$filePath = $basePath . $path;
+		$realPath = realpath($filePath);
+
+		// 3. 파일 유무 검증 및 디렉토리 접근 차단
+		if (!$realPath || !is_file($realPath)) {
+			abort(404, '에셋 파일을 찾을 수 없습니다.');
+		}
+
+		// 4. Directory Traversal 방지 검증: 디렉토리 구분자가 포함되어 있어 접두사 우회 불가능
+		if (strpos($realPath, $basePath) !== 0) {
+			abort(403, '허용되지 않은 파일 경로 접근입니다.');
+		}
+
+		// 5. 브라우저 XSS/Nosniff 차단 대응을 위한 Mime-Type 파싱
+		$extension = pathinfo($realPath, PATHINFO_EXTENSION);
+		$mimeTypes = [
+			'js'    => 'application/javascript; charset=utf-8',
+			'css'   => 'text/css; charset=utf-8',
+			'svg'   => 'image/svg+xml',
+			'png'   => 'image/png',
+			'jpg'   => 'image/jpeg',
+			'jpeg'  => 'image/jpeg',
+			'gif'   => 'image/gif',
+			'woff'  => 'font/woff',
+			'woff2' => 'font/woff2',
+			'ttf'   => 'font/ttf',
+		];
+
+		// 기본 파일 정보 혹은 매핑 테이블에서 MIME을 추출
+		$contentType = isset($mimeTypes[$extension]) ? $mimeTypes[$extension] : File::mimeType($realPath);
+
+		// 6. 캐싱 헤더 구성: 프로덕션용 해시 에셋은 1년 동안 강력하게 캐싱 적용
+		$headers = [
+			'Content-Type'  => $contentType,
+			'Cache-Control' => 'public, max-age=31536000, immutable',
+		];
+
+		// 7. Laravel response()->file() 스트리밍을 통한 고성능 서빙 (OOM 예방)
+		return response()->file($realPath, $headers);
+	}
 }

@@ -36,7 +36,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -49,7 +49,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -57,7 +57,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 	public function testBuild()
 	{
 		$relatedModel = m::mock(array('getKeyName' => 'id', 'getTable' => 'other_table'));
-		$relationship = m::mock(array('getRelated' => $relatedModel, 'getForeignKey' => 'some_id', 'getPlainForeignKey' => 'some_other_id'));
+		$relationship = m::mock(array('getRelated' => $relatedModel, 'getForeignKey' => 'some_id', 'getForeignKeyName' => 'some_id', 'getPlainForeignKey' => 'some_other_id'));
 		$model = m::mock(array('field' => $relationship, 'getTable' => 'table'));
 		$this->config->shouldReceive('getDataModel')->twice()->andReturn($model);
 		$this->validator->shouldReceive('arrayGet')->times(6);

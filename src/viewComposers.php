@@ -2,6 +2,64 @@
 
 use Illuminate\Support\Facades\View;
 
+/**
+ * Vite 빌드 머니페스트를 읽어 해시가 포함된 에셋 실경로를 동적으로 반환하고,
+ * 연결된 CSS가 존재할 경우 글로벌 CSS 배열에 자동으로 추가합니다.
+ *
+ * @param string $entry
+ * @param array &$cssArray
+ * @return string
+ */
+if (!function_exists('getViteAsset')) {
+	/**
+	 * Vite 빌드 머니페스트를 읽어 안전 에셋 로더 라우트 주소를 반환합니다.
+	 * HMR 서버 활성화 시에는 해당 개발 서버 URL을 다이렉트로 반환합니다.
+	 *
+	 * @param string $entry
+	 * @param array &$cssArray
+	 * @return string
+	 */
+	function getViteAsset($entry, &$cssArray = null)
+	{
+		$hotPath = __DIR__ . '/../public/dist/hot';
+		
+		// 1. Vite HMR 개발 서버가 구동 중인 경우 감지 및 처리
+		if (file_exists($hotPath)) {
+			$devServerUrl = trim(file_get_contents($hotPath));
+			// HMR 환경에서는 CSS가 JS 내에 자동 삽입되므로 CSS 바인딩 생략
+			return $devServerUrl . '/' . $entry;
+		}
+
+		// 2. 프로덕션 환경의 manifest.json 읽기
+		$manifestPath = __DIR__ . '/../public/dist/.vite/manifest.json';
+		if (!file_exists($manifestPath)) {
+			$manifestPath = __DIR__ . '/../public/dist/manifest.json';
+		}
+		
+		if (file_exists($manifestPath)) {
+			$manifest = json_decode(file_get_contents($manifestPath), true);
+			if (isset($manifest[$entry])) {
+				$entryData = $manifest[$entry];
+				
+				// 연관된 CSS 에셋이 존재하는 경우 안전 에셋 로더 경로로 바인딩
+				if (is_array($cssArray) && isset($entryData['css']) && is_array($entryData['css'])) {
+					foreach ($entryData['css'] as $cssFile) {
+						$cssKey = 'vite-' . basename($cssFile, '.css');
+						$cssArray[$cssKey] = route('admin_secure_asset', ['path' => $cssFile]);
+					}
+				}
+				
+				if (isset($entryData['file'])) {
+					return route('admin_secure_asset', ['path' => $entryData['file']]);
+				}
+			}
+		}
+		
+		// manifest가 존재하지 않는 등의 예외 상황을 대비한 fallback 경로
+		return route('admin_secure_asset', ['path' => 'js/app.js']);
+	}
+}
+
 //admin index view
 View::composer('administrator::index', function($view)
 {
@@ -30,7 +88,7 @@ View::composer('administrator::index', function($view)
 	$view->rows = $dataTable->getRows(app('db'), $view->filters);
 	$view->formWidth = $config->getOption('form_width');
 	$view->baseUrl = $baseUrl;
-	$view->assetUrl = url('packages/saaksin/administrator/');
+	$view->assetUrl = asset('packages/saaksin/administrator/');
 	$view->route = $route['path'].'/';
 	$view->itemId = isset($view->itemId) ? $view->itemId : null;
 });
@@ -50,7 +108,7 @@ View::composer('administrator::settings', function($view)
 	$view->arrayFields = $fieldFactory->getEditFieldsArrays();
 	$view->actions = $actionFactory->getActionsOptions();
 	$view->baseUrl = $baseUrl;
-	$view->assetUrl = url('packages/saaksin/administrator/');
+	$view->assetUrl = asset('packages/saaksin/administrator/');
 	$view->route = $route['path'].'/';
 });
 
@@ -66,74 +124,37 @@ View::composer(array('administrator::partials.header'), function($view)
 //the layout view
 View::composer(array('administrator::layouts.default'), function($view)
 {
-	//set up the basic asset arrays
+	// 에셋 배열 초기화
 	$view->css = array();
 	$view->js = array(
-		'jquery' => asset('packages/saaksin/administrator/js/jquery/jquery-1.8.2.min.js'),
-		'jquery-ui' => asset('packages/saaksin/administrator/js/jquery/jquery-ui-1.10.3.custom.min.js'),
-		'customscroll' => asset('packages/saaksin/administrator/js/jquery/customscroll/jquery.customscroll.js'),
+		'jquery' => 'https://code.jquery.com/jquery-1.8.2.min.js',
+		'jquery-ui' => 'https://code.jquery.com/ui/1.10.3/jquery-ui.min.js',
 	);
 
-	//add the non-custom-page css assets
+	// Vite 현대화 에셋 (Alpine.js 및 Tailwind CSS)은 대시보드와 커스텀 페이지를 포함한 모든 레이아웃에 필수적이므로 항상 등록합니다.
+	$hotPath = __DIR__ . '/../public/dist/hot';
+	if (file_exists($hotPath)) {
+		// Vite HMR 활성화 시 @vite/client 추가 로드 및 app.js HMR 주소 바인딩
+		$devServerUrl = trim(file_get_contents($hotPath));
+		$view->js['vite-client'] = $devServerUrl . '/@vite/client';
+		$view->js['vite-app'] = $devServerUrl . '/resources/js/app.js';
+	} else {
+		// 프로덕션 상태에서는 manifest 기반 안전 에셋 로더 적용
+		$view->js['vite-app'] = getViteAsset('resources/js/app.js', $view->css);
+	}
+
 	if (!$view->page && !$view->dashboard)
 	{
+		// 1. 특정 관리 뷰 전용 에셋(select2 스타일시트 및 스크립트)을 로드합니다.
 		$view->css += array(
-			'jquery-ui' => asset('packages/saaksin/administrator/css/ui/jquery-ui-1.9.1.custom.min.css'),
-			'jquery-ui-timepicker' => asset('packages/saaksin/administrator/css/ui/jquery.ui.timepicker.css'),
-			'select2' => asset('packages/saaksin/administrator/js/jquery/select2/select2.css'),
-			'jquery-colorpicker' => asset('packages/saaksin/administrator/css/jquery.lw-colorpicker.css'),
+			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.css',
+		);
+		$view->js += array(
+			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js',
 		);
 	}
 
-	//add the package-wide css assets
-	$view->css += array(
-		'customscroll' => asset('packages/saaksin/administrator/js/jquery/customscroll/customscroll.css'),
-		'main' => asset('packages/saaksin/administrator/css/main.css'),
-	);
-
-	//add the non-custom-page js assets
-	if (!$view->page && !$view->dashboard)
-	{
-		$view->js += array(
-			'select2' => asset('packages/saaksin/administrator/js/jquery/select2/select2.js'),
-			'jquery-ui-timepicker' => asset('packages/saaksin/administrator/js/jquery/jquery-ui-timepicker-addon.js'),
-			'ckeditor' => asset('packages/saaksin/administrator/js/ckeditor/ckeditor.js'),
-			'ckeditor-jquery' => asset('packages/saaksin/administrator/js/ckeditor/adapters/jquery.js'),
-			'markdown' => asset('packages/saaksin/administrator/js/markdown.js'),
-			'plupload' => asset('packages/saaksin/administrator/js/plupload/js/plupload.full.js'),
-		);
-
-		//localization js assets
-		$locale = config('app.locale');
-
-		if ($locale !== 'en')
-		{
-			$view->js += array(
-				'plupload-l18n' => asset('packages/saaksin/administrator/js/plupload/js/i18n/'.$locale.'.js'),
-				'timepicker-l18n' => asset('packages/saaksin/administrator/js/jquery/localization/jquery-ui-timepicker-'.$locale.'.js'),
-				'datepicker-l18n' => asset('packages/saaksin/administrator/js/jquery/i18n/jquery.ui.datepicker-'.$locale.'.js'),
-				'select2-l18n' => asset('packages/saaksin/administrator/js/jquery/select2/select2_locale_'.$locale.'.js'),
-			);
-		}
-
-		//remaining js assets
-		$view->js += array(
-			'knockout' => asset('packages/saaksin/administrator/js/knockout/knockout-2.2.0.js'),
-			'knockout-mapping' => asset('packages/saaksin/administrator/js/knockout/knockout.mapping.js'),
-			'knockout-notification' => asset('packages/saaksin/administrator/js/knockout/KnockoutNotification.knockout.min.js'),
-			'knockout-update-data' => asset('packages/saaksin/administrator/js/knockout/knockout.updateData.js'),
-			'knockout-custom-bindings' => asset('packages/saaksin/administrator/js/knockout/custom-bindings.js'),
-			'accounting' => asset('packages/saaksin/administrator/js/accounting.js'),
-			'colorpicker' => asset('packages/saaksin/administrator/js/jquery/jquery.lw-colorpicker.min.js'),
-			'history' => asset('packages/saaksin/administrator/js/history/native.history.js'),
-			'admin' => asset('packages/saaksin/administrator/js/admin.js'),
-			'settings' => asset('packages/saaksin/administrator/js/settings.js'),
-		);
-	}
-
-	$view->js += array('page' => asset('packages/saaksin/administrator/js/page.js'));
-
-    // 사용자 정의 js 추가
+    // 3. 사용자 정의 js 추가
     $customs = config('administrator.custom_js');
     if ($customs) $view->js += $customs;
 });

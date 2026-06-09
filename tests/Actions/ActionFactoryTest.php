@@ -29,7 +29,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
@@ -39,7 +39,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -59,21 +59,19 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($this->factory->parseDefaults('action', array()), $output);
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testParseDefaultsInvalidName()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->config->shouldReceive('getDataModel')->once()
 						->shouldReceive('getOption')->once();
 		$this->factory->parseDefaults(true, array());
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testParseDefaultsInvalidOptions()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$this->config->shouldReceive('getDataModel')->once()
 						->shouldReceive('getOption')->once();
 		$this->factory->parseDefaults('action', true);

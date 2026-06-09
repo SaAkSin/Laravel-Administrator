@@ -29,7 +29,7 @@ class MenuTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->config = m::mock('Illuminate\Config\Repository');
 		$this->configFactory = m::mock('SaAkSin\Administrator\Config\Factory');
@@ -39,7 +39,7 @@ class MenuTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}

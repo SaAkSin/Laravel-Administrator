@@ -112,7 +112,7 @@ class BelongsToMany extends Relationship {
 		$query->whereIn($column2, $value);
 
 		//add having clauses
-		$query->havingRaw('COUNT(DISTINCT ' . $query->getConnection()->getTablePrefix() . $column2 . ') = ' . count($value));
+		$query->havingRaw('COUNT(DISTINCT ' . $query->getConnection()->getTablePrefix() . $column2 . ') = ' . (is_array($value) ? count($value) : 1));
 
 		//add select field
 		if ($selects && !in_array($column2, $selects))

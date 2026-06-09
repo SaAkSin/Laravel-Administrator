@@ -36,7 +36,7 @@ class DataTableTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->config = m::mock('SaAkSin\Administrator\Config\Model\Config');
 		$this->columnFactory = m::mock('SaAkSin\Administrator\DataTable\Columns\Factory');
@@ -48,7 +48,7 @@ class DataTableTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -69,6 +69,7 @@ class DataTableTest extends \PHPUnit\Framework\TestCase {
 			'selects' => array(),
 		);
 		$countResults = array('page' => 30, 'last' => 60, 'total' => 4000);
+		$this->config->shouldReceive('getOption')->with('view')->once()->andReturn(false);
 		$this->dataTable->shouldReceive('prepareQuery')->once()->andReturn($prepared)
 						->shouldReceive('performCountQuery')->once()->andReturn($countResults)
 						->shouldReceive('parseResults')->once()->andReturn(array('funky'));
@@ -124,7 +125,8 @@ class DataTableTest extends \PHPUnit\Framework\TestCase {
 		$countQuery = m::mock('Illuminate\Database\Query\Builder');
 		$countQuery->shouldReceive('getConnection')->once()->andReturn(m::mock(array('select' => array($result))));
 		$model = m::mock('Illuminate\Database\Eloquent\Model');
-		$model->shouldReceive('getKeyName')->once()->andReturn('id');
+		$model->shouldReceive('getKeyName')->once()->andReturn('id')
+				->shouldReceive('getTable')->once()->andReturn('table');
 		$this->config->shouldReceive('getDataModel')->once()->andReturn($model);
 		$output = array('page' => 1, 'last' => 5, 'total' => 100);
 		$this->assertEquals($this->dataTable->performCountQuery($countQuery, 'foo', array(), 1), $output);

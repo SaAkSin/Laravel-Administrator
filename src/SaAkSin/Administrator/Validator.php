@@ -15,6 +15,7 @@ class Validator extends \Illuminate\Validation\Validator
 		'array_with' => "The :attribute array is missing some required values",
 		'not_empty' => "The :attribute option must not be empty",
 		'callable' => "The :attribute option must be a function",
+		'string_or_callable' => "The :attribute option must be a string or a function",
 		'eloquent' => "The :attribute option must be the string name of a valid Eloquent model",
 	);
 
@@ -181,7 +182,7 @@ class Validator extends \Illuminate\Validation\Validator
 	}
 
 	/**
-	 * Validates that an item is either a string or callable
+	 * 항목이 문자열이거나 호출 가능한(callable) 객체인지 검증합니다.
 	 */
 	public function validateStringOrCallable($attribute, $value, $parameters)
 	{

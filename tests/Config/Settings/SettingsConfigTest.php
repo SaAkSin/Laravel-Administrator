@@ -22,7 +22,7 @@ class SettingsConfigTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Set up function
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->validator = m::mock('SaAkSin\Administrator\Validator');
 		$this->config = m::mock('SaAkSin\Administrator\Config\Settings\Config', array($this->validator, $this->validator, array()))->makePartial();
@@ -31,7 +31,7 @@ class SettingsConfigTest extends \PHPUnit\Framework\TestCase {
 	/**
 	 * Tear down function
 	 */
-	public function tearDown()
+	public function tearDown(): void
 	{
 		m::close();
 	}
@@ -160,11 +160,10 @@ class SettingsConfigTest extends \PHPUnit\Framework\TestCase {
 		rmdir($path);
 	}
 
-	/**
-	 * @expectedException InvalidArgumentException
-	 */
+	
 	public function testPutToJsonNotWritableError()
 	{
+		$this->expectException(\InvalidArgumentException::class);
 		$path = __DIR__ . '/bar/';
 		$this->config->shouldReceive('getStoragePath')->once()->andReturn($path)
 						->shouldReceive('getOption')->once()->andReturn('foo');

@@ -77,7 +77,7 @@ class Factory {
 		'model_config_path' => 'required|string|directory',
 		'settings_config_path' => 'required|string|directory',
 		'menu' => 'required|array|not_empty',
-		'permission' => 'required|callable',
+		'permission' => 'required|string_or_callable',
 		'use_dashboard' => 'required',
 		'dashboard_view' => 'string',
 		'home_page' => 'string',

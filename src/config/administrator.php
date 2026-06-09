@@ -73,10 +73,7 @@ return array(
 	 *
 	 * @type closure
 	 */
-	'permission'=> function()
-	{
-		return auth()->check();
-	},
+	'permission' => 'App\Http\Middleware\AdminPermission@check',
 
 	/**
 	 * This determines if you will have a dashboard (whose view you provide in the dashboard_view option) or a non-dashboard home
@@ -142,5 +139,14 @@ return array(
 	 * @type array
 	 */
 	'locales' => array(),
+
+	/**
+	 * 레거시 Knockout.js 엔진의 로드 여부를 결정합니다.
+	 * 점진적인 현대적 프론트엔드 마이그레이션을 지원하기 위해 기본값은 false(비활성화)로 설정합니다.
+	 * 레거시 뷰 컴포넌트를 유지하여 마이그레이션 중인 경우 true로 켭니다.
+	 *
+	 * @type bool
+	 */
+	'enable_knockout' => false,
 
 );

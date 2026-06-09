@@ -90,8 +90,12 @@ abstract class Config {
 	{
 		$options = $this->suppliedOptions;
 
-		//check the permission
-		$options['permission'] = isset($options['permission']) ? $options['permission']() : true;
+		// 권한 검사
+		$options['permission'] = isset($options['permission']) 
+			? ((is_string($options['permission']) || is_callable($options['permission'])) 
+				? app()->call($options['permission']) 
+				: (bool) $options['permission']) 
+			: true;
 
 		$this->suppliedOptions = $options;
 	}

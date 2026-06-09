@@ -183,11 +183,12 @@ class Column
 	/**
 	 * Adds selects to a query
 	 *
-	 * @param array 	$selects
+	 * @param \Illuminate\Database\Eloquent\Builder	$query
+	 * @param array 								$selects
 	 *
 	 * @return void
 	 */
-	public function filterQuery(&$selects)
+	public function filterQuery($query, &$selects)
 	{
 		if ($select = $this->getOption('select')) {
 			$selects[] = $this->db->raw($select . ' AS ' . $this->db->getQueryGrammar()->wrap($this->getOption('column_name')));
