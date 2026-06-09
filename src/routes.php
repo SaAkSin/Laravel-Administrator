@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
+// 관리자 인증 외부에서 패키지 내부 에셋을 제공하는 보안 에셋 로더 라우트
+Route::get('packages/saaksin/administrator/secure-dist/{path}', [
+    \SaAkSin\Administrator\AdminController::class, 
+    'serveAsset'
+])->where('path', '.*')->name('admin_secure_asset');
+
 /**
  * Temperary solution for middleware in routes
  * TODO: remove in favor of setting the config for middleware outside of the routes file

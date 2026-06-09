@@ -11,12 +11,27 @@ use Illuminate\Support\Facades\View;
  * @return string
  */
 if (!function_exists('getViteAsset')) {
+	/**
+	 * Vite 빌드 머니페스트를 읽어 안전 에셋 로더 라우트 주소를 반환합니다.
+	 * HMR 서버 활성화 시에는 해당 개발 서버 URL을 다이렉트로 반환합니다.
+	 *
+	 * @param string $entry
+	 * @param array &$cssArray
+	 * @return string
+	 */
 	function getViteAsset($entry, &$cssArray = null)
 	{
-		// Vite 5+는 outDir/.vite/manifest.json 경로에 머니페스트를 생성합니다.
-		$manifestPath = __DIR__ . '/../public/dist/.vite/manifest.json';
+		$hotPath = __DIR__ . '/../public/dist/hot';
 		
-		// Vite 4 이하 또는 커스텀 설정 대비 fallback 경로
+		// 1. Vite HMR 개발 서버가 구동 중인 경우 감지 및 처리
+		if (file_exists($hotPath)) {
+			$devServerUrl = trim(file_get_contents($hotPath));
+			// HMR 환경에서는 CSS가 JS 내에 자동 삽입되므로 CSS 바인딩 생략
+			return $devServerUrl . '/' . $entry;
+		}
+
+		// 2. 프로덕션 환경의 manifest.json 읽기
+		$manifestPath = __DIR__ . '/../public/dist/.vite/manifest.json';
 		if (!file_exists($manifestPath)) {
 			$manifestPath = __DIR__ . '/../public/dist/manifest.json';
 		}
@@ -26,22 +41,22 @@ if (!function_exists('getViteAsset')) {
 			if (isset($manifest[$entry])) {
 				$entryData = $manifest[$entry];
 				
-				// 연관된 CSS 에셋이 존재하는 경우 자동으로 CSS 배열에 추가
+				// 연관된 CSS 에셋이 존재하는 경우 안전 에셋 로더 경로로 바인딩
 				if (is_array($cssArray) && isset($entryData['css']) && is_array($entryData['css'])) {
 					foreach ($entryData['css'] as $cssFile) {
 						$cssKey = 'vite-' . basename($cssFile, '.css');
-						$cssArray[$cssKey] = asset('packages/saaksin/administrator/dist/' . $cssFile);
+						$cssArray[$cssKey] = route('admin_secure_asset', ['path' => $cssFile]);
 					}
 				}
 				
 				if (isset($entryData['file'])) {
-					return asset('packages/saaksin/administrator/dist/' . $entryData['file']);
+					return route('admin_secure_asset', ['path' => $entryData['file']]);
 				}
 			}
 		}
 		
 		// manifest가 존재하지 않는 등의 예외 상황을 대비한 fallback 경로
-		return asset('packages/saaksin/administrator/dist/js/app.js');
+		return route('admin_secure_asset', ['path' => 'js/app.js']);
 	}
 }
 
@@ -116,18 +131,27 @@ View::composer(array('administrator::layouts.default'), function($view)
 		'jquery-ui' => 'https://code.jquery.com/ui/1.10.3/jquery-ui.min.js',
 	);
 
+	// Vite 현대화 에셋 (Alpine.js 및 Tailwind CSS)은 대시보드와 커스텀 페이지를 포함한 모든 레이아웃에 필수적이므로 항상 등록합니다.
+	$hotPath = __DIR__ . '/../public/dist/hot';
+	if (file_exists($hotPath)) {
+		// Vite HMR 활성화 시 @vite/client 추가 로드 및 app.js HMR 주소 바인딩
+		$devServerUrl = trim(file_get_contents($hotPath));
+		$view->js['vite-client'] = $devServerUrl . '/@vite/client';
+		$view->js['vite-app'] = $devServerUrl . '/resources/js/app.js';
+	} else {
+		// 프로덕션 상태에서는 manifest 기반 안전 에셋 로더 적용
+		$view->js['vite-app'] = getViteAsset('resources/js/app.js', $view->css);
+	}
+
 	if (!$view->page && !$view->dashboard)
 	{
-		// 1. Vite 컴파일 현대화 에셋 등록 (Alpine.js 및 Tailwind CSS) 및 select2 스타일시트 로드
+		// 1. 특정 관리 뷰 전용 에셋(select2 스타일시트 및 스크립트)을 로드합니다.
 		$view->css += array(
 			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.css',
 		);
 		$view->js += array(
 			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js',
-			'vite-app' => getViteAsset('resources/js/app.js', $view->css),
 		);
-
-
 	}
 
     // 3. 사용자 정의 js 추가

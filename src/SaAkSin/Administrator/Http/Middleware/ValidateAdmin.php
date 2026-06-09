@@ -18,8 +18,18 @@ class ValidateAdmin {
 		//get the admin check closure that should be supplied in the config
 		$permission = config('administrator.permission');
 
+		if (is_string($permission) && !is_callable($permission)) {
+			// 문자열 형식의 Laravel DI 호출에만 app()->call 사용
+			$response = app()->call($permission);
+		} elseif (is_callable($permission)) {
+			// 클로저/함수 등은 직접 실행하여 파라미터 매핑 에러 방지
+			$response = $permission();
+		} else {
+			$response = (bool) $permission;
+		}
+
 		//if this is a simple false value, send the user to the login redirect
-		if (!$response = $permission())
+		if (!$response)
 		{
 			$loginUrl = url(config('administrator.login_path', 'user/login'));
 			$redirectKey = config('administrator.login_redirect_key', 'redirect');

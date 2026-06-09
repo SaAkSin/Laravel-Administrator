@@ -145,7 +145,11 @@ class BelongsTo extends Relationship {
 			$subQuery->whereNull($field_table . '.' . $relationship_model->getDeletedAtColumn());
 		}
 
-		list($sql, $bindings) = $query->getQuery()->createSub($subQuery);
+		// Eloquent 빌더인 경우 하부 쿼리 빌더를 획득하여 SQL과 바인딩 정보를 추출함
+		$subQueryBuilder = $subQuery instanceof \Illuminate\Database\Eloquent\Builder ? $subQuery->getQuery() : $subQuery;
+		$sql = $subQueryBuilder->toSql();
+		$bindings = $subQueryBuilder->getBindings();
+
 		$selects[] = $this->db->raw("({$sql}) AS " . $this->db->getQueryGrammar()->wrap($columnName));
 		$query->addBinding($bindings, 'select');
 	}

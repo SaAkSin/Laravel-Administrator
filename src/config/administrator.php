@@ -73,10 +73,7 @@ return array(
 	 *
 	 * @type closure
 	 */
-	'permission'=> function()
-	{
-		return auth()->check();
-	},
+	'permission' => 'App\Http\Middleware\AdminPermission@check',
 
 	/**
 	 * This determines if you will have a dashboard (whose view you provide in the dashboard_view option) or a non-dashboard home

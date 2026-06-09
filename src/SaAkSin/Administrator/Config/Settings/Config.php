@@ -42,7 +42,7 @@ class Config extends ConfigBase implements ConfigInterface {
 	protected $rules = array(
 		'title' => 'required|string',
 		'edit_fields' => 'required|array|not_empty',
-		'permission' => 'callable',
+		'permission' => 'string_or_callable',
 		'before_save' => 'callable',
 		'actions' => 'array',
 		'rules' => 'array',

@@ -64,7 +64,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'edit_fields' => 'required|array|not_empty',
 		'filters' => 'array',
 		'query_filter' => 'callable',
-		'permission' => 'callable',
+		'permission' => 'string_or_callable',
 		'action_permissions' => 'array',
 		'actions' => 'array',
 		'global_actions' => 'array',
