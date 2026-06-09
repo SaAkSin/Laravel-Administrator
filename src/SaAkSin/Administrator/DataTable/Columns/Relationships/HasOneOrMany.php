@@ -48,7 +48,9 @@ class HasOneOrMany extends Relationship {
 			$subQuery->whereNull($field_table . '.' . $relatedModel->getDeletedAtColumn());
 		}
 
-		list($sql, $bindings) = $query->getQuery()->createSub($subQuery);
+		$subQueryBuilder = $subQuery instanceof \Illuminate\Database\Eloquent\Builder ? $subQuery->getQuery() : $subQuery;
+		$sql = $subQueryBuilder->toSql();
+		$bindings = $subQueryBuilder->getBindings();
 		$selects[] = $this->db->raw("({$sql}) AS " . $this->db->getQueryGrammar()->wrap($columnName));
 		$query->addBinding($bindings, 'select');
 	}

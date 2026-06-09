@@ -61,10 +61,15 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 
 	public function testFilterQuery()
 	{
+		$dbQuery = m::mock('Illuminate\Database\Query\Builder');
+		$dbQuery->shouldReceive('toSql')->once()->andReturn('sql')
+				->shouldReceive('getBindings')->once()->andReturn(array('binding_val'));
+
 		$subQuery = m::mock('Illuminate\Database\Eloquent\Builder');
 		$subQuery->shouldReceive('from')->once()->andReturnSelf()
 				 ->shouldReceive('select')->once()->andReturnSelf()
-				 ->shouldReceive('whereRaw')->twice()->andReturnSelf();
+				 ->shouldReceive('whereRaw')->twice()->andReturnSelf()
+				 ->shouldReceive('getQuery')->once()->andReturn($dbQuery);
 
 		$relatedModel = m::mock('Illuminate\Database\Eloquent\Model');
 		$relatedModel->shouldReceive('getTable')->once()->andReturn('table');
@@ -87,11 +92,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 		$this->db->shouldReceive('raw')->twice()->andReturn('foo')
 					->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
 
-		$dbQuery = m::mock('Illuminate\Database\Query\Builder')->shouldAllowMockingProtectedMethods();
-		$dbQuery->shouldReceive('createSub')->once()->with($subQuery)->andReturn(array('sql', array('binding_val')));
-
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('getQuery')->once()->andReturn($dbQuery);
 		$query->shouldReceive('addBinding')->once()->with(array('binding_val'), 'select');
 
 		$selects = array();
@@ -101,11 +102,16 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 
 	public function testFilterQueryWithSoftDeletes()
 	{
+		$dbQuery = m::mock('Illuminate\Database\Query\Builder');
+		$dbQuery->shouldReceive('toSql')->once()->andReturn('sql')
+				->shouldReceive('getBindings')->once()->andReturn(array('binding_val'));
+
 		$subQuery = m::mock('Illuminate\Database\Eloquent\Builder');
 		$subQuery->shouldReceive('from')->once()->andReturnSelf()
 				 ->shouldReceive('select')->once()->andReturnSelf()
 				 ->shouldReceive('whereRaw')->twice()->andReturnSelf()
-				 ->shouldReceive('whereNull')->once()->with('test_table_table.deleted_at')->andReturnSelf();
+				 ->shouldReceive('whereNull')->once()->with('test_table_table.deleted_at')->andReturnSelf()
+				 ->shouldReceive('getQuery')->once()->andReturn($dbQuery);
 
 		$relatedModel = m::mock('SaAkSin\Administrator\Tests\DataTable\Columns\Relationships\HasOneOrManySoftDeleteModelStub');
 		$relatedModel->shouldReceive('getTable')->once()->andReturn('table');
@@ -129,11 +135,7 @@ class HasOneOrManyTest extends \PHPUnit\Framework\TestCase {
 		$this->db->shouldReceive('raw')->twice()->andReturn('foo')
 					->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
 
-		$dbQuery = m::mock('Illuminate\Database\Query\Builder')->shouldAllowMockingProtectedMethods();
-		$dbQuery->shouldReceive('createSub')->once()->with($subQuery)->andReturn(array('sql', array('binding_val')));
-
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('getQuery')->once()->andReturn($dbQuery);
 		$query->shouldReceive('addBinding')->once()->with(array('binding_val'), 'select');
 
 		$selects = array();
