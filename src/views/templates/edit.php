@@ -281,10 +281,10 @@
 					<template x-if="$root[field.field_name] && !loadingItem">
 						<div class="image_container" style="position: relative; display: block; width: 100%; margin-top: 8px; box-sizing: border-box;">
 							<template x-if="field.display_raw_value">
-								<img :src="$root[field.field_name]" style="max-width: 385px; height: auto; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
+								<img :src="$root[field.field_name]" style="max-width: 370px; height: auto; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
 							</template>
 							<template x-if="!field.display_raw_value">
-								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-width: 385px; height: auto; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
+								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-width: 370px; height: auto; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
 							</template>
 							<template x-if="field.editable">
 								<button type="button" class="remove_button" @click="$root[field.field_name] = null" style="position: absolute; top: 0; right: 0; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 4px !important; width: 24px; height: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10; line-height: 1 !important;" title="삭제">

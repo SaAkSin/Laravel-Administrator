@@ -313,7 +313,7 @@
 					</template>
 					<template x-if="$root[field.field_name]">
 						<div class="image_container" style="margin-top: 8px;">
-							<img :src="file_url + '?path=' + field.location + $root[field.field_name]" style="max-width: 385px; height: auto; border: 1px solid #ccc; padding: 2px;" />
+							<img :src="file_url + '?path=' + field.location + $root[field.field_name]" style="max-width: 370px; height: auto; border: 1px solid #ccc; padding: 2px;" />
 							<template x-if="field.editable">
 								<input type="button" class="remove_button" @click="$root[field.field_name] = null" value="x" style="margin-left: 5px; vertical-align: top;" />
 							</template>
