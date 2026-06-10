@@ -234,8 +234,8 @@
 								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
 							</template>
 							<template x-if="field.editable">
-								<button type="button" class="remove_button" @click="$root[field.field_name] = null" style="position: absolute; top: 0; right: 0; padding: 4px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px !important; width: 24px; height: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10;" title="삭제">
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;">
+								<button type="button" class="remove_button" @click="$root[field.field_name] = null" style="position: absolute; top: 0; right: 0; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 4px !important; width: 24px; height: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10; line-height: 1 !important;" title="삭제">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px; display: block; flex-shrink: 0;">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 									</svg>
 								</button>
