@@ -1813,9 +1813,7 @@ a {
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div textarea {
   width: 98%;
 }
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div select,
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div input[type=hidden],
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div .select2-container {
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div input[type=hidden] {
   width: 226px;
 }
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div div.characters_left {

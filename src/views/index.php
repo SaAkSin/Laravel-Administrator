@@ -51,7 +51,7 @@
 
 <style type="text/css">
 	div.item_edit form.edit_form select, div.item_edit form.edit_form input[type=hidden], div.item_edit form.edit_form .select2-container {
-		width: <?php echo $formWidth - 59 ?>px !important;
+		width: <?php echo $formWidth - 75 ?>px !important;
 	}
 
 	div.item_edit form.edit_form .cke {
