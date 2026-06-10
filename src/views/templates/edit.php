@@ -87,8 +87,56 @@
 				</div>
 			</template>
 
-			<!-- 4. WYSIWYG TYPE (Quill Editor 모던 포팅) -->
+			<!-- 4. WYSIWYG TYPE (CKEditor 4) -->
 			<template x-if="field.type === 'wysiwyg'">
+				<div x-data="{ editor: null }"
+					 x-init="
+						$nextTick(() => {
+							if (window.CKEDITOR) {
+								// 중복 초기화 방지를 위해 기존 인스턴스 제거
+								if (CKEDITOR.instances[field.field_id]) {
+									CKEDITOR.instances[field.field_id].destroy(true);
+								}
+								editor = CKEDITOR.replace(field.field_id, {
+									toolbar: [
+										{ name: 'document', items: [ 'Source' ] },
+										{ name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+										{ name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll' ] },
+										{ name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
+										{ name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+										{ name: 'links', items: [ 'Link', 'Unlink' ] },
+										{ name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+										{ name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+										{ name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+										{ name: 'tools', items: [ 'Maximize' ] }
+									]
+								});
+
+								// Alpine.js 모델에서 초기 데이터 로드
+								editor.setData($root[field.field_name] || '');
+
+								// CKEditor의 변경 사항을 Alpine.js 상태 모델에 동기화
+								editor.on('change', () => {
+									$root[field.field_name] = editor.getData();
+								});
+
+								// Alpine.js 상태 변경을 감시하여 CKEditor 데이터 업데이트
+								$watch('$root.' + field.field_name, (newVal) => {
+									if (newVal !== editor.getData()) {
+										editor.setData(newVal || '');
+									}
+								});
+							}
+						});
+					 "
+					 class="ckeditor-wrapper"
+					 style="margin-top: 6px;">
+					<textarea :id="field.field_id" :disabled="freezeForm"></textarea>
+				</div>
+			</template>
+
+			<!-- 4-2. WYSIWYG2 TYPE (Quill Editor) -->
+			<template x-if="field.type === 'wysiwyg2'">
 				<div x-data="{ editor: null }"
 					 x-init="
 						$nextTick(() => {
@@ -115,10 +163,10 @@
 										}
 									});
 
-									// 초기 데이터 장착
+									// 초기 데이터 설정
 									editor.root.innerHTML = $root[field.field_name] || '';
 
-									// 에디팅 수정 시 Alpine 상태 모델에 즉각 싱크
+									// 에디팅 수정 시 Alpine 상태 모델에 즉각 동기화
 									editor.on('text-change', () => {
 										let html = editor.root.innerHTML;
 										if (html === '<p><br></p>') html = '';

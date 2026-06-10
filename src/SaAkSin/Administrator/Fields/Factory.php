@@ -21,6 +21,7 @@ class Factory {
         'text_quick' => 'SaAkSin\\Administrator\\Fields\\TextQuick',
 		'textarea' => 'SaAkSin\\Administrator\\Fields\\Text',
 		'wysiwyg' => 'SaAkSin\\Administrator\\Fields\\Text',
+		'wysiwyg2' => 'SaAkSin\\Administrator\\Fields\\Text',
 		'markdown' => 'SaAkSin\\Administrator\\Fields\\Text',
 		'password' => 'SaAkSin\\Administrator\\Fields\\Password',
 		'date' => 'SaAkSin\\Administrator\\Fields\\Time',
