@@ -2009,7 +2009,6 @@ a {
   }
   #wrapper #content div.item_edit_container div.item_edit form.edit_form > div.image div.image_container img {
     max-width: 88% !important;
-    max-height: 600px;
   }
   #wrapper #content div.item_edit_container div.item_edit form.edit_form > div.bool {
     display: block;
