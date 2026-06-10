@@ -401,7 +401,7 @@
 								<!-- 상단 값 노출/트리거 행 -->
 								<div class="combobox-value-row" 
 									 @click="open = !open"
-									 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
+									 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
 									
 									<!-- 단일 선택일 때의 값 또는 플레이스홀더 표시 -->
 									<span class="selected-text" 
@@ -418,10 +418,10 @@
 									<!-- 우측 액션 영역 -->
 									<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
 										<!-- 값 초기화 x 버튼 (단일 선택이고 값이 존재할 때만 활성화) -->
-										<button type="button" class="clear-btn" 
-												x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0]" 
-												@click.stop="clearSelection()"
-												style="background: none; border: none; padding: 0; color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none;">×</button>
+										<span class="clear-btn" 
+											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0]" 
+											  @click.stop="clearSelection()"
+											  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
 										
 										<!-- 세로 구분선 (닫혀있을 때만 버튼 구분 느낌용으로 노출) -->
 										<span class="vertical-divider" x-show="!open" style="width: 1px; height: 30px; background-color: #cbd5e1; margin-left: 2px;"></span>
