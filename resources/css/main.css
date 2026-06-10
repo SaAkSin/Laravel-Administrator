@@ -310,7 +310,7 @@
 .editForm > div div.characters_left {
   position: absolute;
   top: 1px;
-  right: 40px;
+  right: 50px;
   font-size: 11px;
 }
 .editForm > div.number span.symbol {
@@ -480,7 +480,7 @@
 #settings_page form.settings_form > div div.characters_left {
   position: absolute;
   top: 1px;
-  right: 40px;
+  right: 50px;
   font-size: 11px;
 }
 #settings_page form.settings_form > div.number span.symbol {
@@ -1825,10 +1825,12 @@ a {
   font-size: 11px;
 }
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.number span.symbol {
+  position: absolute;
+  top: 27px;
+  left: -15px;
   font-weight: bold;
   color: #5e6469;
   font-size: 13px;
-  margin-right: 2px;
 }
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key {
   display: flex;
