@@ -55,7 +55,17 @@
 
 			<!-- 2. TEXT TYPE -->
 			<template x-if="field.type === 'text'">
-				<div>
+				<div x-data="{
+					get charCount() {
+						return ($root[field.field_name] || '').length;
+					},
+					get charsLeft() {
+						return (field.limit || 0) - this.charCount;
+					}
+				}">
+					<template x-if="field.editable && field.limit">
+						<div class="characters_left" x-text="charsLeft + ' characters left'"></div>
+					</template>
 					<template x-if="field.editable">
 						<input type="text" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" :maxlength="field.limit || null" />
 					</template>
@@ -341,21 +351,21 @@
 					}
 				}" x-init="init()" style="width: 100%;">
 					<template x-if="field.editable">
-						<div style="display: inline-flex; align-items: center; gap: 6px;">
+						<div style="display: flex; align-items: center; gap: 8px; width: 100%;">
 							<template x-if="field.symbol">
-								<span class="symbol" x-text="field.symbol"></span>
+								<span class="symbol" x-text="field.symbol" style="flex-shrink: 0;"></span>
 							</template>
 							<input type="text" :id="field.field_id" :disabled="freezeForm" 
 								   x-model="displayValue" 
 								   @focus="onFocus()" 
 								   @blur="onBlur()" 
-								   style="padding: 3px;" />
+								   style="padding: 3px; flex: 1; width: 100%;" />
 						</div>
 					</template>
 					<template x-if="!field.editable">
-						<div class="uneditable" style="display: inline-flex; align-items: center; gap: 4px;">
+						<div class="uneditable" style="display: flex; align-items: center; gap: 8px; width: 100%;">
 							<template x-if="field.symbol">
-								<span class="symbol" x-text="field.symbol"></span>
+								<span class="symbol" x-text="field.symbol" style="flex-shrink: 0;"></span>
 							</template>
 							<span x-text="displayValue || '-'"></span>
 						</div>
