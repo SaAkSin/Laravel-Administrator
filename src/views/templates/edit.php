@@ -353,21 +353,21 @@
 					<template x-if="field.editable">
 						<div style="position: relative; display: flex; align-items: center; width: 100%;">
 							<template x-if="field.symbol">
-								<span class="symbol" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
+								<span class="symbol" style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
 							</template>
 							<input type="text" :id="field.field_id" :disabled="freezeForm" 
 								   x-model="displayValue" 
 								   @focus="onFocus()" 
 								   @blur="onBlur()" 
-								   :style="{ paddingLeft: field.symbol ? '22px' : '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px', flex: '1', width: '100%' }" />
+								   style="padding: 3px; flex: 1; width: 100%;" />
 						</div>
 					</template>
 					<template x-if="!field.editable">
-						<div class="uneditable" style="display: inline-flex; align-items: center; gap: 4px;">
+						<div style="position: relative; display: flex; align-items: center; width: 100%;">
 							<template x-if="field.symbol">
-								<span class="symbol" x-text="field.symbol"></span>
+								<span class="symbol" style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
 							</template>
-							<span x-text="displayValue || '-'"></span>
+							<div class="uneditable" x-text="displayValue || '-'" style="flex: 1; width: 100%; margin-right: 0;"></div>
 						</div>
 					</template>
 				</div>
