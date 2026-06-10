@@ -1832,12 +1832,14 @@ a {
   color: #5e6469;
   font-size: 13px;
 }
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key {
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key,
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.bool {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key label {
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key label,
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.bool label {
   display: inline-block;
   margin-bottom: 0 !important;
   flex-shrink: 0;
@@ -1846,9 +1848,6 @@ a {
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key div.uneditable {
   display: inline-block;
   margin-right: 0;
-}
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.bool label {
-  display: inline-block;
 }
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div div.uneditable {
   margin-right: 32px;
