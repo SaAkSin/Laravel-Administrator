@@ -99,12 +99,17 @@
 										theme: 'snow',
 										modules: {
 											toolbar: [
+												[{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
 												[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
 												['bold', 'italic', 'underline', 'strike'],
-												[{ 'list': 'ordered'}, { 'list': 'bullet' }],
+												['blockquote', 'code-block'],
+												[{ 'script': 'sub'}, { 'script': 'super' }],
+												[{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+												[{ 'indent': '-1'}, { 'indent': '+1' }],
+												[{ 'direction': 'rtl' }],
 												[{ 'color': [] }, { 'background': [] }],
 												[{ 'align': [] }],
-												['link', 'image'],
+												['link', 'image', 'video'],
 												['clean']
 											]
 										}
