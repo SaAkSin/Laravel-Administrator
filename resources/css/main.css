@@ -1825,11 +1825,24 @@ a {
   font-size: 11px;
 }
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.number span.symbol {
-  position: absolute;
-  top: 27px;
-  left: -15px;
+  font-weight: bold;
+  color: #5e6469;
+  font-size: 13px;
+  margin-right: 2px;
 }
-#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key label,
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key label {
+  display: inline-block;
+  margin-bottom: 0 !important;
+}
+#admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key div.uneditable {
+  display: inline-block;
+  margin-right: 0;
+}
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.bool label {
   display: inline-block;
 }

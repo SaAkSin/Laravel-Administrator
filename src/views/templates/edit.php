@@ -341,6 +341,9 @@
 				}" x-init="init()" style="width: 100%;">
 					<template x-if="field.editable">
 						<div style="display: inline-flex; align-items: center; gap: 6px;">
+							<template x-if="field.symbol">
+								<span class="symbol" x-text="field.symbol"></span>
+							</template>
 							<input type="text" :id="field.field_id" :disabled="freezeForm" 
 								   x-model="displayValue" 
 								   @focus="onFocus()" 
