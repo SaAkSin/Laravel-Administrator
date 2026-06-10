@@ -1838,6 +1838,8 @@ a {
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key label {
   display: inline-block;
   margin-bottom: 0 !important;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 #admin_page #content div.item_edit_container div.item_edit form.edit_form > div.key div.uneditable {
   display: inline-block;

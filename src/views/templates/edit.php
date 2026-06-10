@@ -300,9 +300,10 @@
 							return;
 						}
 						if (window.accounting) {
+							// 중복 표시를 방지하기 위해 입력 값 포맷팅 시 기호(symbol) 자리를 비워둡니다.
 							this.displayValue = accounting.formatMoney(
 								raw, 
-								field.symbol || '', 
+								'', 
 								field.decimals !== undefined ? parseInt(field.decimals) : 0, 
 								field.thousands_separator !== undefined ? field.thousands_separator : ',', 
 								field.decimal_separator !== undefined ? field.decimal_separator : '.'
@@ -352,7 +353,12 @@
 						</div>
 					</template>
 					<template x-if="!field.editable">
-						<div class="uneditable" x-text="displayValue || '-'"></div>
+						<div class="uneditable" style="display: inline-flex; align-items: center; gap: 4px;">
+							<template x-if="field.symbol">
+								<span class="symbol" x-text="field.symbol"></span>
+							</template>
+							<span x-text="displayValue || '-'"></span>
+						</div>
 					</template>
 				</div>
 			</template>
