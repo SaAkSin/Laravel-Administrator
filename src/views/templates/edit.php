@@ -353,7 +353,7 @@
 					<template x-if="field.editable">
 						<div style="position: relative; display: flex; align-items: center; width: 100%;">
 							<template x-if="field.symbol">
-								<span class="symbol" style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
+								<span class="symbol" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
 							</template>
 							<input type="text" :id="field.field_id" :disabled="freezeForm" 
 								   x-model="displayValue" 
@@ -365,7 +365,7 @@
 					<template x-if="!field.editable">
 						<div style="position: relative; display: flex; align-items: center; width: 100%;">
 							<template x-if="field.symbol">
-								<span class="symbol" style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
+								<span class="symbol" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
 							</template>
 							<div class="uneditable" x-text="displayValue || '-'" style="flex: 1; width: 100%; margin-right: 0;"></div>
 						</div>

@@ -36,12 +36,12 @@
     "src": "resources/img/loader.gif"
   },
   "resources/js/app.js": {
-    "file": "js/app--WZK2f9P.js",
+    "file": "js/app-B0mdY3Nw.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "css/app-BAqwm_Qy.css"
+      "css/app-rHFYcktn.css"
     ],
     "assets": [
       "eot/oxygen-regular-webfont-lbYjdCSB.eot",
