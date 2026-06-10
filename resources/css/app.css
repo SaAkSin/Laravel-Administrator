@@ -517,5 +517,75 @@ table.results td {
     color: #fff !important;
 }
 
+/* =========================================================================
+ * 📦 프리미엄 Combobox 컴포넌트 2단 레이아웃 CSS 명세서 (Zero-jQuery)
+ * =========================================================================
+ */
+
+/* 콤보박스 외부 래퍼 활성화 스타일 */
+.relation-combobox-wrapper.open .combobox-container {
+    border-color: #3b82f6 !important; /* 활성 파란색 테두리 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* 값 초기화 버튼 스타일링 */
+.clear-btn {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    color: #94a3b8;
+    background: none;
+    border: none;
+    padding: 0 4px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.12s ease;
+}
+
+.clear-btn:hover {
+    color: #dc2626 !important; /* 호버 시 세련된 레드 */
+}
+
+/* 닫혀있을 때의 화살표 버튼 그라데이션 스타일 */
+.arrow-indicator.button-style {
+    background-image: linear-gradient(to bottom, #ffffff 0%, #e2e8f0 100%) !important;
+    border-left: 1px solid #cbd5e1 !important;
+    width: 28px !important;
+    height: 30px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-top-right-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+    margin-right: -10px !important; /* 컨테이너 패딩 상쇄를 통해 영역 꽉 채움 */
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+    cursor: pointer !important;
+}
+
+.arrow-indicator.button-style:hover {
+    background-image: linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%) !important;
+}
+
+/* 열려있을 때의 화살표 영역 (일반 투명) */
+.arrow-indicator {
+    cursor: pointer !important;
+}
+
+/* 돋보기 검색 아이콘 및 화살표 SVG 트랜지션 */
+.arrow-svg {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 드롭다운 개방 시 화살표 180도 회전 */
+.arrow-svg.rotate-180 {
+    transform: rotate(180deg) !important;
+}
+
+/* 검색 인풋 포커스 아웃라인 해제 */
+.combobox-search-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
 
 

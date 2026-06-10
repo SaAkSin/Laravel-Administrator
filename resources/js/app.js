@@ -1373,6 +1373,17 @@ function relationSelect(config) {
             this.$watch('$root.' + watchPath, (newVal) => {
                 this.syncValueFromModel();
             });
+
+            // 4. 드롭다운 개방 시 검색창 자동 포커스 처리
+            this.$watch('open', (newVal) => {
+                if (newVal) {
+                    this.$nextTick(() => {
+                        if (this.$refs.searchInput) {
+                            this.$refs.searchInput.focus();
+                        }
+                    });
+                }
+            });
         },
 
         // 입력값에 맞게 로컬 옵션을 실시간 필터링합니다. (Case-insensitive)
@@ -1531,6 +1542,23 @@ function relationSelect(config) {
                 this.$root.filters[config.filterIndex].value = config.field.type === 'belongs_to_many' ? ids : ids.join(',');
             } else {
                 this.$root[fieldName] = config.field.type === 'belongs_to_many' || config.field.type === 'has_many' ? ids : ids.join(',');
+            }
+        },
+
+        // 선택값 초기화 기능 (x 마크 클릭 시 호출)
+        clearSelection() {
+            const fieldName = config.field.field_name;
+            if (config.type === 'filter') {
+                this.$root.filters[config.filterIndex].value = '';
+            } else {
+                this.$root[fieldName] = '';
+            }
+            this.selectedItems = [];
+            this.search = '';
+            
+            // Autocomplete 검색 결과 목록 초기화
+            if (config.autocomplete) {
+                this.options = [];
             }
         }
     };
