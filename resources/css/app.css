@@ -522,6 +522,15 @@ table.results td {
  * =========================================================================
  */
 
+/* 콤보박스 외부 래퍼 기본 스타일 지정 및 필터 사이드바 너비 고정 (일반 select와 정합성 일치) */
+.relation-combobox-wrapper {
+    width: 100% !important;
+}
+
+#admin_page div#sidebar div.filters > div .relation-combobox-wrapper {
+    width: 225px !important;
+}
+
 /* 콤보박스 외부 래퍼 활성화 스타일 */
 .relation-combobox-wrapper.open .combobox-container {
     border-color: #3b82f6 !important; /* 활성 파란색 테두리 */

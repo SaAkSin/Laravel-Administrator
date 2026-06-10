@@ -423,9 +423,6 @@
 											  @click.stop="clearSelection()"
 											  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
 										
-										<!-- 세로 구분선 (닫혀있을 때만 버튼 구분 느낌용으로 노출) -->
-										<span class="vertical-divider" x-show="!open" style="width: 1px; height: 30px; background-color: #cbd5e1; margin-left: 2px;"></span>
-										
 										<!-- 그라데이션 화살표 인디케이터 -->
 										<span class="arrow-indicator" 
 											  :class="{ 'button-style': !open }"

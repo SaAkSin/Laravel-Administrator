@@ -67,7 +67,7 @@
 		width: <?php echo intval(($formWidth - 75) / 2) ?>px !important;
 	}
 
-	div.item_edit form.edit_form input[type="text"], div.item_edit form.edit_form input[type="password"], div.item_edit form.edit_form textarea {
+	div.item_edit form.edit_form input[type="text"], div.item_edit form.edit_form input[type="password"], div.item_edit form.edit_form textarea, div.item_edit form.edit_form .relation-combobox-wrapper {
 		max-width: <?php echo $formWidth - 75 ?>px !important;
 		width: <?php echo $formWidth - 75 ?>px !important;
 	}
