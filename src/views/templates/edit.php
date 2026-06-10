@@ -562,18 +562,16 @@
 	</template>
 
 	<!-- 커스텀 하단 버튼 그룹 -->
-	<?php if(!$config->checkOption('is_top_actions')) { ?>
-		<template x-if="$root[$root.primaryKey] && actions && actions.length">
-			<div class="custom_buttons">
-				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
-					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
-						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
-							   :value="action.title" :disabled="freezeForm || freezeActions" />
-					</template>
+	<template x-if="$root[$root.primaryKey] && actions && actions.length">
+		<div class="custom_buttons">
+			<template x-for="(action, idx) in actions" :key="action.action_name || idx">
+				<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
+					<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+						   :value="action.title" :disabled="freezeForm || freezeActions" />
 				</template>
-			</div>
-		</template>
-	<?php } ?>
+			</template>
+		</div>
+	</template>
 
 	<!-- 제어 및 액션 버튼 세트 (최초 디자인 복원) -->
 	<div class="control_buttons">
