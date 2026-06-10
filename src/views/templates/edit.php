@@ -215,7 +215,7 @@
 							<input type="file" :id="field.field_name + '_uploader'" 
 								   @change="uploadFile($event, field)" :disabled="freezeForm" style="display: none;" />
 							<button type="button" @click="$event.target.parentElement.querySelector('input[type=file]').click()"
-									:disabled="freezeForm" class="remove_button" style="padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+									:disabled="freezeForm" style="padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 								</svg>
@@ -228,13 +228,13 @@
 					<template x-if="$root[field.field_name] && !loadingItem">
 						<div class="image_container" style="margin-top: 8px;">
 							<template x-if="field.display_raw_value">
-								<img :src="$root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px;" />
+								<img :src="$root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px; vertical-align: middle;" />
 							</template>
 							<template x-if="!field.display_raw_value">
-								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px;" />
+								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px; vertical-align: middle;" />
 							</template>
 							<template x-if="field.editable">
-								<button type="button" class="remove_button" @click="$root[field.field_name] = null" style="margin-left: 5px; vertical-align: top; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center;" title="삭제">
+								<button type="button" class="remove_button" @click="$root[field.field_name] = null" style="margin-left: 5px; vertical-align: middle; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center;" title="삭제">
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 									</svg>
