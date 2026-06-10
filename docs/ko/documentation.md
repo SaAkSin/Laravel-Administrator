@@ -24,6 +24,7 @@
     - [비밀번호](/docs/ko/field-type-password)
     - [텍스트 영역](/docs/ko/field-type-textarea)
     - [위지윅](/docs/ko/field-type-wysiwyg)
+    - [위지윅2](/docs/ko/field-type-wysiwyg2)
     - [마크다운](/docs/ko/field-type-markdown)
     - [관계](/docs/ko/field-type-relationship)
     - [숫자](/docs/ko/field-type-number)

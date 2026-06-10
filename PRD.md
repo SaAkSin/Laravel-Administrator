@@ -101,7 +101,7 @@
 * **주요 작업**:
   - Select2 ➡️ Alpine.js 기반 경량 커스텀 Combobox 컴포넌트로 대체
   - Plupload ➡️ HTML5 Dropzone 및 바닐라 JS 멀티 업로더 연동
-  - CKEditor ➡️ 최신 CKEditor 5 또는 경량 에디터(Trix 등) 연동 표준화
+  - CKEditor ➡️ 무료 CKEditor 4 복원 (로컬 번들 및 Full 스펙 제공, `wysiwyg` 타입) 및 Quill 에디터 분리 탑재 (`wysiwyg2` 타입) 이원화 표준화
 
 ### [Phase 5] 통합 테스트 및 미세 최적화 (4주차)
 * **목표**: 100% 기능 정합성 보장 및 릴리즈 준비
@@ -123,3 +123,5 @@
 2. 필터를 추가하고 적용했을 때 비동기 통신을 통해 화면 리로드 없이 실시간으로 리스트가 필터링된다.
 3. 임의의 컬럼 헤더 클릭 시 정상적으로 오름차순/내림차순 정렬 쿼리가 동작하여 갱신된다.
 4. 신규 등록 및 기존 항목 수정 폼이 세련된 모던 CSS 스타일로 렌더링되며, 저장을 눌렀을 때 백엔드에 바인딩된 Eloquent 모델이 오류 없이 저장 및 업데이트된다.
+5. `wysiwyg` 타입 호출 시 로컬 번들 CKEditor 4 (Full Spec)가 정상 렌더링되고, `wysiwyg2` 타입 호출 시 Quill 에디터가 정상 렌더링되며 둘 다 Alpine.js 바인딩과 양방향 싱크가 유지된다.
+6. `php artisan vendor:publish --tag=laravel-administrator` 전용 퍼블리시 태그를 실행했을 때 에셋이 정상 복사된다.
