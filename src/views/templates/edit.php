@@ -21,7 +21,20 @@
 
 	<!-- 상단 제어 및 액션 버튼 세트 (is_top_actions 활성화 시) -->
 	<?php if($config->checkOption('is_top_actions')) { ?>
-		<div class="control_buttons" style="margin-top: 0; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+		<!-- 커스텀 상단 버튼 그룹 -->
+		<template x-if="$root[$root.primaryKey] && actions && actions.length">
+			<div class="custom_buttons" style="margin-top: 0; margin-bottom: 10px;">
+				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
+					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
+						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+							   :value="action.title" :disabled="freezeForm || freezeActions" />
+					</template>
+				</template>
+			</div>
+		</template>
+
+		<!-- 제어 및 액션 버튼 세트 -->
+		<div class="control_buttons" style="margin-top: 0; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
 			<template x-if="$root[$root.primaryKey]">
 				<input type="button" value="<?php echo trans('administrator::administrator.close') ?>"
 					   @click="closeItem()" :disabled="freezeForm || freezeActions" />
@@ -45,18 +58,6 @@
 			<template x-if="!$root[$root.primaryKey] && actionPermissions.create">
 				<input type="submit" value="<?php echo trans('administrator::administrator.create') ?>"
 					   :disabled="freezeForm || freezeActions" />
-			</template>
-
-			<!-- 커스텀 버튼 목록을 제어 버튼 우측에 배치 -->
-			<template x-if="$root[$root.primaryKey] && actions && actions.length">
-				<div class="custom_buttons" style="display: flex; gap: 6px; margin: 0; padding: 0; border: none; background: none;">
-					<template x-for="(action, idx) in actions" :key="action.action_name || idx">
-						<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
-							<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
-								   :value="action.title" :disabled="freezeForm || freezeActions" />
-						</template>
-					</template>
-				</div>
 			</template>
 		</div>
 	<?php } ?>
