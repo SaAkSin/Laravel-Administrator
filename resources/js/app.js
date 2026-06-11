@@ -398,6 +398,18 @@ function adminController() {
                                 } catch (e) {
                                     hasBoundStorageValue = true;
                                 }
+                            } else if (f.value !== null && f.value !== undefined && f.value !== '') {
+                                // 스토리지에 값은 없지만 필터의 초기값(value)이 지정되어 있는 경우 스토리지 동기화 및 로딩 유도
+                                try {
+                                    if (Array.isArray(f.value)) {
+                                        safeStorage.setItem(key, JSON.stringify(f.value));
+                                    } else {
+                                        safeStorage.setItem(key, f.value);
+                                    }
+                                    hasBoundStorageValue = true;
+                                } catch (storageError) {
+                                    console.error('[스토리지 동기화 실패 방어]:', storageError);
+                                }
                             }
                         }
                     }
