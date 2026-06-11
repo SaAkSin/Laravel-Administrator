@@ -1045,6 +1045,67 @@ function adminController() {
             }
         },
 
+        /**
+         * 범용 링크 액션 처리 (선언적 스토리지 바인딩 및 브라우저 이동)
+         */
+        async handleLinkAction(action) {
+            // 1. 컨펌 창이 설정된 경우 확인 절차 진행
+            if (action.confirmation) {
+                if (!confirm(action.confirmation)) return false;
+            }
+
+            // 2. 스토리지 바인딩 지시어가 있는 경우 파싱하여 값 주입
+            if (action.storage_bind) {
+                const parts = action.storage_bind.split(':');
+                if (parts.length === 2) {
+                    const storageType = parts[0]; // 'sessionStorage' 또는 'localStorage'
+                    const storageKey = parts[1];
+                    
+                    // 스토리지에 넣을 키 값 추출 (기본 키 혹은 지정 컬럼)
+                    const targetCol = action.storage_value || this.primaryKey;
+                    const rawValue = this[targetCol];
+                    
+                    // 만약 객체 형태이거나 특수 포맷을 가질 수 있으므로 값 정제
+                    let cleanValue = rawValue;
+                    if (rawValue && typeof rawValue === 'object') {
+                        cleanValue = rawValue.raw !== undefined ? rawValue.raw : JSON.stringify(rawValue);
+                    }
+                    
+                    if (cleanValue !== null && cleanValue !== undefined && cleanValue !== '') {
+                        try {
+                            if (storageType === 'sessionStorage') {
+                                safeStorage.setItem(storageKey, cleanValue);
+                            } else if (storageType === 'localStorage') {
+                                localStorage.setItem(storageKey, cleanValue);
+                            }
+                        } catch (e) {
+                            console.error('[범용 링크 스토리지 에러]:', e);
+                        }
+                    }
+                }
+            }
+
+            // 3. 플레이스홀더 치환 처리 (예: {orders_id} -> sessionStorage 또는 localStorage 값으로 치환)
+            let finalUrl = action.url;
+            if (finalUrl) {
+                const placeholderRegex = /\{([^}]+)\}/g;
+                let match;
+                while ((match = placeholderRegex.exec(action.url)) !== null) {
+                    const placeholder = match[0]; // '{orders_id}'
+                    const key = match[1];         // 'orders_id'
+                    
+                    // sessionStorage 또는 localStorage에서 값을 가져옴
+                    let val = safeStorage.getItem(key) || localStorage.getItem(key) || '';
+                    finalUrl = finalUrl.replace(placeholder, val);
+                }
+            }
+
+            // 4. 지정된 URL로 브라우저 이동
+            if (finalUrl) {
+                window.location.href = finalUrl;
+            }
+        },
+
         downloadFile(url) {
             const hiddenIFrameId = 'hiddenDownloader';
             let iframe = document.getElementById(hiddenIFrameId);

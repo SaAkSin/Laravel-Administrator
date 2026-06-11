@@ -48,6 +48,10 @@ class Action {
 			'success' => 'Success!',
 			'error' => 'There was an error performing this action',
 		),
+		'type' => 'action',
+		'url' => '',
+		'storage_bind' => '',
+		'storage_value' => '',
 	);
 
 	/**
@@ -60,6 +64,10 @@ class Action {
 		'confirmation' => 'string_or_callable',
 		'messages' => 'array|array_with_all_or_none:active,success,error',
 		'action' => 'required|callable',
+		'type' => 'in:link,action',
+		'url' => 'string_or_callable',
+		'storage_bind' => 'string',
+		'storage_value' => 'string',
 	);
 
 	/**
@@ -83,8 +91,16 @@ class Action {
 	 */
 	public function validateOptions()
 	{
+		$rules = $this->rules;
+
+		// type이 link인 경우 action 콜백은 필수가 아니며, url이 필수입니다.
+		if (isset($this->suppliedOptions['type']) && $this->suppliedOptions['type'] === 'link') {
+			$rules['action'] = 'callable';
+			$rules['url'] = 'required|string_or_callable';
+		}
+
 		//override the config
-		$this->validator->override($this->suppliedOptions, $this->rules);
+		$this->validator->override($this->suppliedOptions, $rules);
 
 		//if the validator failed, throw an exception
 		if ($this->validator->fails())
@@ -103,8 +119,8 @@ class Action {
 	{
 		$options = $this->suppliedOptions;
 
-		//build the string or callable values for title and confirmation
-		$this->buildStringOrCallable($options, array('confirmation', 'title'));
+		//build the string or callable values for title, confirmation, and url
+		$this->buildStringOrCallable($options, array('confirmation', 'title', 'url'));
 
 		//build the string or callable values for the messages
 		$messages = $this->validator->arrayGet($options, 'messages', array());
