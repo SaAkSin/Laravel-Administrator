@@ -5,6 +5,7 @@ export class RelationSelectController {
     public selectedItems: any[] = [];
     public loading = false;
     public focusedIndex = -1;
+    private searchTimer: any = null;
 
     private config: any;
 
@@ -56,8 +57,24 @@ export class RelationSelectController {
             }
         });
 
-        this.$watch('search', () => {
+        this.$watch('search', (newVal) => {
             this.focusedIndex = -1;
+            if (this.config.autocomplete) {
+                if (this.searchTimer) {
+                    clearTimeout(this.searchTimer);
+                }
+                this.searchTimer = setTimeout(() => {
+                    this.fetchAutocomplete();
+                }, 250);
+            }
+        });
+
+        // autocompleteData의 비동기 업데이트를 감시하여 selectedItems 텍스트가 정상 노출되도록 보증
+        this.$watch(() => {
+            const autoKey = this.config.field.field_name + '_autocomplete';
+            return this.$root.autocompleteData[autoKey];
+        }, () => {
+            this.syncValueFromModel();
         });
     }
 
