@@ -9,7 +9,7 @@
 <div id="admin_page" class="with_sidebar" x-data="adminController" style="position: relative; min-height: 500px;">
 	<!-- 1. 스켈레톤 로더 (Alpine.js 및 데이터 초기 마운트 전 노출) -->
 	<div x-show="!initialized" 
-		 style="position: absolute; inset: 0; background-color: #f8fafc; z-index: 9999; display: flex; gap: 20px; padding: 20px; box-sizing: border-box;">
+		 style="width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; background-color: #f8fafc;">
 		
 		<!-- 사이드바 필터 스켈레톤 영역 -->
 		<div style="width: 250px; flex-shrink: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; height: fit-content;">
