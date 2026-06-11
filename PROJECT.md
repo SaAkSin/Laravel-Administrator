@@ -23,6 +23,7 @@
 | 3 | R3: Vite HMR & Asset Loader | hot 파일 감지, @vite/client 연동, serveAsset 액션/라우트 추가 및 에셋 주입 링크 대체 | none | DONE |
 | 4 | R4: E2E Integration Testing | R1~R3 구현 완료 후 E2E 테스트 검증 | M1, M2, M3 | DONE |
 | 5 | R5: Editor Separation & UI Refinements | 무료 CKEditor 4 (wysiwyg) 및 Quill (wysiwyg2) 이원화, 이미지 업로드/삭제 UI 및 관계형 콤보박스 정교화, 패키지 전용 퍼블리시 태그 추가 | none | DONE |
+| 6 | R6: Combobox Clear Button Fix | 콤보박스 초기 빈 상태일 때 삭제 아이콘 은폐 및 클릭 시 초기화 동작 보장, 에셋 빌드/배포 | none | DONE |
 
 ## Interface Contracts
 ### Config/Validator ↔ Middleware

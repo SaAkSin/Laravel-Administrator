@@ -128,3 +128,35 @@ Integrity mode: development
 - [ ] `type`이 `wysiwyg2`인 필드는 Quill 에디터 인스턴스로 생성되어 정상 렌더링된다.
 - [ ] 에셋 퍼블리싱 명령(`php artisan vendor:publish --tag=laravel-administrator --force`) 실행 후 호스트 프로젝트에서도 로컬 CKEditor 4 리소스가 404 없이 정상 로드된다.
 - [ ] 각 에디터 영역의 입력값 변경이 Alpine.js 모델 상태에 즉시 동기화되며, 저장 시 서버로 정상 전달된다.
+
+## Follow-up — 2026-06-11T13:40:19+09:00
+
+관계형 콤보박스(Select/Combobox) 단일 선택 삭제 아이콘(clear-btn)이 -- 전체 -- 또는 초기 빈 상태일 때 사라지지 않고 오작동하는 현상을 다중 에이전트 간의 심층 분석 및 상호 디버깅 토론을 통해 해결합니다.
+
+작업 디렉토리: 
+- 패키지: /Users/galahan/SaAkSin/artgrammer/laravel-administrator
+- 호스트: /Users/galahan/SaAkSin/artgrammer/sparekorea/web/admin
+
+Integrity mode: development
+
+## 요구사항
+
+### R1. 단일 선택 콤보박스 삭제 아이콘의 완벽한 조건부 노출
+- 상세 편집 화면(edit.php) 및 필터 영역(filters.php)의 단일 선택 콤보박스가 빈 값(초기 상태, -- 전체 --, -- 검색 또는 선택 --)일 때 × 삭제 아이콘이 브라우저 상에서 완벽하게 은폐되어야 합니다.
+- 값이 유효하게 선택되어 있는 상태에서만 X 아이콘이 노출되고, 해당 아이콘을 누르면 선택값이 초기화되어야 합니다.
+- Alpine.js 런타임 반응성 및 resources/js/app.js 내의 selectedItems 등의 객체 매핑 라이프사이클 전체를 교차 감사하여 오작동의 근본 원인을 디버깅하고 해결합니다.
+
+### R2. 프론트엔드 에셋 빌드 및 배포 정합성 확보
+- 필요시 npm run build (Vite 컴파일)를 수행하여 public/dist/... 폴더의 번들 에셋까지 실시간으로 업데이트 및 커밋에 포함시킵니다.
+- 패키지 소스 변경이 호스트 프로젝트 및 외부 개발 서버에서 캐시 지연 없이 즉각 배포될 수 있도록 composer.json의 VCS(repositories) 연동 체계를 보장하고 composer.lock 갱신 및 배포 무결성을 확보합니다.
+
+### R3. [매우 중요] 데이터베이스 마이그레이션 금지 제약
+- 데이터베이스 마이그레이션이나 DB 스키마 변경, 혹은 DB 마이그레이션 명령어(php artisan migrate 등)는 절대 실행하지 마십시오. 오직 패키지의 PHP 및 JS/CSS 번들 소스코드 수준의 버그 해결로 한정합니다.
+
+## 인수 기준 (Acceptance Criteria)
+
+### 기능 및 배포 정합성 검증
+- [ ] 상세 폼 및 필터 화면에서 관계형 콤보박스가 초기 빈 상태일 때 삭제용 × 버튼이 시각적으로 노출되지 않는다.
+- [ ] 값을 선택한 이후에만 × 버튼이 보이며, 클릭 시 값이 빈 상태('')로 정상 초기화되고 동시에 × 버튼이 즉시 사라진다.
+- [ ] 패키지의 변경 사항이 JS/CSS 번들 빌드 최신화 및 composer.lock 실시간 커밋 해시 갱신을 통해 호스트 리포지토리에 완전 반영된다.
+- [ ] 데이터베이스 마이그레이션 등의 스키마 수정 행위가 전혀 발생하지 않는다.

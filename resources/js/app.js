@@ -1366,11 +1366,12 @@ function relationSelect(config) {
             }
 
             // 3. 부모 스코프($root) 내 원래 모델의 상태 데이터 변화 와칭 동기화
-            const watchPath = config.type === 'filter' 
-                ? `filters[${config.filterIndex}].value` 
-                : config.field.field_name;
-
-            this.$watch('$root.' + watchPath, (newVal) => {
+            // Getter 함수 방식을 사용하여 Alpine.js가 중첩된 경로의 반응성 의존성을 안정적으로 강제 추적하게 함
+            this.$watch(() => {
+                return config.type === 'filter'
+                    ? this.$root.filters[config.filterIndex]?.value
+                    : this.$root[config.field.field_name];
+            }, (newVal) => {
                 this.syncValueFromModel();
             });
 
@@ -1404,13 +1405,14 @@ function relationSelect(config) {
         // 부모 모델에 엮여 있는 실제 ID 데이터를 바탕으로 상세 배지 목록(selectedItems)을 정밀 싱크합니다.
         syncValueFromModel() {
             const modelVal = config.type === 'filter'
-                ? this.$root.filters[config.filterIndex].value
+                ? this.$root.filters[config.filterIndex]?.value
                 : this.$root[config.field.field_name];
 
             let ids = [];
             if (Array.isArray(modelVal)) {
-                ids = modelVal.map(String);
-            } else if (modelVal !== undefined && modelVal !== null && modelVal !== '') {
+                // 배열 요소 중 빈 값, null, undefined, 0, '0'에 해당하는 원소를 엄격하게 필터링합니다.
+                ids = modelVal.map(String).filter(id => id !== '' && id !== 'null' && id !== 'undefined' && id !== '0');
+            } else if (modelVal !== undefined && modelVal !== null && modelVal !== '' && modelVal !== 0 && modelVal !== '0') {
                 ids = String(modelVal).split(',').map(s => s.trim()).filter(Boolean);
             }
 

@@ -493,11 +493,12 @@
 									 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
 									
 									<!-- 단일 선택일 때의 값 또는 플레이스홀더 표시 -->
+									<!-- 단일 선택일 때 유효한 값이 존재할 때만 텍스트를 출력하고, 그렇지 않으면 플레이스홀더를 출력합니다. -->
 									<span class="selected-text" 
-										  x-text="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] ? selectedItems[0].text : '-- 검색 또는 선택 --'" 
+										  x-text="(!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== null && selectedItems[0].id !== undefined) ? selectedItems[0].text : '-- 검색 또는 선택 --'" 
 										  :style="{
 											  fontSize: '12px',
-											  color: (!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0]) ? '#1f2937' : '#9ca3af',
+											  color: (!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== null && selectedItems[0].id !== undefined) ? '#1f2937' : '#9ca3af',
 											  whiteSpace: 'nowrap',
 											  overflow: 'hidden',
 											  textOverflow: 'ellipsis',
@@ -506,9 +507,9 @@
 									
 									<!-- 우측 액션 영역 -->
 									<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
-										<!-- 값 초기화 x 버튼 (단일 선택이고 값이 존재할 때만 활성화) -->
+										<!-- 값 초기화 x 버튼 (단일 선택이고 유효한 실제 ID가 존재할 때만 활성화) -->
 										<span class="clear-btn" 
-											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== null && selectedItems[0].id !== undefined" 
+											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== null && selectedItems[0].id !== undefined" 
 											  @click.stop="clearSelection()"
 											  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
 										
