@@ -1262,15 +1262,15 @@ function adminController() {
                     }
                 }
 
-                // 일반 페이지 이동 링크(사이드바 메뉴 등) 클릭 시 isUnloading 플래그를 사전에 활성화하여
-                // History.js statechange 내부의 window.location.reload() 오작동을 차단합니다.
+                // 메뉴 및 헤더 영역의 링크 클릭 시에만 isUnloading 플래그를 활성화합니다.
+                // 페이징, 테이블 내 정렬 등 페이지 내부의 비동기 링크 동작에 간섭하는 부작용을 예방합니다.
                 const a = e.target.closest('a');
                 if (a) {
-                    const href = a.getAttribute('href');
-                    const targetAttr = a.getAttribute('target');
-                    if (href && !href.startsWith('#') && !href.startsWith('javascript:') && targetAttr !== '_blank') {
-                        const isNewItem = a.closest('div.results_header a.new_item');
-                        if (!isNewItem) {
+                    const isMenuLink = a.closest('header') || a.closest('#menu') || a.closest('#mobile_menu') || a.closest('#right_nav');
+                    if (isMenuLink) {
+                        const href = a.getAttribute('href');
+                        const targetAttr = a.getAttribute('target');
+                        if (href && !href.startsWith('#') && !href.startsWith('javascript:') && targetAttr !== '_blank') {
                             isUnloading = true;
                         }
                     }
