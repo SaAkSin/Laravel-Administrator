@@ -1,0 +1,51 @@
+# 🤖 GEMINI.md — Laravel-Administrator 패키지 개발 명세 및 가이드라인
+
+본 문서는 **Laravel-Administrator** 패키지 프로젝트의 핵심 아키텍처, 작업 이력, 컴파일 및 빌드 가이드라인을 수록하고 있습니다. 후속 AI 개발 에이전트(Gemini 등)가 본 패키지를 안전하고 신속하게 유지보수 및 연동 개발할 수 있도록 돕는 지침서입니다.
+
+---
+
+## 📂 1. 프로젝트 및 연동 레이아웃
+
+- **로컬 패키지 루트:** `/Users/galahan/SaAkSin/artgrammer/laravel-administrator` (본 디렉토리)
+- **연동 호스트 프로젝트 루트 (예시):** `../sparekorea/web/admin` (상대경로 기준)
+- **패키지 빌드 대상:** 컴파일된 JS/CSS 번들은 `public/dist/` 경로로 출력됩니다.
+
+---
+
+## 🛠️ 2. 핵심 작업 완료 내역 (Milestones)
+
+### 2.1. 에디터 이원화 (CKEditor 4 & Quill)
+- `type => 'wysiwyg'` 설정 시 로컬 Full Spec **CKEditor 4**가 매핑되고, `type => 'wysiwyg2'` 설정 시 경량 **Quill** 에디터가 독립 구동되도록 이원화 설계했습니다.
+- 두 에디터 모두 Alpine.js와 양방향 데이터 싱크가 정합성을 유지하도록 바인딩 처리했습니다.
+
+### 2.2. Eloquent API 전환 (SoftDeletes 호환)
+- 기존 Raw SQL Join 조립 방식을 Eloquent Builder의 `selectSub` API 조합(`toSql()`, `getBindings()`)으로 재작성하여, 회원이나 부품 등의 논리 삭제(`SoftDeletes`) 데이터가 어드민 관리 화면에 완벽하게 필터링(노출 안 됨)되도록 안정성을 확보했습니다.
+
+### 2.3. 콤보박스(Combobox) UI 반응성 개선
+- 초기 비어있거나 `-- 검색 또는 선택 --` 플레이스홀더 상태일 때 X 삭제 버튼(`×` 아이콘)이 숨겨지지 않던 버그를, 원본 CSS 내 `.clear-btn` 스타일의 `display: inline-block !important;`를 제거함으로써 Alpine.js `x-show` 지시어의 런타임 제어권이 온전히 회복되도록 해결했습니다.
+- 자동완성 검색 상태에서 키보드 방향키 위/아래(`ArrowUp`, `ArrowDown`)를 통해 포커스 활성화가 이동하고 엔터(`Enter`) 키 입력 시 올바르게 선택되는 키보드 네비게이션을 완성했습니다.
+
+---
+
+## ⚙️ 3. 개발 및 컴파일 명령어 레퍼런스
+
+### 3.1. 에셋 빌드 및 호스트 프로젝트 동기화 (rsync)
+패키지에서 JS/CSS 소스코드를 변경한 경우, 아래 명령어 블록을 순차 실행하여 호스트 프로젝트에 반영해 주어야 합니다.
+```bash
+# 1. 패키지 에셋 프로덕션 빌드
+npm run build
+
+# 2. 빌드된 에셋 및 PHP 소스코드 호스트 프로젝트로 동기화 (호스트 경로에 맞춤 수정 필요)
+rsync -av --delete public/dist/ ../sparekorea/web/admin/public/packages/saaksin/administrator/dist/
+rsync -av --delete public/dist/ ../sparekorea/web/admin/vendor/saaksin/laravel-administrator/public/dist/
+rsync -av src/ ../sparekorea/web/admin/vendor/saaksin/laravel-administrator/src/
+```
+
+---
+
+## ⚠️ 4. 향후 작업 이행을 위한 불변의 규칙 (Cautions)
+
+1. **CSS `!important` 지양 규칙**
+   - UI 마크업에 `!important`를 사용하는 경우 Alpine.js 반응성 인라인 스타일 오염으로 인해 요소가 은폐되지 않는 등의 UI 버그가 재발할 수 있으므로, CSS 선택자 우선순위 점수를 정교히 계산하여 코딩해야 합니다.
+2. **한국어 작성 의무**
+   - 커밋 메시지, 소스코드 주석 및 아티팩트 보고서는 **반드시 한국어**로 정성스럽게 기술되어야 합니다.
