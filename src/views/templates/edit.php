@@ -508,7 +508,7 @@
 									<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
 										<!-- 값 초기화 x 버튼 (단일 선택이고 값이 존재할 때만 활성화) -->
 										<span class="clear-btn" 
-											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== ''" 
+											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && $root[field.field_name] !== '' && $root[field.field_name] !== null && $root[field.field_name] !== undefined" 
 											  @click.stop="clearSelection()"
 											  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
 										
