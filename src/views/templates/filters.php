@@ -93,9 +93,9 @@
 								 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
 								
 								<!-- 단일 선택일 때의 값 또는 플레이스홀더 표시 -->
-								<!-- 단일 선택일 때 유효한 값이 존재할 때만 텍스트를 출력하고, 그렇지 않으면 전체 플레이스홀더를 출력합니다. -->
+								<!-- 단일 선택일 때 유효한 값이 존재할 때만 텍스트를 출력하고, 그렇지 않으면 비워둡니다. -->
 								<span class="selected-text" 
-									  x-text="(filter.type !== 'belongs_to_many' && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== null && selectedItems[0].id !== undefined) ? selectedItems[0].text : '-- 전체 --'" 
+									  x-text="(filter.type !== 'belongs_to_many' && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== null && selectedItems[0].id !== undefined) ? selectedItems[0].text : ''" 
 									  :style="{
 										  fontSize: '12px',
 										  color: (filter.type !== 'belongs_to_many' && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== null && selectedItems[0].id !== undefined) ? '#1f2937' : '#9ca3af',
@@ -166,14 +166,7 @@
 									<div style="padding: 10px 14px; color: #9ca3af; font-size: 12px; text-align: center;">결과 없음</div>
 								</template>
 								
-								<!-- '전체' 옵션 추가 (단일 선택 필터에만 표출) -->
-								<template x-if="filter.type !== 'belongs_to_many'">
-									<div @click="selectItem({ id: '', text: '-- 전체 --' })"
-										 class="combobox-option-item"
-										 style="color: #6b7280 !important; font-style: italic !important; border-bottom: 1px solid #f3f4f6 !important;"
-										 x-text="'-- 전체 --'">
-									</div>
-								</template>
+
 								
 								<template x-for="opt in filteredOptions" :key="opt.id">
 									<div @click="selectItem(opt)" 
