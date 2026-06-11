@@ -19,22 +19,22 @@
 
 			<!-- 1. key, text, text_quick, fulltext_mysql, color -->
 			<template x-if="['key', 'text', 'text_quick', 'fulltext_mysql', 'color'].includes(filter.type)">
-				<input type="text" x-model="filter.value" :id="filter.field_id" />
+				<input type="text" x-model="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box;" />
 			</template>
 
 			<!-- 2. number -->
 			<template x-if="filter.type === 'number'">
-				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px;">
+				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px; width: 225px; box-sizing: border-box;">
 					<span class="symbol" x-text="filter.symbol"></span>
-					<input type="text" x-model="filter.min_value" :id="filter.field_id + '_min'" style="width: 70px;" />
+					<input type="text" x-model="filter.min_value" :id="filter.field_id + '_min'" style="flex: 1; min-width: 0; box-sizing: border-box;" />
 					<span>-</span>
-					<input type="text" x-model="filter.max_value" :id="filter.field_id + '_max'" style="width: 70px;" />
+					<input type="text" x-model="filter.max_value" :id="filter.field_id + '_max'" style="flex: 1; min-width: 0; box-sizing: border-box;" />
 				</div>
 			</template>
 
 			<!-- 3. bool (Zero-jQuery 순수 Alpine.js 셀렉트) -->
 			<template x-if="filter.type === 'bool'">
-				<select x-model="filter.value" :id="filter.field_id" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
+				<select x-model="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
 					<option value="">-- 전체 --</option>
 					<template x-for="opt in boolOptions" :key="opt.id">
 						<option :value="opt.id" x-text="opt.text" :selected="opt.id == filter.value"></option>
@@ -44,7 +44,7 @@
 
 			<!-- 4. enum (Zero-jQuery 순수 Alpine.js 셀렉트) -->
 			<template x-if="filter.type === 'enum'">
-				<select x-model="filter.value" :id="filter.field_id" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
+				<select x-model="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
 					<option value="">-- 전체 --</option>
 					<template x-for="opt in filter.options" :key="opt.id">
 						<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == filter.value"></option>
@@ -54,12 +54,12 @@
 
 			<!-- 5. date, time, datetime (네이티브 피커 혹은 슬림 플랫) -->
 			<template x-if="['date', 'time', 'datetime'].includes(filter.type)">
-				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px;">
+				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px; width: 225px; box-sizing: border-box;">
 					<input :type="filter.type === 'date' ? 'date' : (filter.type === 'time' ? 'time' : 'datetime-local')" 
-						   x-model="filter.min_value" :id="filter.field_id + '_min'" style="width: 100px; padding: 2px;" />
+						   x-model="filter.min_value" :id="filter.field_id + '_min'" style="flex: 1; min-width: 0; box-sizing: border-box; padding: 2px;" />
 					<span>-</span>
 					<input :type="filter.type === 'date' ? 'date' : (filter.type === 'time' ? 'time' : 'datetime-local')" 
-						   x-model="filter.max_value" :id="filter.field_id + '_max'" style="width: 100px; padding: 2px;" />
+						   x-model="filter.max_value" :id="filter.field_id + '_max'" style="flex: 1; min-width: 0; box-sizing: border-box; padding: 2px;" />
 				</div>
 			</template>
 
@@ -67,7 +67,7 @@
 			<template x-if="initialized && ['belongs_to', 'belongs_to_many'].includes(filter.type)">
 				<div class="relative w-full"
 					 x-data="relationSelect({ field: filter, type: 'filter', multiple: filter.type === 'belongs_to_many', autocomplete: filter.autocomplete, filterIndex: index })"
-					 style="position: relative; width: 100%;">
+					 style="position: relative; width: 225px; box-sizing: border-box;">
 					
 					<div class="relation-combobox-wrapper" :class="{ 'open': open }" @click.away="open = false" style="position: relative; width: 100%;">
 						<!-- 1) 다중 선택 배지 목록 (belongs_to_many일 경우 노출) -->
