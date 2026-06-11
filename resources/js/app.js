@@ -22,6 +22,13 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 window.Quill = Quill;
 
+// 페이지가 이동 중(언로드 중)인지 여부를 추적하는 플래그
+// 메뉴 클릭 등으로 완전히 페이지를 떠날 때 불필요한 새로고침(깜박임)이 작동하지 않도록 방지합니다.
+let isUnloading = false;
+window.addEventListener('beforeunload', () => {
+    isUnloading = true;
+});
+
 /**
  * 중첩된 객체를 x-www-form-urlencoded 쿼리 스트링 포맷으로 직렬화하기 위한 헬퍼 함수
  * jQuery.param()의 직렬화 로직과 호환되도록 설계되었습니다.
@@ -1259,6 +1266,8 @@ function adminController() {
 
             if (window.History && window.History.Adapter) {
                 window.History.Adapter.bind(window, 'statechange', () => {
+                    if (isUnloading) return;
+
                     const state = window.History.getState();
                     console.log('[디버그] statechange 발생 - state.data:', state.data);
 
