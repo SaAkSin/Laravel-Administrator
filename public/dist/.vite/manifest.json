@@ -35,13 +35,13 @@
     "file": "gif/loader-S2xpefX9.gif",
     "src": "resources/img/loader.gif"
   },
-  "resources/js/app.js": {
-    "file": "js/app-ClDEIAGc.js",
+  "resources/js/app.ts": {
+    "file": "js/app-CKIuFizk.js",
     "name": "app",
-    "src": "resources/js/app.js",
+    "src": "resources/js/app.ts",
     "isEntry": true,
     "css": [
-      "css/app-C_j-1Ltr.css"
+      "css/app-DBmc32q4.css"
     ],
     "assets": [
       "eot/oxygen-regular-webfont-lbYjdCSB.eot",

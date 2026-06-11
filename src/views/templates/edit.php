@@ -118,46 +118,7 @@
 
 			<!-- 4. WYSIWYG TYPE (CKEditor 4) -->
 			<template x-if="field.type === 'wysiwyg'">
-				<div x-data="{ editor: null }"
-					 x-init="
-						$nextTick(() => {
-							if (window.CKEDITOR) {
-								// 중복 초기화 방지를 위해 기존 인스턴스 제거
-								if (CKEDITOR.instances[field.field_id]) {
-									CKEDITOR.instances[field.field_id].destroy(true);
-								}
-								editor = CKEDITOR.replace(field.field_id, {
-									toolbar: [
-										{ name: 'document', items: [ 'Source' ] },
-										{ name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
-										{ name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll' ] },
-										{ name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ] },
-										{ name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
-										{ name: 'links', items: [ 'Link', 'Unlink' ] },
-										{ name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-										{ name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-										{ name: 'colors', items: [ 'TextColor', 'BGColor' ] },
-										{ name: 'tools', items: [ 'Maximize' ] }
-									]
-								});
-
-								// Alpine.js 모델에서 초기 데이터 로드
-								editor.setData($root[field.field_name] || '');
-
-								// CKEditor의 변경 사항을 Alpine.js 상태 모델에 동기화
-								editor.on('change', () => {
-									$root[field.field_name] = editor.getData();
-								});
-
-								// Alpine.js 상태 변경을 감시하여 CKEditor 데이터 업데이트
-								$watch('$root.' + field.field_name, (newVal) => {
-									if (newVal !== editor.getData()) {
-										editor.setData(newVal || '');
-									}
-								});
-							}
-						});
-					 "
+				<div x-init="$nextTick(() => $root.initEditor($el.querySelector('textarea'), field.field_name, 'wysiwyg'))"
 					 class="ckeditor-wrapper"
 					 style="margin-top: 6px;">
 					<textarea :id="field.field_id" :disabled="freezeForm"></textarea>
@@ -166,54 +127,7 @@
 
 			<!-- 4-2. WYSIWYG2 TYPE (Quill Editor) -->
 			<template x-if="field.type === 'wysiwyg2'">
-				<div x-data="{ editor: null }"
-					 x-init="
-						$nextTick(() => {
-							if (window.Quill) {
-								let container = $el.querySelector('.quill-editor-container');
-								if (container) {
-									editor = new Quill(container, {
-										theme: 'snow',
-										modules: {
-											toolbar: [
-												[{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
-												[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-												['bold', 'italic', 'underline', 'strike'],
-												['blockquote', 'code-block'],
-												[{ 'script': 'sub'}, { 'script': 'super' }],
-												[{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-												[{ 'indent': '-1'}, { 'indent': '+1' }],
-												[{ 'direction': 'rtl' }],
-												[{ 'color': [] }, { 'background': [] }],
-												[{ 'align': [] }],
-												['link', 'image', 'video'],
-												['clean']
-											]
-										}
-									});
-
-									// 초기 데이터 설정
-									editor.root.innerHTML = $root[field.field_name] || '';
-
-									// 에디팅 수정 시 Alpine 상태 모델에 즉각 동기화
-									editor.on('text-change', () => {
-										let html = editor.root.innerHTML;
-										if (html === '<p><br></p>') html = '';
-										$root[field.field_name] = html;
-									});
-
-									// 외부 모델 강제 변경 시 화면에 동기화
-									$watch('$root.' + field.field_name, (newVal) => {
-										let currentHTML = editor.root.innerHTML;
-										if (currentHTML === '<p><br></p>') currentHTML = '';
-										if (newVal !== currentHTML) {
-											editor.root.innerHTML = newVal || '';
-										}
-									});
-								}
-							}
-						});
-					 "
+				<div x-init="$nextTick(() => $root.initEditor($el.querySelector('.quill-editor-container'), field.field_name, 'wysiwyg2'))"
 					 class="quill-wrapper"
 					 style="margin-top: 6px;">
 					<div class="quill-editor-container" :id="field.field_id" style="min-height: 150px; background: #fff; color: #333;"></div>
