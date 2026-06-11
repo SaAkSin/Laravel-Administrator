@@ -287,7 +287,7 @@ function adminController() {
                 this.initialized = true;
                 // 엘리먼트 오프셋이 확실히 확보된 활성화 시점에 리사이즈를 재호출하여 렌더링 오차를 보정합니다.
                 this.resizePage();
-            }, 1000);
+            }, 50); // 1000ms -> 50ms로 대기시간을 대폭 줄여 깜박임 제거 및 반응성 확보
 
             // 문서 로딩이 완전히 완료된 온로드 시점에 한 번 더 레이아웃을 보정합니다.
             window.addEventListener('load', () => {
@@ -854,8 +854,11 @@ function adminController() {
                         }, 3000);
                     }
 
+                    // 리다이렉션 응답인 경우 즉시 언로드 모드로 이행하고 리턴하여 후속 비동기 갱신 억제
                     if (response.redirect) {
+                        isUnloading = true;
                         window.location.href = response.redirect;
+                        return;
                     }
 
                     if (response.download) {
@@ -1256,6 +1259,20 @@ function adminController() {
                     e.preventDefault();
                     if (window.History && window.History.pushState) {
                         window.History.pushState({ modelName: this.modelName, id: 0 }, null, window.route + this.modelName + '/new');
+                    }
+                }
+
+                // 일반 페이지 이동 링크(사이드바 메뉴 등) 클릭 시 isUnloading 플래그를 사전에 활성화하여
+                // History.js statechange 내부의 window.location.reload() 오작동을 차단합니다.
+                const a = e.target.closest('a');
+                if (a) {
+                    const href = a.getAttribute('href');
+                    const targetAttr = a.getAttribute('target');
+                    if (href && !href.startsWith('#') && !href.startsWith('javascript:') && targetAttr !== '_blank') {
+                        const isNewItem = a.closest('div.results_header a.new_item');
+                        if (!isNewItem) {
+                            isUnloading = true;
+                        }
                     }
                 }
             });
