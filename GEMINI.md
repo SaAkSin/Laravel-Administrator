@@ -9,6 +9,8 @@
 - **로컬 패키지 루트:** `/Users/galahan/SaAkSin/artgrammer/laravel-administrator` (본 디렉토리)
 - **연동 호스트 프로젝트 루트 (예시):** `../sparekorea/web/admin` (상대경로 기준)
 - **패키지 빌드 대상:** 컴파일된 JS/CSS 번들은 `public/dist/` 경로로 출력됩니다.
+- **에이전트 히스토리 문서 디렉토리:** `.agents/`
+  - 에이전트가 패키지 분석 및 테스트 세팅 과정에서 수립한 문서들(`PRD.md`, `DEVELOPMENT_GUIDE.md`, `TEST_INFRA.md`, `ADOPTION_ANALYSIS.md`, `review.md` 등)을 한데 모아 정리했습니다.
 
 ---
 
