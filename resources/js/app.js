@@ -482,7 +482,7 @@ function adminController() {
                 }
             });
 
-            this.statusMessage = this.languages['saving'] || '저장 중...';
+            this.statusMessage = this.languages['saving'] || 'Saving...';
             this.statusMessageType = '';
             this.freezeForm = true;
 
@@ -498,7 +498,7 @@ function adminController() {
                 this.resizePage();
 
                 if (response.success) {
-                    const savedMsg = this.languages['saved'] || '저장되었습니다.';
+                    const savedMsg = this.languages['saved'] || 'Item saved.';
                     this.statusMessage = savedMsg;
                     this.statusMessageType = 'success';
                     
@@ -528,12 +528,12 @@ function adminController() {
                         }
                     }, 200);
                 } else {
-                    this.statusMessage = response.errors || '저장 실패';
+                    this.statusMessage = response.errors || 'Save failed';
                     this.statusMessageType = 'error';
                 }
             } catch (error) {
                 this.freezeForm = false;
-                this.statusMessage = '네트워크 오류가 발생했습니다.';
+                this.statusMessage = 'A network error occurred.';
                 this.statusMessageType = 'error';
                 this.resizePage();
             }
@@ -543,10 +543,10 @@ function adminController() {
          * 항목 삭제 (POST)
          */
         async deleteItem() {
-            const conf = confirm(this.languages['delete_active_item'] || '정말 이 항목을 삭제하시겠습니까?');
+            const conf = confirm(this.languages['delete_active_item'] || 'Are you sure you want to delete this item?');
             if (!conf) return false;
 
-            this.statusMessage = this.languages['deleting'] || '삭제 중...';
+            this.statusMessage = this.languages['deleting'] || 'Deleting...';
             this.statusMessageType = '';
             this.freezeForm = true;
 
@@ -562,7 +562,7 @@ function adminController() {
                 this.resizePage();
 
                 if (response.success) {
-                    const deletedMsg = this.languages['deleted'] || '삭제되었습니다.';
+                    const deletedMsg = this.languages['deleted'] || 'Item deleted.';
                     this.statusMessage = deletedMsg;
                     this.statusMessageType = 'success';
                     
@@ -583,12 +583,12 @@ function adminController() {
                         }
                     }, 500);
                 } else {
-                    this.statusMessage = response.error || '삭제 실패';
+                    this.statusMessage = response.error || 'Delete failed';
                     this.statusMessageType = 'error';
                 }
             } catch (error) {
                 this.freezeForm = false;
-                this.statusMessage = '네트워크 오류가 발생했습니다.';
+                this.statusMessage = 'A network error occurred.';
                 this.statusMessageType = 'error';
                 this.resizePage();
             }
@@ -781,14 +781,14 @@ function adminController() {
 
             if (isItem) {
                 url = `${window.base_url}${this.modelName}/${this[this.primaryKey]}/custom_action`;
-                this.statusMessage = messages.active || '작업을 수행 중입니다...';
+                this.statusMessage = messages.active || 'Performing action...';
                 this.statusMessageType = '';
             } else {
                 url = `${window.base_url}${this.modelName}/custom_action`;
                 data.sortOptions = this.sortOptions;
                 data.filters = this.getFilters();
                 data.page = this.pagination.page;
-                this.globalStatusMessage = messages.active || '작업을 수행 중입니다...';
+                this.globalStatusMessage = messages.active || 'Performing action...';
                 this.globalStatusMessageType = '';
             }
 
@@ -803,7 +803,7 @@ function adminController() {
                 this.freezeForm = false;
 
                 if (response.success) {
-                    const actionSuccessMsg = messages.success || '작업 완료';
+                    const actionSuccessMsg = messages.success || 'Action completed';
                     if (isItem) {
                         this.statusMessage = actionSuccessMsg;
                         this.statusMessageType = 'success';
