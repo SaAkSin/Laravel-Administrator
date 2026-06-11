@@ -498,8 +498,16 @@ function adminController() {
                 this.resizePage();
 
                 if (response.success) {
-                    this.statusMessage = this.languages['saved'] || '저장되었습니다.';
+                    const savedMsg = this.languages['saved'] || '저장되었습니다.';
+                    this.statusMessage = savedMsg;
                     this.statusMessageType = 'success';
+                    
+                    setTimeout(() => {
+                        if (this.statusMessage === savedMsg) {
+                            this.statusMessage = '';
+                            this.statusMessageType = '';
+                        }
+                    }, 3000);
                     
                     // 상세 데이터 주입 시의 미세한 Alpine.js 출렁임으로 인한 필터 오작동 리스트 갱신을 차단하는 락을 작동시킵니다.
                     this.freezeUpdateRows = true;
@@ -554,8 +562,16 @@ function adminController() {
                 this.resizePage();
 
                 if (response.success) {
-                    this.statusMessage = this.languages['deleted'] || '삭제되었습니다.';
+                    const deletedMsg = this.languages['deleted'] || '삭제되었습니다.';
+                    this.statusMessage = deletedMsg;
                     this.statusMessageType = 'success';
+                    
+                    setTimeout(() => {
+                        if (this.statusMessage === deletedMsg) {
+                            this.statusMessage = '';
+                            this.statusMessageType = '';
+                        }
+                    }, 3000);
                     
                     await this.updateRows();
                     await this.updateSelfRelationships();
@@ -787,13 +803,28 @@ function adminController() {
                 this.freezeForm = false;
 
                 if (response.success) {
+                    const actionSuccessMsg = messages.success || '작업 완료';
                     if (isItem) {
-                        this.statusMessage = messages.success || '작업 완료';
+                        this.statusMessage = actionSuccessMsg;
                         this.statusMessageType = 'success';
                         this.setData(response.data);
+                        
+                        setTimeout(() => {
+                            if (this.statusMessage === actionSuccessMsg) {
+                                this.statusMessage = '';
+                                this.statusMessageType = '';
+                            }
+                        }, 3000);
                     } else {
-                        this.globalStatusMessage = messages.success || '작업 완료';
+                        this.globalStatusMessage = actionSuccessMsg;
                         this.globalStatusMessageType = 'success';
+                        
+                        setTimeout(() => {
+                            if (this.globalStatusMessage === actionSuccessMsg) {
+                                this.globalStatusMessage = '';
+                                this.globalStatusMessageType = '';
+                            }
+                        }, 3000);
                     }
 
                     if (response.redirect) {
