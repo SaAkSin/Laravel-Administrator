@@ -135,13 +135,13 @@ View::composer(array('administrator::layouts.default'), function($view)
 	// Vite 현대화 에셋 (Alpine.js 및 Tailwind CSS)은 대시보드와 커스텀 페이지를 포함한 모든 레이아웃에 필수적이므로 항상 등록합니다.
 	$hotPath = __DIR__ . '/../public/dist/hot';
 	if (file_exists($hotPath)) {
-		// Vite HMR 활성화 시 @vite/client 추가 로드 및 app.js HMR 주소 바인딩
+		// Vite HMR 활성화 시 @vite/client 추가 로드 및 app.ts HMR 주소 바인딩
 		$devServerUrl = trim(file_get_contents($hotPath));
 		$view->js['vite-client'] = $devServerUrl . '/@vite/client';
-		$view->js['vite-app'] = $devServerUrl . '/resources/js/app.js';
+		$view->js['vite-app'] = $devServerUrl . '/resources/js/app.ts';
 	} else {
 		// 프로덕션 상태에서는 manifest 기반 안전 에셋 로더 적용
-		$view->js['vite-app'] = getViteAsset('resources/js/app.js', $view->css);
+		$view->js['vite-app'] = getViteAsset('resources/js/app.ts', $view->css);
 	}
 
 	if (!$view->page && !$view->dashboard)
