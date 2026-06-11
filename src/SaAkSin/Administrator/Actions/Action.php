@@ -171,6 +171,14 @@ class Action {
 	 */
 	public function perform(&$data)
 	{
+		if ($this->getOption('type') === 'link')
+		{
+			return array(
+				'success' => true,
+				'redirect' => $this->getOption('url')
+			);
+		}
+
 		$action = $this->getOption('action');
 		return $action($data);
 	}

@@ -17,10 +17,20 @@
 				<div class="inline-block">
 					<template x-for="(action, idx) in globalActions" :key="action.action_name || idx">
 						<template x-if="action.has_permission">
-							<input type="button" 
-								   @click="customAction(false, action.action_name, action.messages, action.confirmation)" 
-								   :value="action.title"
-								   :disabled="freezeForm || freezeActions" />
+							<span>
+								<template x-if="action.type === 'link'">
+									<input type="button" 
+										   @click="handleLinkAction(action)" 
+										   :value="action.title"
+										   :disabled="freezeForm || freezeActions" />
+								</template>
+								<template x-if="action.type !== 'link'">
+									<input type="button" 
+										   @click="customAction(false, action.action_name, action.messages, action.confirmation)" 
+										   :value="action.title"
+										   :disabled="freezeForm || freezeActions" />
+								</template>
+							</span>
 						</template>
 					</template>
 				</div>
