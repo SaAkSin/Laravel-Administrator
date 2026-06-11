@@ -98,41 +98,6 @@ async function request(url, { method = 'GET', data = null, headers = {} } = {}) 
 }
 
 /**
- * sessionStorage 접근 시 발생할 수 있는 SecurityError 및 QuotaExceededError에 대응하기 위한 안전한 래퍼 객체.
- * 브라우저 설정에 의해 sessionStorage 접근이 원천 차단된 경우, 인메모리 임시 객체를 Fallback으로 사용합니다.
- */
-const safeStorage = {
-    _memoryStore: {},
-    
-    getItem(key) {
-        try {
-            return sessionStorage.getItem(key);
-        } catch (e) {
-            console.warn('[저장소 경고] sessionStorage.getItem 접근 실패 (인메모리 대체):', e);
-            return this._memoryStore[key] !== undefined ? this._memoryStore[key] : null;
-        }
-    },
-    
-    setItem(key, value) {
-        try {
-            sessionStorage.setItem(key, value);
-        } catch (e) {
-            console.warn('[저장소 경고] sessionStorage.setItem 접근 실패 (인메모리 대체):', e);
-            this._memoryStore[key] = String(value);
-        }
-    },
-    
-    removeItem(key) {
-        try {
-            sessionStorage.removeItem(key);
-        } catch (e) {
-            console.warn('[저장소 경고] sessionStorage.removeItem 접근 실패 (인메모리 대체):', e);
-            delete this._memoryStore[key];
-        }
-    }
-};
-
-/**
  * Alpine.js 전역 컨트롤러: adminController
  * 글로벌 adminData 객체를 읽고, Alpine.js 반응형 상태 구조에 완전히 매핑합니다.
  */
@@ -254,50 +219,9 @@ function adminController() {
                 this.rowsPerPageOptions.push({ id: i, text: String(i) });
             }
 
-            // 2.2. reset_storage URL 쿼리 파라미터 감지 및 sessionStorage 리셋 처리
-            let resetStorageKeys = [];
-            let needsResetStorageUpdate = false;
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                resetStorageKeys = urlParams.getAll('reset_storage');
-                if (resetStorageKeys.length > 0) {
-                    // 수집된 모든 키 배열에 대해 sessionStorage에서 삭제를 실행합니다.
-                    resetStorageKeys.forEach(key => {
-                        safeStorage.removeItem(key);
-                    });
-                    // 주소창 파라미터에서 모든 reset_storage 쿼리를 제거하고 URL을 세척합니다.
-                    urlParams.delete('reset_storage');
-                    const newSearch = urlParams.toString();
-                    const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
-                    if (window.history && window.history.replaceState) {
-                        window.history.replaceState(null, '', newUrl);
-                    }
-                    needsResetStorageUpdate = true;
-                }
-            } catch (e) {
-                console.error(e);
-            }
-
             // 3. columns, filters, editFields 속성 변환 및 전처리
             this.columns = this.prepareColumns();
             this.filters = this.prepareFilters();
-
-            // resetStorageKeys가 존재하고 그 길이가 0보다 크다면, filters를 순회하며 storage_bind가 sessionStorage:{key} 형식의 키 중 리셋 대상에 속하는 필터들을 모두 찾아 UI 값을 null로 리셋합니다.
-            if (resetStorageKeys && resetStorageKeys.length > 0) {
-                this.filters.forEach(filter => {
-                    if (filter.storage_bind) {
-                        const parts = filter.storage_bind.split(':');
-                        if (parts.length === 2 && parts[0] === 'sessionStorage') {
-                            const key = parts[1];
-                            if (resetStorageKeys.includes(key)) {
-                                filter.value = null;
-                                if ('min_value' in filter) filter.min_value = null;
-                                if ('max_value' in filter) filter.max_value = null;
-                            }
-                        }
-                    }
-                });
-            }
             this.originalEditFields = window.adminData.edit_fields || [];
             this.editFields = this.prepareEditFields(this.originalEditFields);
 
@@ -326,28 +250,6 @@ function adminController() {
             // 필터 데이터 변경 감시
             this.filters.forEach((filter, index) => {
                 this.$watch(`filters[${index}].value`, (val) => {
-                    // sessionStorage 연동이 설정된 경우 sessionStorage 갱신
-                    if (filter.storage_bind) {
-                        const parts = filter.storage_bind.split(':');
-                        if (parts.length === 2 && parts[0] === 'sessionStorage') {
-                            const key = parts[1];
-                            try {
-                                if (val !== null && val !== undefined && val !== '') {
-                                    // 배열 형태인 경우 JSON 문자열로 직렬화하여 저장
-                                    if (Array.isArray(val)) {
-                                        safeStorage.setItem(key, JSON.stringify(val));
-                                    } else {
-                                        safeStorage.setItem(key, val);
-                                    }
-                                } else {
-                                    safeStorage.removeItem(key);
-                                }
-                            } catch (storageError) {
-                                console.error('[스토리지 에러 방어] sessionStorage 쓰기/삭제 중 예외 차단:', storageError);
-                            }
-                        }
-                    }
-
                     if (filter.type === 'key') {
                         const intVal = isNaN(parseInt(val)) ? '' : parseInt(val);
                         this.filters[index].value = intVal;
@@ -376,49 +278,6 @@ function adminController() {
             // 컴포넌트 활성화 대기 시간 적용
             setTimeout(() => {
                 this.initialized = true;
-
-                // sessionStorage에서 로드된 필터 값이나 storage_bind가 설정되어 있고 값이 존재하는 경우,
-                // 최초 뷰 렌더링 후 백엔드에 강제 데이터를 요청합니다.
-                let hasBoundStorageValue = false;
-                this.filters.forEach(f => {
-                    if (f.storage_bind) {
-                        const parts = f.storage_bind.split(':');
-                        if (parts.length === 2 && parts[0] === 'sessionStorage') {
-                            const key = parts[1];
-                            const val = safeStorage.getItem(key);
-                            if (val !== null && val !== undefined && val !== '') {
-                                try {
-                                    // JSON 문자열인 경우 파싱하여 빈 배열이 아닌지 검증
-                                    const parsed = JSON.parse(val);
-                                    if (Array.isArray(parsed) && parsed.length === 0) {
-                                        // 빈 배열인 경우 로드 대상으로 판단하지 않음
-                                    } else {
-                                        hasBoundStorageValue = true;
-                                    }
-                                } catch (e) {
-                                    hasBoundStorageValue = true;
-                                }
-                            } else if (f.value !== null && f.value !== undefined && f.value !== '') {
-                                // 스토리지에 값은 없지만 필터의 초기값(value)이 지정되어 있는 경우 스토리지 동기화 및 로딩 유도
-                                try {
-                                    if (Array.isArray(f.value)) {
-                                        safeStorage.setItem(key, JSON.stringify(f.value));
-                                    } else {
-                                        safeStorage.setItem(key, f.value);
-                                    }
-                                    hasBoundStorageValue = true;
-                                } catch (storageError) {
-                                    console.error('[스토리지 동기화 실패 방어]:', storageError);
-                                }
-                            }
-                        }
-                    }
-                });
-
-                if (needsResetStorageUpdate || hasBoundStorageValue) {
-                    this.updateRows();
-                }
-
                 // 엘리먼트 오프셋이 확실히 확보된 활성화 시점에 리사이즈를 재호출하여 렌더링 오차를 보정합니다.
                 this.resizePage();
             }, 1000);
@@ -450,29 +309,7 @@ function adminController() {
             
             filterItems.forEach(filter => {
                 const prepared = { ...filter };
-                
-                // sessionStorage 연동이 설정된 경우 초기값 로드
-                if (filter.storage_bind) {
-                    const parts = filter.storage_bind.split(':');
-                    if (parts.length === 2 && parts[0] === 'sessionStorage') {
-                        const key = parts[1];
-                        const val = safeStorage.getItem(key);
-                        if (val !== null && val !== undefined) {
-                            try {
-                                // JSON 파싱 시도 (배열 형식 복구 목적)
-                                prepared.value = JSON.parse(val);
-                            } catch (e) {
-                                // JSON 형식이 아니면 일반 단일 문자열로 폴백 복구
-                                prepared.value = val;
-                            }
-                        }
-                    }
-                }
-                
-                if (prepared.value === undefined) {
-                    prepared.value = filter.value !== undefined ? filter.value : null;
-                }
-                
+                prepared.value = filter.value !== undefined ? filter.value : null;
                 if ('min_value' in filter) prepared.min_value = filter.min_value !== undefined ? filter.min_value : null;
                 if ('max_value' in filter) prepared.max_value = filter.max_value !== undefined ? filter.max_value : null;
                 
@@ -1042,67 +879,6 @@ function adminController() {
                     this.globalStatusMessage = errText;
                     this.globalStatusMessageType = 'error';
                 }
-            }
-        },
-
-        /**
-         * 범용 링크 액션 처리 (선언적 스토리지 바인딩 및 브라우저 이동)
-         */
-        async handleLinkAction(action) {
-            // 1. 컨펌 창이 설정된 경우 확인 절차 진행
-            if (action.confirmation) {
-                if (!confirm(action.confirmation)) return false;
-            }
-
-            // 2. 스토리지 바인딩 지시어가 있는 경우 파싱하여 값 주입
-            if (action.storage_bind) {
-                const parts = action.storage_bind.split(':');
-                if (parts.length === 2) {
-                    const storageType = parts[0]; // 'sessionStorage' 또는 'localStorage'
-                    const storageKey = parts[1];
-                    
-                    // 스토리지에 넣을 키 값 추출 (기본 키 혹은 지정 컬럼)
-                    const targetCol = action.storage_value || this.primaryKey;
-                    const rawValue = this[targetCol];
-                    
-                    // 만약 객체 형태이거나 특수 포맷을 가질 수 있으므로 값 정제
-                    let cleanValue = rawValue;
-                    if (rawValue && typeof rawValue === 'object') {
-                        cleanValue = rawValue.raw !== undefined ? rawValue.raw : JSON.stringify(rawValue);
-                    }
-                    
-                    if (cleanValue !== null && cleanValue !== undefined && cleanValue !== '') {
-                        try {
-                            if (storageType === 'sessionStorage') {
-                                safeStorage.setItem(storageKey, cleanValue);
-                            } else if (storageType === 'localStorage') {
-                                localStorage.setItem(storageKey, cleanValue);
-                            }
-                        } catch (e) {
-                            console.error('[범용 링크 스토리지 에러]:', e);
-                        }
-                    }
-                }
-            }
-
-            // 3. 플레이스홀더 치환 처리 (예: {orders_id} -> sessionStorage 또는 localStorage 값으로 치환)
-            let finalUrl = action.url;
-            if (finalUrl) {
-                const placeholderRegex = /\{([^}]+)\}/g;
-                let match;
-                while ((match = placeholderRegex.exec(action.url)) !== null) {
-                    const placeholder = match[0]; // '{orders_id}'
-                    const key = match[1];         // 'orders_id'
-                    
-                    // sessionStorage 또는 localStorage에서 값을 가져옴
-                    let val = safeStorage.getItem(key) || localStorage.getItem(key) || '';
-                    finalUrl = finalUrl.replace(placeholder, val);
-                }
-            }
-
-            // 4. 지정된 URL로 브라우저 이동
-            if (finalUrl) {
-                window.location.href = finalUrl;
             }
         },
 

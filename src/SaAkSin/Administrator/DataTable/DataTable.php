@@ -78,36 +78,6 @@ class DataTable {
 	 */
 	public function getRows(DB $db, $filters = null, $page = 1, $sort = null)
 	{
-		// defer_loading 설정이 활성화되어 있고 필터 값이 비어있다면 조기 반환 (AJAX 성능 최적화)
-		if ($this->config->checkOption('defer_loading')) {
-			$hasValuableFilter = false;
-			if ($filters && is_array($filters)) {
-				foreach ($filters as $filter) {
-					if (isset($filter['value']) && $this->isFilterValueValuable($filter['value'])) {
-						$hasValuableFilter = true;
-						break;
-					}
-					if (isset($filter['min_value']) && $this->isFilterValueValuable($filter['min_value'])) {
-						$hasValuableFilter = true;
-						break;
-					}
-					if (isset($filter['max_value']) && $this->isFilterValueValuable($filter['max_value'])) {
-						$hasValuableFilter = true;
-						break;
-					}
-				}
-			}
-
-			if (!$hasValuableFilter) {
-				return array(
-					'page' => 1,
-					'last' => 1,
-					'total' => 0,
-					'results' => array()
-				);
-			}
-		}
-
         $isView = $this->config->getOption('view');
         if($isView) {
             // View 인 경우 order by 를 사용하지 않는다. - 성능 이슈
@@ -526,19 +496,5 @@ class DataTable {
 	public function getRowsPerPage()
 	{
 		return $this->rowsPerPage;
-	}
-
-	/**
-	 * 필터 값이 실제로 유효한 값인지 판별합니다.
-	 *
-	 * @param mixed $val
-	 * @return bool
-	 */
-	protected function isFilterValueValuable($val)
-	{
-		if (is_array($val)) {
-			return count($val) > 0;
-		}
-		return ($val === 0 || $val === '0' || ($val !== null && $val !== '' && trim((string)$val) !== ''));
 	}
 }

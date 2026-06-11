@@ -26,16 +26,8 @@
 			<div class="custom_buttons" style="margin-top: 0; margin-bottom: 10px;">
 				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
 					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
-						<span>
-							<template x-if="action.type === 'link'">
-								<input type="button" @click="handleLinkAction(action)"
-									   :value="action.title" :disabled="freezeForm || freezeActions" />
-							</template>
-							<template x-if="action.type !== 'link'">
-								<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
-									   :value="action.title" :disabled="freezeForm || freezeActions" />
-							</template>
-						</span>
+						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+							   :value="action.title" :disabled="freezeForm || freezeActions" />
 					</template>
 				</template>
 			</div>
@@ -613,16 +605,8 @@
 		<div class="custom_buttons">
 			<template x-for="(action, idx) in actions" :key="action.action_name || idx">
 				<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
-					<span>
-						<template x-if="action.type === 'link'">
-							<input type="button" @click="handleLinkAction(action)"
-								   :value="action.title" :disabled="freezeForm || freezeActions" />
-						</template>
-						<template x-if="action.type !== 'link'">
-							<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
-								   :value="action.title" :disabled="freezeForm || freezeActions" />
-						</template>
-					</span>
+					<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+						   :value="action.title" :disabled="freezeForm || freezeActions" />
 				</template>
 			</template>
 		</div>

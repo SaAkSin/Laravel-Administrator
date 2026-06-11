@@ -85,8 +85,7 @@ View::composer('administrator::index', function($view)
 	$view->globalActions = $actionFactory->getGlobalActionsOptions();
 	$view->actionPermissions = $actionFactory->getActionPermissions();
 	$view->filters = $fieldFactory->getFiltersArrays();
-	$deferLoading = $config->checkOption('defer_loading');
-	$view->rows = $deferLoading ? array('page' => 1, 'last' => 1, 'total' => 0, 'results' => array()) : $dataTable->getRows(app('db'), $view->filters);
+	$view->rows = $dataTable->getRows(app('db'), $view->filters);
 	$view->formWidth = $config->getOption('form_width');
 	$view->baseUrl = $baseUrl;
 	$view->assetUrl = asset('packages/saaksin/administrator/');
