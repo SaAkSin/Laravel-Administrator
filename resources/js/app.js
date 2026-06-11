@@ -219,9 +219,41 @@ function adminController() {
                 this.rowsPerPageOptions.push({ id: i, text: String(i) });
             }
 
+            // 2.2. reset_storage URL 쿼리 파라미터 감지 및 sessionStorage 리셋 처리
+            let resetStorageKey = null;
+            let needsResetStorageUpdate = false;
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                resetStorageKey = urlParams.get('reset_storage');
+                if (resetStorageKey) {
+                    sessionStorage.removeItem(resetStorageKey);
+                    needsResetStorageUpdate = true;
+                    urlParams.delete('reset_storage');
+                    const newSearch = urlParams.toString();
+                    const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(null, '', newUrl);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
             // 3. columns, filters, editFields 속성 변환 및 전처리
             this.columns = this.prepareColumns();
             this.filters = this.prepareFilters();
+
+            // reset_storage 키와 일치하는 필터의 UI 상태(값) 클리어
+            if (resetStorageKey && this.filters) {
+                const targetBind = 'sessionStorage:' + resetStorageKey;
+                this.filters.forEach(filter => {
+                    if (filter.storage_bind === targetBind) {
+                        filter.value = null;
+                        if ('min_value' in filter) filter.min_value = null;
+                        if ('max_value' in filter) filter.max_value = null;
+                    }
+                });
+            }
             this.originalEditFields = window.adminData.edit_fields || [];
             this.editFields = this.prepareEditFields(this.originalEditFields);
 
@@ -250,6 +282,24 @@ function adminController() {
             // 필터 데이터 변경 감시
             this.filters.forEach((filter, index) => {
                 this.$watch(`filters[${index}].value`, (val) => {
+                    // sessionStorage 연동이 설정된 경우 sessionStorage 갱신
+                    if (filter.storage_bind) {
+                        const parts = filter.storage_bind.split(':');
+                        if (parts.length === 2 && parts[0] === 'sessionStorage') {
+                            const key = parts[1];
+                            if (val !== null && val !== undefined && val !== '') {
+                                // 배열 형태인 경우 JSON 문자열로 직렬화하여 저장
+                                if (Array.isArray(val)) {
+                                    sessionStorage.setItem(key, JSON.stringify(val));
+                                } else {
+                                    sessionStorage.setItem(key, val);
+                                }
+                            } else {
+                                sessionStorage.removeItem(key);
+                            }
+                        }
+                    }
+
                     if (filter.type === 'key') {
                         const intVal = isNaN(parseInt(val)) ? '' : parseInt(val);
                         this.filters[index].value = intVal;
@@ -278,6 +328,37 @@ function adminController() {
             // 컴포넌트 활성화 대기 시간 적용
             setTimeout(() => {
                 this.initialized = true;
+
+                // sessionStorage에서 로드된 필터 값이나 storage_bind가 설정되어 있고 값이 존재하는 경우,
+                // 최초 뷰 렌더링 후 백엔드에 강제 데이터를 요청합니다.
+                let hasBoundStorageValue = false;
+                this.filters.forEach(f => {
+                    if (f.storage_bind) {
+                        const parts = f.storage_bind.split(':');
+                        if (parts.length === 2 && parts[0] === 'sessionStorage') {
+                            const key = parts[1];
+                            const val = sessionStorage.getItem(key);
+                            if (val !== null && val !== undefined && val !== '') {
+                                try {
+                                    // JSON 문자열인 경우 파싱하여 빈 배열이 아닌지 검증
+                                    const parsed = JSON.parse(val);
+                                    if (Array.isArray(parsed) && parsed.length === 0) {
+                                        // 빈 배열인 경우 로드 대상으로 판단하지 않음
+                                    } else {
+                                        hasBoundStorageValue = true;
+                                    }
+                                } catch (e) {
+                                    hasBoundStorageValue = true;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (hasBoundStorageValue || needsResetStorageUpdate) {
+                    this.updateRows();
+                }
+
                 // 엘리먼트 오프셋이 확실히 확보된 활성화 시점에 리사이즈를 재호출하여 렌더링 오차를 보정합니다.
                 this.resizePage();
             }, 1000);
@@ -309,7 +390,29 @@ function adminController() {
             
             filterItems.forEach(filter => {
                 const prepared = { ...filter };
-                prepared.value = filter.value !== undefined ? filter.value : null;
+                
+                // sessionStorage 연동이 설정된 경우 초기값 로드
+                if (filter.storage_bind) {
+                    const parts = filter.storage_bind.split(':');
+                    if (parts.length === 2 && parts[0] === 'sessionStorage') {
+                        const key = parts[1];
+                        const val = sessionStorage.getItem(key);
+                        if (val !== null && val !== undefined) {
+                            try {
+                                // JSON 파싱 시도 (배열 형식 복구 목적)
+                                prepared.value = JSON.parse(val);
+                            } catch (e) {
+                                // JSON 형식이 아니면 일반 단일 문자열로 폴백 복구
+                                prepared.value = val;
+                            }
+                        }
+                    }
+                }
+                
+                if (prepared.value === undefined) {
+                    prepared.value = filter.value !== undefined ? filter.value : null;
+                }
+                
                 if ('min_value' in filter) prepared.min_value = filter.min_value !== undefined ? filter.min_value : null;
                 if ('max_value' in filter) prepared.max_value = filter.max_value !== undefined ? filter.max_value : null;
                 
