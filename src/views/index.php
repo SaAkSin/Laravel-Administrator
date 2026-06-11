@@ -9,29 +9,10 @@
 <div id="admin_page" class="with_sidebar" x-data="adminController" style="position: relative; min-height: 500px;">
 	<!-- 1. 스켈레톤 로더 (Alpine.js 및 데이터 초기 마운트 전 노출) -->
 	<div x-show="!initialized" 
-		 style="width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; background-color: #f8fafc;">
+		 style="width: 100%; padding: 20px; box-sizing: border-box; background-color: #f8fafc;">
 		
-		<!-- 사이드바 필터 스켈레톤 영역 -->
-		<div style="width: 250px; flex-shrink: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; height: fit-content;">
-			<div class="skeleton-shimmer" style="height: 18px; width: 60%; border-radius: 4px;"></div>
-			<div style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">
-				<div style="display: flex; flex-direction: column; gap: 6px;">
-					<div class="skeleton-shimmer" style="height: 12px; width: 40%; border-radius: 3px;"></div>
-					<div class="skeleton-shimmer" style="height: 30px; border-radius: 4px;"></div>
-				</div>
-				<div style="display: flex; flex-direction: column; gap: 6px;">
-					<div class="skeleton-shimmer" style="height: 12px; width: 50%; border-radius: 3px;"></div>
-					<div class="skeleton-shimmer" style="height: 30px; border-radius: 4px;"></div>
-				</div>
-				<div style="display: flex; flex-direction: column; gap: 6px;">
-					<div class="skeleton-shimmer" style="height: 12px; width: 30%; border-radius: 3px;"></div>
-					<div class="skeleton-shimmer" style="height: 30px; border-radius: 4px;"></div>
-				</div>
-			</div>
-		</div>
-
-		<!-- 메인 그리드 리스트 스켈레톤 영역 -->
-		<div style="flex-grow: 1; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+		<!-- 메인 그리드 리스트 스켈레톤 영역 (단일 리스트 스켈레톤으로 통합) -->
+		<div style="width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
 			<!-- 상단 헤더 스켈레톤 -->
 			<div style="display: flex; justify-content: space-between; align-items: center;">
 				<div class="skeleton-shimmer" style="height: 24px; width: 180px; border-radius: 4px;"></div>
