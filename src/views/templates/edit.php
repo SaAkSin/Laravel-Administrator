@@ -381,8 +381,8 @@
 				</div>
 			</template>
 
-			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many, has_many) -->
-			<template x-if="initialized && ['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
+			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many, has_many, relationship) -->
+			<template x-if="initialized && ['belongs_to', 'belongs_to_many', 'has_many', 'relationship'].includes(field.type)">
 				<div class="relative w-full"
 					 x-data="relationSelect({ field: field, type: 'edit', multiple: ['belongs_to_many', 'has_many'].includes(field.type), autocomplete: field.autocomplete })"
 					 style="position: relative; width: 100%;">

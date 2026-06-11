@@ -146,7 +146,8 @@ export class AdminController {
         if (this.editFields) {
             this.editFields.forEach(field => {
                 if (field && field.field_name && !(field.field_name in this)) {
-                    (this as any)[field.field_name] = field.type === 'belongs_to_many' || field.type === 'has_many' ? [] : '';
+                    const isMultiple = field.type === 'belongs_to_many' || field.type === 'has_many' || !!field.multiple_values;
+                    (this as any)[field.field_name] = isMultiple ? [] : '';
                 }
             });
         }
@@ -274,6 +275,17 @@ export class AdminController {
             if (filter.relationship) {
                 this.listOptions[ind] = filter.options || [];
                 this.listOptions['filter_' + filter.field_name] = filter.options || [];
+            }
+            if (filter.autocomplete) {
+                const autoKey = filter.field_name + '_autocomplete';
+                if (!(autoKey in this.autocompleteData)) {
+                    this.autocompleteData[autoKey] = {};
+                }
+                if (filter.options) {
+                    filter.options.forEach((option: any) => {
+                        this.autocompleteData[autoKey][option.id] = option;
+                    });
+                }
             }
         });
 

@@ -63,8 +63,8 @@
 				</div>
 			</template>
 
-			<!-- 6. belongs_to, belongs_to_many -->
-			<template x-if="initialized && ['belongs_to', 'belongs_to_many'].includes(filter.type)">
+			<!-- 6. belongs_to, belongs_to_many, relationship -->
+			<template x-if="initialized && ['belongs_to', 'belongs_to_many', 'relationship'].includes(filter.type)">
 				<div class="relative w-full"
 					 x-data="relationSelect({ field: filter, type: 'filter', multiple: filter.type === 'belongs_to_many', autocomplete: filter.autocomplete, filterIndex: index })"
 					 style="position: relative; width: 225px; box-sizing: border-box;">
