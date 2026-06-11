@@ -6,6 +6,7 @@
  * 비주얼 무결성과 현대화된 데이터 처리 효율을 동시에 충족시킵니다.
  */
 ?>
+<style>[x-cloak] { display: none !important; }</style>
 <div id="admin_page" class="with_sidebar" x-data="adminController" style="position: relative; min-height: 500px;">
 	<!-- 1. 스켈레톤 로더 (Alpine.js 및 데이터 초기 마운트 전 노출) -->
 	<div x-show="!initialized" 
@@ -73,7 +74,7 @@
 	</div>
 
 	<!-- 2. 실제 데이터 렌더링 영역 (인스턴스 초기 구성이 완비되면 페이드인 노출) -->
-	<div x-show="initialized" x-cloak style="display: flex; width: 100%;" class="fade-in-content">
+	<div x-show="initialized" x-cloak class="fade-in-content" style="display: none; width: 100%;" :style="initialized ? 'display: flex !important;' : 'display: none !important;'">
 		<div id="sidebar">
 			<div class="panel sidebar_section" id="filters_sidebar_section">
 				<?php echo view("administrator::templates.filters")?>
