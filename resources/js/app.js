@@ -98,6 +98,41 @@ async function request(url, { method = 'GET', data = null, headers = {} } = {}) 
 }
 
 /**
+ * sessionStorage 접근 시 발생할 수 있는 SecurityError 및 QuotaExceededError에 대응하기 위한 안전한 래퍼 객체.
+ * 브라우저 설정에 의해 sessionStorage 접근이 원천 차단된 경우, 인메모리 임시 객체를 Fallback으로 사용합니다.
+ */
+const safeStorage = {
+    _memoryStore: {},
+    
+    getItem(key) {
+        try {
+            return sessionStorage.getItem(key);
+        } catch (e) {
+            console.warn('[저장소 경고] sessionStorage.getItem 접근 실패 (인메모리 대체):', e);
+            return this._memoryStore[key] !== undefined ? this._memoryStore[key] : null;
+        }
+    },
+    
+    setItem(key, value) {
+        try {
+            sessionStorage.setItem(key, value);
+        } catch (e) {
+            console.warn('[저장소 경고] sessionStorage.setItem 접근 실패 (인메모리 대체):', e);
+            this._memoryStore[key] = String(value);
+        }
+    },
+    
+    removeItem(key) {
+        try {
+            sessionStorage.removeItem(key);
+        } catch (e) {
+            console.warn('[저장소 경고] sessionStorage.removeItem 접근 실패 (인메모리 대체):', e);
+            delete this._memoryStore[key];
+        }
+    }
+};
+
+/**
  * Alpine.js 전역 컨트롤러: adminController
  * 글로벌 adminData 객체를 읽고, Alpine.js 반응형 상태 구조에 완전히 매핑합니다.
  */
@@ -220,20 +255,24 @@ function adminController() {
             }
 
             // 2.2. reset_storage URL 쿼리 파라미터 감지 및 sessionStorage 리셋 처리
-            let resetStorageKey = null;
+            let resetStorageKeys = [];
             let needsResetStorageUpdate = false;
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                resetStorageKey = urlParams.get('reset_storage');
-                if (resetStorageKey) {
-                    sessionStorage.removeItem(resetStorageKey);
-                    needsResetStorageUpdate = true;
+                resetStorageKeys = urlParams.getAll('reset_storage');
+                if (resetStorageKeys.length > 0) {
+                    // 수집된 모든 키 배열에 대해 sessionStorage에서 삭제를 실행합니다.
+                    resetStorageKeys.forEach(key => {
+                        safeStorage.removeItem(key);
+                    });
+                    // 주소창 파라미터에서 모든 reset_storage 쿼리를 제거하고 URL을 세척합니다.
                     urlParams.delete('reset_storage');
                     const newSearch = urlParams.toString();
                     const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
                     if (window.history && window.history.replaceState) {
                         window.history.replaceState(null, '', newUrl);
                     }
+                    needsResetStorageUpdate = true;
                 }
             } catch (e) {
                 console.error(e);
@@ -243,14 +282,19 @@ function adminController() {
             this.columns = this.prepareColumns();
             this.filters = this.prepareFilters();
 
-            // reset_storage 키와 일치하는 필터의 UI 상태(값) 클리어
-            if (resetStorageKey && this.filters) {
-                const targetBind = 'sessionStorage:' + resetStorageKey;
+            // resetStorageKeys가 존재하고 그 길이가 0보다 크다면, filters를 순회하며 storage_bind가 sessionStorage:{key} 형식의 키 중 리셋 대상에 속하는 필터들을 모두 찾아 UI 값을 null로 리셋합니다.
+            if (resetStorageKeys && resetStorageKeys.length > 0) {
                 this.filters.forEach(filter => {
-                    if (filter.storage_bind === targetBind) {
-                        filter.value = null;
-                        if ('min_value' in filter) filter.min_value = null;
-                        if ('max_value' in filter) filter.max_value = null;
+                    if (filter.storage_bind) {
+                        const parts = filter.storage_bind.split(':');
+                        if (parts.length === 2 && parts[0] === 'sessionStorage') {
+                            const key = parts[1];
+                            if (resetStorageKeys.includes(key)) {
+                                filter.value = null;
+                                if ('min_value' in filter) filter.min_value = null;
+                                if ('max_value' in filter) filter.max_value = null;
+                            }
+                        }
                     }
                 });
             }
@@ -287,15 +331,19 @@ function adminController() {
                         const parts = filter.storage_bind.split(':');
                         if (parts.length === 2 && parts[0] === 'sessionStorage') {
                             const key = parts[1];
-                            if (val !== null && val !== undefined && val !== '') {
-                                // 배열 형태인 경우 JSON 문자열로 직렬화하여 저장
-                                if (Array.isArray(val)) {
-                                    sessionStorage.setItem(key, JSON.stringify(val));
+                            try {
+                                if (val !== null && val !== undefined && val !== '') {
+                                    // 배열 형태인 경우 JSON 문자열로 직렬화하여 저장
+                                    if (Array.isArray(val)) {
+                                        safeStorage.setItem(key, JSON.stringify(val));
+                                    } else {
+                                        safeStorage.setItem(key, val);
+                                    }
                                 } else {
-                                    sessionStorage.setItem(key, val);
+                                    safeStorage.removeItem(key);
                                 }
-                            } else {
-                                sessionStorage.removeItem(key);
+                            } catch (storageError) {
+                                console.error('[스토리지 에러 방어] sessionStorage 쓰기/삭제 중 예외 차단:', storageError);
                             }
                         }
                     }
@@ -337,7 +385,7 @@ function adminController() {
                         const parts = f.storage_bind.split(':');
                         if (parts.length === 2 && parts[0] === 'sessionStorage') {
                             const key = parts[1];
-                            const val = sessionStorage.getItem(key);
+                            const val = safeStorage.getItem(key);
                             if (val !== null && val !== undefined && val !== '') {
                                 try {
                                     // JSON 문자열인 경우 파싱하여 빈 배열이 아닌지 검증
@@ -355,7 +403,7 @@ function adminController() {
                     }
                 });
 
-                if (hasBoundStorageValue || needsResetStorageUpdate) {
+                if (needsResetStorageUpdate || hasBoundStorageValue) {
                     this.updateRows();
                 }
 
@@ -396,7 +444,7 @@ function adminController() {
                     const parts = filter.storage_bind.split(':');
                     if (parts.length === 2 && parts[0] === 'sessionStorage') {
                         const key = parts[1];
-                        const val = sessionStorage.getItem(key);
+                        const val = safeStorage.getItem(key);
                         if (val !== null && val !== undefined) {
                             try {
                                 // JSON 파싱 시도 (배열 형식 복구 목적)
