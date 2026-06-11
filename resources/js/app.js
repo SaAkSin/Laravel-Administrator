@@ -1349,6 +1349,7 @@ function relationSelect(config) {
         options: [],
         selectedItems: [], // { id, text } 배지 목록 객체의 배열
         loading: false,
+        focusedIndex: -1,
 
         init() {
             // 1. 초기 모델 값 동기화 및 렌더링 배지 구성
@@ -1378,6 +1379,7 @@ function relationSelect(config) {
             // 4. 드롭다운 개방 시 검색창 자동 포커스 처리
             this.$watch('open', (newVal) => {
                 if (newVal) {
+                    this.focusedIndex = -1;
                     this.$nextTick(() => {
                         if (this.$refs.searchInput) {
                             this.$refs.searchInput.focus();
@@ -1385,6 +1387,39 @@ function relationSelect(config) {
                     });
                 }
             });
+
+            // 5. 검색어 변경 시 포커스 인덱스 초기화
+            this.$watch('search', () => {
+                this.focusedIndex = -1;
+            });
+        },
+
+        // 키보드 방향키 이동
+        moveFocus(step) {
+            const max = this.filteredOptions.length - 1;
+            if (max < 0) return;
+            
+            this.focusedIndex += step;
+            if (this.focusedIndex < 0) this.focusedIndex = max;
+            if (this.focusedIndex > max) this.focusedIndex = 0;
+            
+            // 자동 스크롤
+            this.$nextTick(() => {
+                if (this.$refs.optionsList && this.$refs.optionsList.children[this.focusedIndex]) {
+                    const el = this.$refs.optionsList.children[this.focusedIndex];
+                    el.scrollIntoView({ block: 'nearest' });
+                }
+            });
+        },
+
+        // 키보드 엔터 선택
+        selectFocused() {
+            if (this.focusedIndex >= 0 && this.focusedIndex < this.filteredOptions.length) {
+                this.selectItem(this.filteredOptions[this.focusedIndex]);
+            } else if (this.filteredOptions.length > 0) {
+                // 아무것도 포커스 되지 않았을 경우 첫번째 항목 선택
+                this.selectItem(this.filteredOptions[0]);
+            }
         },
 
         // 입력값에 맞게 로컬 옵션을 실시간 필터링합니다. (Case-insensitive)

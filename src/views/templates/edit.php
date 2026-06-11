@@ -495,10 +495,10 @@
 									<!-- 단일 선택일 때의 값 또는 플레이스홀더 표시 -->
 									<!-- 단일 선택일 때 유효한 값이 존재할 때만 텍스트를 출력하고, 그렇지 않으면 플레이스홀더를 출력합니다. -->
 									<span class="selected-text" 
-										  x-text="(!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== 'null' && selectedItems[0].id !== 'undefined' && selectedItems[0].id !== null && selectedItems[0].id !== undefined && selectedItems[0].text && selectedItems[0].text !== '' && selectedItems[0].text !== 'null' && selectedItems[0].text !== 'undefined') ? selectedItems[0].text : '-- 검색 또는 선택 --'" 
+										  x-text="(!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : '-- 검색 또는 선택 --'" 
 										  :style="{
 											  fontSize: '12px',
-											  color: (!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== 'null' && selectedItems[0].id !== 'undefined' && selectedItems[0].id !== null && selectedItems[0].id !== undefined && selectedItems[0].text && selectedItems[0].text !== '' && selectedItems[0].text !== 'null' && selectedItems[0].text !== 'undefined') ? '#1f2937' : '#9ca3af',
+											  color: (!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? '#1f2937' : '#9ca3af',
 											  whiteSpace: 'nowrap',
 											  overflow: 'hidden',
 											  textOverflow: 'ellipsis',
@@ -509,7 +509,7 @@
 									<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
 										<!-- 값 초기화 x 버튼 (단일 선택이고 유효한 실제 ID가 존재할 때만 활성화) -->
 										<span class="clear-btn" 
-											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && selectedItems[0].id !== '' && selectedItems[0].id !== 0 && selectedItems[0].id !== '0' && selectedItems[0].id !== 'null' && selectedItems[0].id !== 'undefined' && selectedItems[0].id !== null && selectedItems[0].id !== undefined && selectedItems[0].text && selectedItems[0].text !== '' && selectedItems[0].text !== 'null' && selectedItems[0].text !== 'undefined'" 
+											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null" 
 											  @click.stop="clearSelection()"
 											  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
 										
@@ -534,6 +534,9 @@
 										   placeholder="검색어를 입력하세요..." 
 										   x-model="search"
 										   @input="if (field.autocomplete) fetchAutocomplete()"
+										   @keydown.up.prevent="moveFocus(-1)"
+										   @keydown.down.prevent="moveFocus(1)"
+										   @keydown.enter.prevent="selectFocused()"
 										   x-ref="searchInput"
 										   style="width: 100% !important; height: 26px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 2px 28px 2px 8px !important; font-size: 12px !important; box-sizing: border-box !important; outline: none !important; background-color: #ffffff !important;" />
 									
@@ -555,7 +558,7 @@
 								 x-show="open" 
 								 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 9999; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.08); max-height: 200px; overflow-y: auto; margin-top: 4px; box-sizing: border-box; padding: 4px 0;">
 								
-								<div class="options-list">
+								<div class="options-list" x-ref="optionsList">
 									<!-- 자동완성 최소 글자 수 가이드 안내 (예: Please enter 1 more character) -->
 									<template x-if="field.autocomplete && search.length < 1">
 										<div style="padding: 8px 12px; color: #4b5563; font-size: 12px; background-color: #f8fafc;">Please enter 1 more character</div>
@@ -566,11 +569,12 @@
 										<div style="padding: 10px 14px; color: #9ca3af; font-size: 12px; text-align: center;">검색 결과가 없습니다.</div>
 									</template>
 									
-									<template x-for="opt in filteredOptions" :key="opt.id">
+									<template x-for="(opt, index) in filteredOptions" :key="opt.id">
 										<div @click="selectItem(opt)" 
 											 class="combobox-option-item"
-											 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)) }"
-											 x-text="opt.text || opt.name">
+											 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)), 'focus-active': index === focusedIndex }"
+											 x-text="opt.text || opt.name"
+											 :style="index === focusedIndex ? 'background-color: #f1f5f9; color: #1e293b;' : ''">
 										</div>
 									</template>
 								</div>
