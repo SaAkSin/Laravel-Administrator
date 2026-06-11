@@ -736,6 +736,26 @@ function adminController() {
                     }
                 });
             }
+            // datetime 및 time 타입의 초 단위 노출을 억제하고 input[type=datetime-local] 규격에 맞게 포맷팅합니다.
+            if (this.editFields) {
+                this.editFields.forEach(field => {
+                    if (field && field.field_name && this[field.field_name]) {
+                        let val = String(this[field.field_name]);
+                        if (field.type === 'datetime') {
+                            val = val.replace(' ', 'T');
+                            if (val.length > 16) {
+                                val = val.substring(0, 16);
+                            }
+                            this[field.field_name] = val;
+                        } else if (field.type === 'time') {
+                            if (val.length > 5) {
+                                val = val.substring(0, 5);
+                            }
+                            this[field.field_name] = val;
+                        }
+                    }
+                });
+            }
 
             this.freezeConstraints = false;
             this.resizePage();

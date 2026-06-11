@@ -288,7 +288,9 @@
 				<div>
 					<template x-if="field.editable">
 						<input :type="field.type === 'date' ? 'date' : (field.type === 'time' ? 'time' : 'datetime-local')" 
-							   :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" style="padding: 3px;" />
+							   :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" 
+							   :step="['time', 'datetime'].includes(field.type) ? '60' : null"
+							   style="padding: 3px;" />
 					</template>
 					<template x-if="!field.editable">
 						<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
