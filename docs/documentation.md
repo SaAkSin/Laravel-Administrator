@@ -24,6 +24,7 @@
     - [Password](/docs/field-type-password)
     - [TextArea](/docs/field-type-textarea)
     - [WYSIWYG](/docs/field-type-wysiwyg)
+    - [WYSIWYG2](/docs/field-type-wysiwyg2)
     - [Markdown](/docs/field-type-markdown)
     - [Relationship](/docs/field-type-relationship)
     - [Number](/docs/field-type-number)

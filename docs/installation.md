@@ -11,21 +11,29 @@
 <a name="composer"></a>
 ## Composer
 
-To install Administrator as a Composer package to be used with Laravel 5, simply add this to your composer.json:
+To install Administrator to be used with Laravel 10.x, simply run the following command:
 
-```json
-"frozennode/administrator": "5.*"
+```sh
+composer require "saaksin/laravel-administrator:^10.6"
 ```
 
-..and run `composer update`.  Once it's installed, you can register the service provider in `config/app.php` in the `providers` array:
+Once it's installed, you can register the service provider in `config/app.php` in the `providers` array (if package auto-discovery is disabled in your application, you can register it manually):
 
 ```php
 'providers' => [
-    'Frozennode\Administrator\AdministratorServiceProvider',
+    ...
+    SaAkSin\Administrator\AdministratorServiceProvider::class,
 ]
 ```
 
-Then publish Administrator's assets with `php artisan vendor:publish`. This will add the file `config/administrator.php`. This [config file](http://administrator.frozennode.com/docs/configuration) is the primary way you interact with Administrator. This command will also publish all of the assets, views, and translation files.
+Then publish Administrator's assets and config with the following command:
+
+```sh
+# Publish config file and built Vite assets (including CKEditor 4 bundle)
+php artisan vendor:publish --tag=laravel-administrator --force
+```
+
+This will add the config file `config/administrator.php` and copy built asset assets into your `public/packages/saaksin/administrator/dist/` directory.
 
 
 <a name="laravel-4"></a>
@@ -54,27 +62,28 @@ Since Administrator has switched over to Composer, you can no longer use `php ar
 ```
 
 <a name="assets"></a>
-## Assets
+## Assets and Deployment Automation
 
-After the package is installed, you need to publish the package's assets like this:
+It is best to publish the latest assets whenever Administrator is updated:
 
-	php artisan asset:publish frozennode/administrator
+```sh
+php artisan vendor:publish --tag=laravel-administrator --force
+```
 
-It is best to publish the assets whenever Administrator updates. Instead of doing this manually, you can add the above command to your `scripts` object in your composer.json file:
+Instead of doing this manually, you can automate this by adding the publish command to the `scripts` object in your host project's `composer.json` file:
 
-	"scripts": {
-		"pre-update-cmd": [
-			"php artisan clear-compiled"
-		],
-		"post-install-cmd": [
-			"php artisan optimize",
-			"php artisan vendor:publish --tag=public --force"
-		],
-		"post-update-cmd": [
-			"php artisan optimize",
-			"php artisan vendor:publish --tag=public --force"
-		]
-	},
+```json
+"scripts": {
+	"post-install-cmd": [
+		"php artisan clear-compiled",
+		"php artisan vendor:publish --tag=laravel-administrator --force"
+	],
+	"post-update-cmd": [
+		"php artisan clear-compiled",
+		"php artisan vendor:publish --tag=laravel-administrator --force"
+	]
+}
+```
 
 <a name="administrator-config"></a>
 ## Administrator Config

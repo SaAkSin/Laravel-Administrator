@@ -12,7 +12,7 @@
 
 </head>
 <body>
-	<div id="wrapper">
+	<div id="wrapper" x-data="{ mobileMenuOpen: false, mobileFiltersOpen: false }">
 		@include('administrator::partials.header')
 
 		{!! $content !!}

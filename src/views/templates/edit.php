@@ -19,10 +19,11 @@
 		   x-text="'<?php echo trans('administrator::administrator.viewitem', array('single' => $config->getOption('single'))) ?>'"></a>
 	</template>
 
-	<!-- 커스텀 버튼 목록 (상단 액션용) -->
+	<!-- 상단 제어 및 액션 버튼 세트 (is_top_actions 활성화 시) -->
 	<?php if($config->checkOption('is_top_actions')) { ?>
+		<!-- 커스텀 상단 버튼 그룹 -->
 		<template x-if="$root[$root.primaryKey] && actions && actions.length">
-			<div class="custom_buttons">
+			<div class="custom_buttons" style="margin-top: 0; margin-bottom: 10px;">
 				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
 					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
 						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
@@ -31,6 +32,34 @@
 				</template>
 			</div>
 		</template>
+
+		<!-- 제어 및 액션 버튼 세트 -->
+		<div class="control_buttons" style="margin-top: 0; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
+			<template x-if="$root[$root.primaryKey]">
+				<input type="button" value="<?php echo trans('administrator::administrator.close') ?>"
+					   @click="closeItem()" :disabled="freezeForm || freezeActions" />
+			</template>
+
+			<template x-if="$root[$root.primaryKey] && actionPermissions.delete">
+				<input type="button" value="<?php echo trans('administrator::administrator.delete') ?>"
+					   @click="deleteItem()" :disabled="freezeForm || freezeActions" class="remove_button" />
+			</template>
+
+			<template x-if="$root[$root.primaryKey] && actionPermissions.update">
+				<input type="submit" value="<?php echo trans('administrator::administrator.save') ?>"
+					   :disabled="freezeForm || freezeActions" />
+			</template>
+
+			<template x-if="!$root[$root.primaryKey]">
+				<input type="button" value="<?php echo trans('administrator::administrator.cancel') ?>"
+					   @click="closeItem()" :disabled="freezeForm || freezeActions" />
+			</template>
+
+			<template x-if="!$root[$root.primaryKey] && actionPermissions.create">
+				<input type="submit" value="<?php echo trans('administrator::administrator.create') ?>"
+					   :disabled="freezeForm || freezeActions" />
+			</template>
+		</div>
 	<?php } ?>
 
 	<!-- 오리지널 편집 폼 필드 루프 -->
@@ -55,7 +84,17 @@
 
 			<!-- 2. TEXT TYPE -->
 			<template x-if="field.type === 'text'">
-				<div>
+				<div x-data="{
+					get charCount() {
+						return ($root[field.field_name] || '').length;
+					},
+					get charsLeft() {
+						return (field.limit || 0) - this.charCount;
+					}
+				}">
+					<template x-if="field.editable && field.limit">
+						<div class="characters_left" x-text="charsLeft + ' characters left'"></div>
+					</template>
 					<template x-if="field.editable">
 						<input type="text" :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" :maxlength="field.limit || null" />
 					</template>
@@ -77,51 +116,18 @@
 				</div>
 			</template>
 
-			<!-- 4. WYSIWYG TYPE (Quill Editor 모던 포팅) -->
+			<!-- 4. WYSIWYG TYPE (CKEditor 4) -->
 			<template x-if="field.type === 'wysiwyg'">
-				<div x-data="{ editor: null }"
-					 x-init="
-						$nextTick(() => {
-							if (window.Quill) {
-								let container = $el.querySelector('.quill-editor-container');
-								if (container) {
-									editor = new Quill(container, {
-										theme: 'snow',
-										modules: {
-											toolbar: [
-												[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-												['bold', 'italic', 'underline', 'strike'],
-												[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-												[{ 'color': [] }, { 'background': [] }],
-												[{ 'align': [] }],
-												['link', 'image'],
-												['clean']
-											]
-										}
-									});
+				<div x-init="$nextTick(() => $root.initEditor($el.querySelector('textarea'), field.field_name, 'wysiwyg'))"
+					 class="ckeditor-wrapper"
+					 style="margin-top: 6px;">
+					<textarea :id="field.field_id" :disabled="freezeForm"></textarea>
+				</div>
+			</template>
 
-									// 초기 데이터 장착
-									editor.root.innerHTML = $root[field.field_name] || '';
-
-									// 에디팅 수정 시 Alpine 상태 모델에 즉각 싱크
-									editor.on('text-change', () => {
-										let html = editor.root.innerHTML;
-										if (html === '<p><br></p>') html = '';
-										$root[field.field_name] = html;
-									});
-
-									// 외부 모델 강제 변경 시 화면에 동기화
-									$watch('$root.' + field.field_name, (newVal) => {
-										let currentHTML = editor.root.innerHTML;
-										if (currentHTML === '<p><br></p>') currentHTML = '';
-										if (newVal !== currentHTML) {
-											editor.root.innerHTML = newVal || '';
-										}
-									});
-								}
-							}
-						});
-					 "
+			<!-- 4-2. WYSIWYG2 TYPE (Quill Editor) -->
+			<template x-if="field.type === 'wysiwyg2'">
+				<div x-init="$nextTick(() => $root.initEditor($el.querySelector('.quill-editor-container'), field.field_name, 'wysiwyg2'))"
 					 class="quill-wrapper"
 					 style="margin-top: 6px;">
 					<div class="quill-editor-container" :id="field.field_id" style="min-height: 150px; background: #fff; color: #333;"></div>
@@ -167,16 +173,108 @@
 				</div>
 			</template>
 
-			<!-- 8. ENUM TYPE (Zero-jQuery 순수 Alpine.js 셀렉트) -->
-			<template x-if="field.type === 'enum'">
+			<!-- 8. ENUM TYPE -->
+			<template x-if="initialized && field.type === 'enum'">
 				<div>
 					<template x-if="field.editable">
-						<select x-model="$root[field.field_name]" :id="field.field_id" style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff;">
-							<option value="">-- 선택 --</option>
-							<template x-for="opt in field.options" :key="opt.id">
-								<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == $root[field.field_name]"></option>
-							</template>
-						</select>
+						<div class="relative w-full"
+							 x-data="relationSelect({ field: field, type: 'edit', multiple: false, autocomplete: false })"
+							 style="position: relative; width: 100%; box-sizing: border-box;">
+							
+							<div class="relation-combobox-wrapper" :class="{ 'open': open }" @click.away="open = false" style="position: relative; width: 100%;">
+								
+								<!-- 단일/다중 통합 프리미엄 콤보박스 컨테이너 -->
+								<div class="combobox-container" 
+									 :class="{ 'open': open }"
+									 style="position: relative; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: border-color 0.15s ease, box-shadow 0.15s ease; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;">
+									
+									<!-- 상단 값 노출/트리거 행 -->
+									<div class="combobox-value-row" 
+										 @click="open = !open"
+										 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
+										
+										<!-- 선택된 값 또는 플레이스홀더 표시 (선택되지 않았을 때는 플레이스홀더 출력) -->
+										<span class="selected-text" 
+											  x-text="(selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : '-- Select Some Options --'" 
+											  :style="{
+												  fontSize: '12px',
+												  color: (selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? '#1f2937' : '#9ca3af',
+												  whiteSpace: 'nowrap',
+												  overflow: 'hidden',
+												  textOverflow: 'ellipsis',
+												  maxWidth: 'calc(100% - 70px)'
+											  }"></span>
+										
+										<!-- 우측 액션 영역 -->
+										<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+											<!-- 값 초기화 x 버튼 -->
+											<span class="clear-btn" 
+												  x-show="selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null" 
+												  @click.stop="clearSelection()"
+												  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
+											
+											<!-- 그라데이션 화살표 인디케이터 -->
+											<span class="arrow-indicator" 
+												  :class="{ 'button-style': !open }"
+												  style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px;">
+												<svg xmlns="http://www.w3.org/2000/svg" class="arrow-svg" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="#475569" stroke-width="2.5" style="width: 11px; height: 11px; transition: transform 0.2s ease; transform-origin: center;">
+													<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+												</svg>
+											</span>
+										</div>
+									</div>
+									
+									<!-- 하단 검색 입력창 행 (open 일 때만 렌더링/노출) -->
+									<div class="combobox-search-row" 
+										 x-show="open" 
+										 style="border-top: 1px solid #edf2f7; padding: 6px 10px; background-color: #f8fafc; box-sizing: border-box; display: flex; align-items: center; position: relative;">
+										
+										<input type="text" 
+											   class="combobox-search-input" 
+											   placeholder="검색어를 입력하세요..." 
+											   x-model="search"
+											   @keydown.up.prevent="moveFocus(-1)"
+											   @keydown.down.prevent="moveFocus(1)"
+											   @keydown.enter.prevent="selectFocused()"
+											   x-ref="searchInput"
+											   style="width: 100% !important; height: 26px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 2px 28px 2px 8px !important; font-size: 12px !important; box-sizing: border-box !important; outline: none !important; background-color: #ffffff !important;" />
+										
+										<!-- 돋보기 아이콘 -->
+										<svg xmlns="http://www.w3.org/2000/svg" 
+											 class="search-icon-svg" 
+											 fill="none" 
+											 viewBox="0 0 24 24" 
+											 stroke="#9ca3af" 
+											 stroke-width="2.5" 
+											 style="width: 13px; height: 13px; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+										</svg>
+									</div>
+								</div>
+								
+								<!-- 모던 드롭다운 옵션 보드 -->
+								<div class="combobox-dropdown" 
+									 x-show="open" 
+									 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 9999; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.08); max-height: 180px; overflow-y: auto; margin-top: 4px; box-sizing: border-box; padding: 4px 0; width: 100%;">
+									
+									<div class="options-list" x-ref="optionsList">
+										<!-- 검색 결과 없음 -->
+										<template x-if="filteredOptions.length === 0">
+											<div style="padding: 10px 14px; color: #9ca3af; font-size: 12px; text-align: center;">결과 없음</div>
+										</template>
+										
+										<template x-for="(opt, index) in filteredOptions" :key="opt.id">
+											<div @click="selectItem(opt)" 
+												 class="combobox-option-item"
+												 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)), 'focus-active': index === focusedIndex }"
+												 x-html="highlight(opt.text || opt.name)"
+												 :style="index === focusedIndex ? 'background-color: #f1f5f9; color: #1e293b;' : ''">
+											</div>
+										</template>
+									</div>
+								</div>
+							</div>
+						</div>
 					</template>
 					<template x-if="!field.editable">
 						<div class="uneditable" x-text="(field.options.find(x => String(x.id) === String($root[field.field_name])) || {}).text || $root[field.field_name] || '-'"></div>
@@ -189,7 +287,9 @@
 				<div>
 					<template x-if="field.editable">
 						<input :type="field.type === 'date' ? 'date' : (field.type === 'time' ? 'time' : 'datetime-local')" 
-							   :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" style="padding: 3px;" />
+							   :id="field.field_id" :disabled="freezeForm" x-model="$root[field.field_name]" 
+							   :step="['time', 'datetime'].includes(field.type) ? '60' : null"
+							   style="padding: 3px;" />
 					</template>
 					<template x-if="!field.editable">
 						<div class="uneditable" x-text="$root[field.field_name] || '-'"></div>
@@ -204,24 +304,31 @@
 						<div class="upload_container" :id="field.field_id">
 							<input type="file" :id="field.field_name + '_uploader'" 
 								   @change="uploadFile($event, field)" :disabled="freezeForm" style="display: none;" />
-							<button type="button" @click="$event.target.parentElement.querySelector('input[type=file]').click()"
-									:disabled="freezeForm" class="remove_button" style="padding: 4px 10px; font-size: 11px;">
-								<?php echo trans('administrator::administrator.uploadimage') ?>
+							<button type="button" @click="$el.parentElement.querySelector('input[type=file]').click()"
+									:disabled="freezeForm" style="padding: 4px 10px; font-size: 11px; display: inline-flex !important; align-items: center; justify-content: center; gap: 4px; line-height: 1 !important; white-space: nowrap !important;">
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; flex-shrink: 0; display: block;">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								</svg>
+								<span style="display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap !important;"><?php echo trans('administrator::administrator.uploadimage') ?></span>
 							</button>
 							<div class="uploading" x-show="field.uploading"
 								 x-text="'<?php echo trans('administrator::administrator.imageuploading') ?>' + field.upload_percentage + '%'"></div>
 						</div>
 					</template>
 					<template x-if="$root[field.field_name] && !loadingItem">
-						<div class="image_container" style="margin-top: 8px;">
+						<div class="image_container" style="position: relative; display: block; width: 100%; margin-top: 8px; box-sizing: border-box;">
 							<template x-if="field.display_raw_value">
-								<img :src="$root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px;" />
+								<img :src="$root[field.field_name]" style="max-width: 370px; height: auto; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
 							</template>
 							<template x-if="!field.display_raw_value">
-								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-height: 100px; border: 1px solid #ccc; padding: 2px;" />
+								<img :src="$root.file_url + '?path=' + field.location + $root[field.field_name]" style="max-width: 370px; height: auto; border: 1px solid #ccc; padding: 2px; display: inline-block; vertical-align: top;" />
 							</template>
 							<template x-if="field.editable">
-								<input type="button" class="remove_button" @click="$root[field.field_name] = null" value="x" style="margin-left: 5px; vertical-align: top;" />
+								<button type="button" class="remove_button" @click="$root[field.field_name] = null" style="position: absolute; top: 0; right: 0; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 4px !important; width: 24px; height: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); z-index: 10; line-height: 1 !important;" title="삭제">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px; display: block; flex-shrink: 0;">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+									</svg>
+								</button>
 							</template>
 						</div>
 					</template>
@@ -238,9 +345,12 @@
 						<div class="upload_container" :id="field.field_id">
 							<input type="file" :id="field.field_name + '_uploader'" 
 								   @change="uploadFile($event, field)" :disabled="freezeForm" style="display: none;" />
-							<button type="button" @click="$event.target.parentElement.querySelector('input[type=file]').click()"
-									:disabled="freezeForm" class="remove_button" style="padding: 4px 10px; font-size: 11px;">
-								<?php echo trans('administrator::administrator.uploadfile') ?>
+							<button type="button" @click="$el.parentElement.querySelector('input[type=file]').click()"
+									:disabled="freezeForm" style="padding: 4px 10px; font-size: 11px; display: inline-flex !important; align-items: center; justify-content: center; gap: 4px; line-height: 1 !important; white-space: nowrap !important;">
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px; flex-shrink: 0; display: block;">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+								</svg>
+								<span style="display: inline-block; line-height: 1; vertical-align: middle; white-space: nowrap !important;"><?php echo trans('administrator::administrator.uploadfile') ?></span>
 							</button>
 							<div class="uploading" x-show="field.uploading"
 								 x-text="'<?php echo trans('administrator::administrator.fileuploading') ?>' + field.upload_percentage + '%'"></div>
@@ -300,9 +410,10 @@
 							return;
 						}
 						if (window.accounting) {
+							// 중복 표시를 방지하기 위해 입력 값 포맷팅 시 기호(symbol) 자리를 비워둡니다.
 							this.displayValue = accounting.formatMoney(
 								raw, 
-								field.symbol || '', 
+								'', 
 								field.decimals !== undefined ? parseInt(field.decimals) : 0, 
 								field.thousands_separator !== undefined ? field.thousands_separator : ',', 
 								field.decimal_separator !== undefined ? field.decimal_separator : '.'
@@ -340,28 +451,36 @@
 					}
 				}" x-init="init()" style="width: 100%;">
 					<template x-if="field.editable">
-						<div style="display: inline-flex; align-items: center; gap: 6px;">
+						<div style="position: relative; display: flex; align-items: center; width: 100%;">
+							<template x-if="field.symbol">
+								<span class="symbol" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
+							</template>
 							<input type="text" :id="field.field_id" :disabled="freezeForm" 
 								   x-model="displayValue" 
 								   @focus="onFocus()" 
 								   @blur="onBlur()" 
-								   style="padding: 3px;" />
+								   style="padding: 3px; flex: 1; width: 100%;" />
 						</div>
 					</template>
 					<template x-if="!field.editable">
-						<div class="uneditable" x-text="displayValue || '-'"></div>
+						<div style="position: relative; display: flex; align-items: center; width: 100%;">
+							<template x-if="field.symbol">
+								<span class="symbol" style="position: absolute; left: -15px; top: 50%; transform: translateY(-50%); pointer-events: none; z-index: 10;" x-text="field.symbol"></span>
+							</template>
+							<div class="uneditable" x-text="displayValue || '-'" style="flex: 1; width: 100%; margin-right: 0;"></div>
+						</div>
 					</template>
 				</div>
 			</template>
 
-			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many, has_many) -->
-			<template x-if="initialized && ['belongs_to', 'belongs_to_many', 'has_many'].includes(field.type)">
+			<!-- 13. RELATIONSHIP (belongs_to, belongs_to_many, has_many, relationship) -->
+			<template x-if="initialized && ['belongs_to', 'belongs_to_many', 'has_many', 'relationship'].includes(field.type)">
 				<div class="relative w-full"
 					 x-data="relationSelect({ field: field, type: 'edit', multiple: ['belongs_to_many', 'has_many'].includes(field.type), autocomplete: field.autocomplete })"
 					 style="position: relative; width: 100%;">
 					
 					<template x-if="field.editable">
-						<div class="relation-combobox-wrapper" style="position: relative; width: 100%;">
+						<div class="relation-combobox-wrapper" :class="{ 'open': open }" @click.away="open = false" style="position: relative; width: 100%;">
 							<!-- 1) 다중 선택 배지 목록 (belongs_to_many, has_many일 경우 노출) -->
 							<template x-if="['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0">
 								<div class="selected-badges" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;">
@@ -374,59 +493,98 @@
 								</div>
 							</template>
 
-							<!-- 2) 단일/다중 통합 콤보박스 입력 컨트롤러 (display: flex 제거로 아이콘 이탈 해결) -->
-							<div class="combobox-trigger-container" style="position: relative; width: 100%;">
-								<input type="text" 
-									   placeholder="-- 검색 또는 선택 --"
-									   x-model="search"
-									   @focus="open = true"
-									   @click.away="setTimeout(() => open = false, 200)"
-									   @input="if (field.autocomplete) fetchAutocomplete()"
-									   class="relation-combobox-input"
-									   :value="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems[0] && !search ? selectedItems[0].text : search" />
+							<!-- 2) 단일/다중 통합 프리미엄 콤보박스 컨테이너 (open 여부에 따라 높이 및 보더 확장) -->
+							<div class="combobox-container" 
+								 :class="{ 'open': open }"
+								 style="position: relative; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: border-color 0.15s ease, box-shadow 0.15s ease; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;">
 								
-								<!-- 로딩 인디케이터, 돋보기 검색, 및 트리거 화살표 (우측 끝 정렬) -->
-								<div class="icons" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 6px; pointer-events: none;">
-									<div class="spinner" x-show="loading" style="width: 12px; height: 12px; border: 2px solid #ccc; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.6s linear infinite; pointer-events: auto;"></div>
-									<!-- 미려한 돋보기(검색) SVG 아이콘 탑재 -->
+								<!-- 상단 값 노출/트리거 행 -->
+								<div class="combobox-value-row" 
+									 @click="open = !open"
+									 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
+									
+									<!-- 단일 선택일 때의 값 또는 플레이스홀더 표시 -->
+									<!-- 단일 선택일 때 유효한 값이 존재할 때만 텍스트를 출력하고, 그렇지 않으면 플레이스홀더를 출력합니다. -->
+									<span class="selected-text" 
+										  x-text="(!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : '-- Select Some Options --'" 
+										  :style="{
+											  fontSize: '12px',
+											  color: (!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? '#1f2937' : '#9ca3af',
+											  whiteSpace: 'nowrap',
+											  overflow: 'hidden',
+											  textOverflow: 'ellipsis',
+											  maxWidth: 'calc(100% - 70px)'
+										  }"></span>
+									
+									<!-- 우측 액션 영역 -->
+									<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+										<!-- 값 초기화 x 버튼 (단일 선택이고 유효한 실제 ID가 존재할 때만 활성화) -->
+										<span class="clear-btn" 
+											  x-show="!['belongs_to_many', 'has_many'].includes(field.type) && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null" 
+											  @click.stop="clearSelection()"
+											  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
+										
+										<!-- 그라데이션 화살표 인디케이터 -->
+										<span class="arrow-indicator" 
+											  :class="{ 'button-style': !open }"
+											  style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px;">
+											<svg xmlns="http://www.w3.org/2000/svg" class="arrow-svg" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="#475569" stroke-width="2.5" style="width: 11px; height: 11px; transition: transform 0.2s ease; transform-origin: center;">
+												<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+											</svg>
+										</span>
+									</div>
+								</div>
+								
+								<!-- 하단 검색 입력창 행 (open 일 때만 렌더링/노출) -->
+								<div class="combobox-search-row" 
+									 x-show="open" 
+									 style="border-top: 1px solid #edf2f7; padding: 6px 10px; background-color: #f8fafc; box-sizing: border-box; display: flex; align-items: center; position: relative;">
+									
+									<input type="text" 
+										   class="combobox-search-input" 
+										   placeholder="검색어를 입력하세요..." 
+										   x-model="search"
+										   @keydown.up.prevent="moveFocus(-1)"
+										   @keydown.down.prevent="moveFocus(1)"
+										   @keydown.enter.prevent="selectFocused()"
+										   x-ref="searchInput"
+										   style="width: 100% !important; height: 26px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 2px 28px 2px 8px !important; font-size: 12px !important; box-sizing: border-box !important; outline: none !important; background-color: #ffffff !important;" />
+									
+									<!-- 돋보기 아이콘 -->
 									<svg xmlns="http://www.w3.org/2000/svg" 
-										 class="search-icon" 
+										 class="search-icon-svg" 
 										 fill="none" 
 										 viewBox="0 0 24 24" 
-										 stroke="currentColor"
-										 style="width: 13px; height: 13px; color: #9ca3af;">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-									</svg>
-									<!-- 미려한 회전식 Chevron Down SVG 아이콘 탑재 -->
-									<svg xmlns="http://www.w3.org/2000/svg" 
-										 class="chevron-icon" 
-										 :class="{ 'rotate-180': open }"
-										 @click="open = !open" 
-										 fill="none" 
-										 viewBox="0 0 24 24" 
-										 stroke="currentColor"
-										 style="width: 13px; height: 13px; color: #9ca3af; cursor: pointer; transition: transform 0.2s ease; pointer-events: auto;">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+										 stroke="#9ca3af" 
+										 stroke-width="2.5" 
+										 style="width: 13px; height: 13px; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 									</svg>
 								</div>
 							</div>
- 
+							
 							<!-- 3) 모던 드롭다운 옵션 보드 -->
 							<div class="combobox-dropdown" 
 								 x-show="open" 
-								 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 50; background: white; border: 1px solid #e5e7eb; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto; margin-top: 6px; box-sizing: border-box;">
+								 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 9999; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.08); max-height: 200px; overflow-y: auto; margin-top: 4px; box-sizing: border-box; padding: 4px 0;">
 								
-								<div class="options-list">
+								<div class="options-list" x-ref="optionsList">
+									<!-- 자동완성 최소 글자 수 가이드 안내 (예: Please enter 1 more character) -->
+									<template x-if="field.autocomplete && search.length < 1">
+										<div style="padding: 8px 12px; color: #4b5563; font-size: 12px; background-color: #f8fafc;">Please enter 1 more character</div>
+									</template>
+									
 									<!-- 검색 결과 없음 표출 -->
-									<template x-if="filteredOptions.length === 0 && !loading">
+									<template x-if="!(field.autocomplete && search.length < 1) && filteredOptions.length === 0 && !loading">
 										<div style="padding: 10px 14px; color: #9ca3af; font-size: 12px; text-align: center;">검색 결과가 없습니다.</div>
 									</template>
 									
-									<template x-for="opt in filteredOptions" :key="opt.id">
+									<template x-for="(opt, index) in filteredOptions" :key="opt.id">
 										<div @click="selectItem(opt)" 
 											 class="combobox-option-item"
-											 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)) }"
-											 x-text="opt.text || opt.name">
+											 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)), 'focus-active': index === focusedIndex }"
+											 x-html="highlight(opt.text || opt.name)"
+											 :style="index === focusedIndex ? 'background-color: #f1f5f9; color: #1e293b;' : ''">
 										</div>
 									</template>
 								</div>
@@ -448,18 +606,16 @@
 	</template>
 
 	<!-- 커스텀 하단 버튼 그룹 -->
-	<?php if(!$config->checkOption('is_top_actions')) { ?>
-		<template x-if="$root[$root.primaryKey] && actions && actions.length">
-			<div class="custom_buttons">
-				<template x-for="(action, idx) in actions" :key="action.action_name || idx">
-					<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
-						<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
-							   :value="action.title" :disabled="freezeForm || freezeActions" />
-					</template>
+	<template x-if="$root[$root.primaryKey] && actions && actions.length">
+		<div class="custom_buttons">
+			<template x-for="(action, idx) in actions" :key="action.action_name || idx">
+				<template x-if="action.has_permission && $root.actionPermissions[action.action_name] !== false">
+					<input type="button" @click="customAction(true, action.action_name, action.messages, action.confirmation)"
+						   :value="action.title" :disabled="freezeForm || freezeActions" />
 				</template>
-			</div>
-		</template>
-	<?php } ?>
+			</template>
+		</div>
+	</template>
 
 	<!-- 제어 및 액션 버튼 세트 (최초 디자인 복원) -->
 	<div class="control_buttons">

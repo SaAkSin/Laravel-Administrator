@@ -6,7 +6,33 @@
  * 데이터 바인딩 동작만 Alpine.js 지시어로 안전하게 포팅했습니다.
  */
 ?>
-<div class="table_container" :style="{ marginRight: (activeItem !== null || loadingItem) ? (expandWidth + 5) + 'px' : '290px' }">
+<div class="table_container" 
+	 :style="{ marginRight: (activeItem !== null || loadingItem) ? (expandWidth + 5) + 'px' : '290px' }"
+	 x-data="{
+		tbodyHeight: 0,
+		tbodyWidth: 0,
+		tbodyTop: 0
+	 }"
+	 x-init="
+		const updateDims = () => {
+			const scrollable = $el.querySelector('.table_scrollable');
+			const thead = $el.querySelector('thead');
+			if (scrollable) {
+				tbodyWidth = scrollable.offsetWidth;
+				tbodyTop = thead ? thead.offsetHeight : 0;
+				tbodyHeight = thead ? (scrollable.offsetHeight - thead.offsetHeight) : scrollable.offsetHeight;
+			}
+		};
+		$watch('loadingRows', value => {
+			if (value) {
+				$nextTick(() => updateDims());
+			}
+		});
+		$watch('rows', () => {
+			$nextTick(() => updateDims());
+		});
+		window.addEventListener('resize', () => updateDims());
+	">
 
 	<div class="results_header">
 		<h2 x-text="modelTitle"></h2>
@@ -66,46 +92,62 @@
 	</div>
 
 	<!-- 오리지널 격자 테이블 표출 -->
-	<table class="results" border="0" cellspacing="0" id="customers" cellpadding="0">
-		<thead>
-			<tr>
-				<template x-for="column in columns" :key="column.column_name">
-					<th x-show="column.visible"
-						@click="column.sortable && setSortOptions(column.sort_field ? column.sort_field : column.column_name)"
-						:class="{
-							sortable: column.sortable,
-							'sorted-asc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'asc',
-							'sorted-desc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'desc'
-						}">
-						<div x-text="column.title"></div>
-					</th>
-				</template>
-			</tr>
-		</thead>
-		<tbody>
-			<template x-for="(row, index) in rows" :key="(row[primaryKey] && row[primaryKey].raw) ? row[primaryKey].raw : index">
-				<tr @click="if (row[primaryKey]) { clickItem(row[primaryKey].raw); } return true"
-					:class="{
-						result: true, 
-						even: index % 2 === 1, 
-						odd: index % 2 !== 1,
-						selected: (row[primaryKey] && row[primaryKey].raw) == itemLoadingId
-					}">
+	<div class="table_scrollable" style="position: relative; min-height: 400px;">
+		<table class="results" border="0" cellspacing="0" id="customers" cellpadding="0">
+			<thead>
+				<tr>
 					<template x-for="column in columns" :key="column.column_name">
-						<td x-show="column.visible" x-html="row[column.column_name] ? row[column.column_name].rendered : ''"></td>
+						<th x-show="column.visible"
+							@click="column.sortable && setSortOptions(column.sort_field ? column.sort_field : column.column_name)"
+							:class="{
+								sortable: column.sortable,
+								'sorted-asc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'asc',
+								'sorted-desc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'desc'
+							}">
+							<div x-text="column.title"></div>
+						</th>
 					</template>
 				</tr>
-			</template>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				<template x-for="(row, index) in rows" :key="(row[primaryKey] && row[primaryKey].raw) ? row[primaryKey].raw : index">
+					<tr @click="if (row[primaryKey]) { clickItem(row[primaryKey].raw); } return true"
+						:class="{
+							result: true, 
+							even: index % 2 === 1, 
+							odd: index % 2 !== 1,
+							selected: (row[primaryKey] && row[primaryKey].raw) == itemLoadingId
+						}">
+						<template x-for="column in columns" :key="column.column_name">
+							<td x-show="column.visible" x-html="row[column.column_name] ? row[column.column_name].rendered : ''"></td>
+						</template>
+					</tr>
+				</template>
+			</tbody>
+		</table>
 
-	<!-- 로딩창 -->
-	<div class="loading_rows" x-show="loadingRows">
-		<div><?php echo trans('administrator::administrator.loading') ?></div>
+		<!-- 로딩창 -->
+		<div class="loading_rows" 
+			 x-show="loadingRows"
+			 :style="{
+				 position: 'absolute',
+				 top: tbodyTop + 'px',
+				 left: '0px',
+				 width: tbodyWidth + 'px',
+				 height: (tbodyHeight > 120 ? tbodyHeight : 120) + 'px',
+				 right: 'auto',
+				 bottom: 'auto',
+				 display: loadingRows ? 'flex' : 'none'
+			 }">
+			<div class="loading_spinner_wrapper">
+				<div class="loading_spinner"></div>
+				<div class="loading_text"><?php echo trans('administrator::administrator.loading') ?></div>
+			</div>
+		</div>
 	</div>
 
 	<!-- 빈 상태 가이드 -->
-	<div class="no_results" x-show="pagination.last === 0">
+	<div class="no_results" x-show="initialized && pagination.last === 0 && !loadingRows">
 		<div><?php echo trans('administrator::administrator.noresults') ?></div>
 	</div>
 </div>

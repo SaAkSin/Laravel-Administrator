@@ -39,6 +39,10 @@ class AdministratorServiceProvider extends ServiceProvider {
 
 		$this->publishes([
 			__DIR__.'/../../../public' => public_path('packages/saaksin/administrator'),
+		], 'laravel-administrator');
+
+		$this->publishes([
+			__DIR__.'/../../../public' => public_path('packages/saaksin/administrator'),
 		], 'public');
 
 		//set the locale

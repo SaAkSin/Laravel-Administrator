@@ -63,6 +63,8 @@ class Column
 		'external' => false,
 		'belongs_to_many' => false,
 		'visible' => true,
+		'sanitize' => true,
+		'is_html' => false,
 	);
 
 	/**
@@ -244,10 +246,31 @@ class Column
 		$output = $this->getOption('output');
 		
 		if (is_callable($output)) {
-			return $output($value, $item);
+			$rawOutput = $output($value, $item);
+		} else {
+			$rawOutput = str_replace('(:value)', $value ?: '', $output);
 		}
-		
-		return str_replace('(:value)', $value ?: '', $output);
+
+		// 1. HTML 출력을 허용해야 하는 호환성 대상 조건 검사 (커스텀 output, Accessor 속성, 관계성 등)
+		$isHtmlAllowed = $this->getOption('is_html', false) || 
+		                 is_callable($output) || 
+		                 $output !== '(:value)' || 
+		                 $this->getOption('is_computed', false) || 
+		                 $this->getOption('is_related', false);
+
+		// 2. 이스케이프 및 보안 클렌징 결정
+		if ($this->getOption('sanitize', true) && !$isHtmlAllowed) {
+			// 단순 평문 칼럼에 대해서만 HTML 엔티티 이스케이프 적용
+			return e($rawOutput);
+		}
+
+		// 3. HTML 허용 대상의 경우 HTML Purifier(clean()) 연동을 통한 Stored XSS 방어
+		// clean() 헬퍼 함수가 존재하지 않는 호스트 프로젝트 환경을 위해 안전 분기 처리
+		if (function_exists('clean')) {
+			return clean($rawOutput);
+		}
+
+		return $rawOutput;
 	}
 
 	/**

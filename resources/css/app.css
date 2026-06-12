@@ -32,6 +32,46 @@ select {
     box-sizing: border-box !important;
 }
 
+/* 1-1. 셀렉트 박스 우측 화살표 영역 버튼 디자인 격상 */
+select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-right: 28px !important; /* 우측 버튼 영역 축소에 맞춰 텍스트 가용 폭 확보 */
+    background-image: 
+        /* 1. 세련된 화살표 SVG (d="M19.5 8.25...") */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E"),
+        /* 2. 세로 경계 구분선 */
+        linear-gradient(to right, #cbd5e1, #cbd5e1),
+        /* 3. 우측 버튼 영역 은은한 실버 그라데이션 */
+        linear-gradient(to bottom, #ffffff 0%, #e2e8f0 100%) !important;
+    background-repeat: no-repeat, no-repeat, no-repeat !important;
+    background-position: 
+        right 8px center, 
+        right 22px center,
+        right center !important;
+    background-size: 
+        10px 10px, 
+        1px 100%, 
+        22px 100% !important;
+    cursor: pointer !important;
+}
+
+select:focus {
+    background-image: 
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e293b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E"),
+        linear-gradient(to right, #94a3b8, #94a3b8),
+        linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%) !important;
+}
+
+/* 페이지네이션당 행수(rowsPerPage) 셀렉트 박스의 폭과 패딩 예외 조정 */
+div.per_page select {
+    width: 75px !important;
+    padding-right: 20px !important;
+    background-position: right 4px center, right 16px center, right center !important;
+    background-size: 8px 8px, 1px 100%, 16px 100% !important;
+}
+
 /* 1-2. 날짜/시간 컨트롤러 정밀 보정 (HTML5 네이티브 위젯 모던 정합) */
 input[type="date"],
 input[type="time"],
@@ -475,6 +515,112 @@ table.results td {
 #wrapper header ul#lang_menu > li ul li.menu > span:hover {
     background-color: #444 !important;
     color: #fff !important;
+}
+
+/* =========================================================================
+ * 📦 프리미엄 Combobox 컴포넌트 2단 레이아웃 CSS 명세서 (Zero-jQuery)
+ * =========================================================================
+ */
+
+/* 콤보박스 외부 래퍼 기본 스타일 지정 및 필터 사이드바 너비 고정 (일반 select와 정합성 일치) */
+.relation-combobox-wrapper {
+    width: 100% !important;
+}
+
+#admin_page div#sidebar div.filters > div .relation-combobox-wrapper {
+    width: 225px !important;
+}
+
+/* 콤보박스 외부 래퍼 활성화 스타일 */
+.relation-combobox-wrapper.open .combobox-container {
+    border-color: #3b82f6 !important; /* 활성 파란색 테두리 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* 값 초기화 버튼 스타일링 (버튼 느낌 배제 및 순수 아이콘 마크화) */
+.clear-btn {
+    font-family: inherit !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #9ca3af !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    padding: 0 4px !important;
+    cursor: pointer !important;
+    line-height: 1 !important;
+    display: inline-block;
+    transition: color 0.12s ease !important;
+}
+
+.clear-btn:hover {
+    color: #dc2626 !important; /* 호버 시 세련된 레드 */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 닫혀있을 때의 화살표 버튼 그라데이션 스타일 */
+.arrow-indicator.button-style {
+    background-image: linear-gradient(to bottom, #ffffff 0%, #e2e8f0 100%) !important;
+    border-left: 1px solid #cbd5e1 !important;
+    width: 28px !important;
+    height: 30px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-top-right-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+    cursor: pointer !important;
+}
+
+.arrow-indicator.button-style:hover {
+    background-image: linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%) !important;
+}
+
+/* 열려있을 때의 화살표 영역 (일반 투명) */
+.arrow-indicator {
+    cursor: pointer !important;
+}
+
+/* 돋보기 검색 아이콘 및 화살표 SVG 트랜지션 */
+.arrow-svg {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 드롭다운 개방 시 화살표 180도 회전 */
+.arrow-svg.rotate-180 {
+    transform: rotate(180deg) !important;
+}
+
+/* 검색 인풋 포커스 아웃라인 해제 */
+.combobox-search-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* =========================================================================
+ * 📱 모바일 다단계 아코디언 메뉴 활성화 스타일 (Zero-!important)
+ * =========================================================================
+ * Alpine.js 클래스 바인딩(.shown)을 활용하여, CSS specificity(우선순위 점수)를 
+ * 높임으로써 !important 남용 없이 모바일 서브메뉴의 display: block을 완벽히 보장합니다.
+ */
+#wrapper header #mobile_menu_wrapper ul#mobile_menu li.menu ul.shown {
+    display: block;
+}
+
+/* =========================================================================
+ * 📱 모바일 및 태블릿용 Edit Form 패딩 최적화
+ * =========================================================================
+ * 모바일 화면의 좁은 가용 폭을 확보하기 위해 왼쪽 패딩 여백을 27px -> 8px 로 축소합니다.
+ */
+@media only screen and (max-width: 949px) {
+    #admin_page #content div.item_edit_container div.item_edit {
+        padding-left: 8px !important;
+    }
 }
 
 

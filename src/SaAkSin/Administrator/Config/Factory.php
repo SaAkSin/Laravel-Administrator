@@ -305,7 +305,7 @@ class Factory {
 	}
 
 	/**
-	 * Fetches a config file given a path
+	 * Fetches a config file given a path (하이브리드 하위 호환성 지원 버전)
 	 *
 	 * @param string	$name
 	 *
@@ -316,17 +316,34 @@ class Factory {
 		$name = str_replace($this->getPrefix(), '', $name);
 		$path = $this->getPath() . $name . '.php';
 
-		//check that this is a legitimate file
+		// 1. 물리 파일 존재 여부 확인
 		if (is_file($path))
 		{
-			//set the options var
-			require_once $path;
-			$options = call_user_func($name);
+			$options = null;
 
-			//add the name in
-			$options['name'] = $name;
+			// 2. 이미 메모리에 글로벌 함수가 로드되어 있는 경우 (중복 선언 에러 원천 차단)
+			if (function_exists($name))
+			{
+				$options = call_user_func($name);
+			}
+			else
+			{
+				// 3. 파일 include를 실행하여 반환값 평가 (순수 배열 방식 로드 시도)
+				$options = include $path;
 
-			return $options;
+				// 4. include 반환값이 배열이 아니고, include를 통해 비로소 글로벌 함수가 선언된 경우 (기존 함수 방식 지원)
+				if (!is_array($options) && function_exists($name))
+				{
+					$options = call_user_func($name);
+				}
+			}
+
+			// 5. 최종 추출 결과가 유효한 배열인지 재검증 후 이름 주입
+			if (is_array($options))
+			{
+				$options['name'] = $name;
+				return $options;
+			}
 		}
 
 		return false;

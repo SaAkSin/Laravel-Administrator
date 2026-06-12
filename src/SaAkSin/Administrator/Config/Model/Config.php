@@ -42,6 +42,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'rules' => false,
 		'messages' => false,
         'view' => false,
+        'is_top_actions' => false,
 	);
 
 	/**
@@ -74,6 +75,7 @@ class Config extends ConfigBase implements ConfigInterface {
 		'rules' => 'array',
 		'messages' => 'array',
         'view' => 'boolean',
+        'is_top_actions' => 'boolean',
 	);
 
 	/**

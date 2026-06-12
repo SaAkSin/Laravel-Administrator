@@ -11,21 +11,29 @@
 <a name="composer"></a>
 ## Composer
 
-Laravel 5와 함께 사용할 Administrator를 Composer 패키지로 설치하려면 `composer.json`에 다음을 추가하기만 하면 됩니다:
+Laravel 10.x와 함께 사용할 Administrator를 설치하려면 다음 명령어를 실행하십시오:
 
-```json
-"frozennode/administrator": "5.*"
+```sh
+composer require "saaksin/laravel-administrator:^10.6"
 ```
 
-..그리고 `composer update`를 실행하십시오. 설치가 완료되면 `config/app.php` 파일의 `providers` 배열에 서비스 프로바이더(Service Provider)를 등록할 수 있습니다:
+설치가 완료되면 `config/app.php` 파일의 `providers` 배열에 서비스 프로바이더(Service Provider)를 등록합니다 (라라벨의 패키지 자동 검색 기능이 활성화되어 있다면 자동 등록되므로 수동 등록을 생략할 수 있습니다):
 
 ```php
 'providers' => [
-    'Frozennode\Administrator\AdministratorServiceProvider',
+    ...
+    SaAkSin\Administrator\AdministratorServiceProvider::class,
 ]
 ```
 
-그런 다음 `php artisan vendor:publish` 명령어로 Administrator의 에셋을 퍼블리시합니다. 이 명령을 실행하면 `config/administrator.php` 파일이 추가됩니다. 이 [설정 파일(config file)](http://administrator.frozennode.com/docs/configuration)은 Administrator와 상호작용하는 기본적인 방법입니다. 또한 이 명령어는 모든 에셋(assets), 뷰(views), 번역(translation) 파일도 함께 퍼블리시합니다.
+그런 다음 아래 명령어를 통해 패키지의 설정 파일 및 컴파일된 Vite 프론트엔드 에셋을 호스트 프로젝트로 퍼블리시(게시)합니다.
+
+```sh
+# 설정 파일 및 에셋 전체 강제 퍼블리시 (Vite 에셋 및 CKEditor 4 번들 포함)
+php artisan vendor:publish --tag=laravel-administrator --force
+```
+
+이 명령을 실행하면 프로젝트 루트에 `config/administrator.php` 설정 파일이 추가되고, `public/packages/saaksin/administrator/dist/` 경로에 배포용 에셋들이 복사됩니다.
 
 
 <a name="laravel-4"></a>
@@ -54,27 +62,28 @@ Administrator가 Composer로 전환되었기 때문에 더 이상 `php artisan b
 ```
 
 <a name="assets"></a>
-## 에셋 (Assets)
+## 에셋 (Assets) 및 배포 자동화
 
-패키지가 설치된 후에는 다음과 같이 패키지의 에셋을 퍼블리시해야 합니다:
+패키지가 업데이트될 때마다 최신 빌드 에셋 자산이 호스트로 동기화되도록 퍼블리시 명령을 실행해야 합니다:
 
-	php artisan asset:publish frozennode/administrator
+```sh
+php artisan vendor:publish --tag=laravel-administrator --force
+```
 
-Administrator가 업데이트될 때마다 에셋을 퍼블리시하는 것이 좋습니다. 이를 수동으로 처리하는 대신 `composer.json` 파일의 `scripts` 객체에 위의 명령어를 추가하여 자동화할 수 있습니다:
+이 작업을 수동으로 처리하는 대신, 호스트 프로젝트의 `composer.json` 파일 내 `scripts` 객체에 아래와 같이 추가하여 자동화할 수 있습니다:
 
-	"scripts": {
-		"pre-update-cmd": [
-			"php artisan clear-compiled"
-		],
-		"post-install-cmd": [
-			"php artisan optimize",
-			"php artisan vendor:publish --tag=public --force"
-		],
-		"post-update-cmd": [
-			"php artisan optimize",
-			"php artisan vendor:publish --tag=public --force"
-		]
-	},
+```json
+"scripts": {
+	"post-install-cmd": [
+		"php artisan clear-compiled",
+		"php artisan vendor:publish --tag=laravel-administrator --force"
+	],
+	"post-update-cmd": [
+		"php artisan clear-compiled",
+		"php artisan vendor:publish --tag=laravel-administrator --force"
+	]
+}
+```
 
 <a name="administrator-config"></a>
 ## Administrator 설정 (Administrator Config)

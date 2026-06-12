@@ -1,17 +1,35 @@
 @if (is_array($item))
-	<li class="menu">
-		<span>{{$key}}</span>
-		<ul>
-			@foreach ($item as $k => $subitem)
-				<?php echo view("administrator::partials.menu_item", array(
-					'item' => $subitem,
-					'key' => $k,
-					'settingsPrefix' => $settingsPrefix,
-					'pagePrefix' => $pagePrefix
-				))?>
-			@endforeach
-		</ul>
-	</li>
+	@if (isset($isMobile) && $isMobile)
+		<li class="menu" x-data="{ open: false }">
+			<span @click="open = !open" style="cursor: pointer;">{{$key}}</span>
+			<ul x-show="open" x-cloak :class="{ 'shown': open }">
+				@foreach ($item as $k => $subitem)
+					<?php echo view("administrator::partials.menu_item", array(
+						'item' => $subitem,
+						'key' => $k,
+						'settingsPrefix' => $settingsPrefix,
+						'pagePrefix' => $pagePrefix,
+						'isMobile' => true
+					))?>
+				@endforeach
+			</ul>
+		</li>
+	@else
+		<li class="menu">
+			<span>{{$key}}</span>
+			<ul>
+				@foreach ($item as $k => $subitem)
+					<?php echo view("administrator::partials.menu_item", array(
+						'item' => $subitem,
+						'key' => $k,
+						'settingsPrefix' => $settingsPrefix,
+						'pagePrefix' => $pagePrefix,
+						'isMobile' => false
+					))?>
+				@endforeach
+			</ul>
+		</li>
+	@endif
 @else
 	<li class="item">
 		@if (strpos($key, $settingsPrefix) === 0)

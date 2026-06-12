@@ -13,6 +13,10 @@ Any Eloquent model (or any object that ultimately extends from an Eloquent model
 
 There are several required fields that must be supplied in order for a model config file to work. Apart from those, you can also define a number of optional fields that help you customize your admin interface on a per-model basis. For instance, if one of your models needs a WYSIWYG field, you'll probably want the edit form to be wider than the default width. All you would have to do is set the `form_width` option in that model's config.
 
+> **💡 Tip - Recommended Modern Refactoring**: 
+> In older legacy versions, setting configurations by declaring global anonymous functions (e.g., `function model_name() { return array(...); }`) was standard. However, this approach can cause duplicate function declarations or runtime "function not found" errors when executing Laravel configuration caching (`php artisan config:cache`).
+> Therefore, in the latest version, it is strongly recommended to return a **pure PHP array** directly at the top of the file (i.e., `return [ ... ];`) instead of wrapping it in a global function.
+
 <a name="examples"></a>
 ## Examples
 

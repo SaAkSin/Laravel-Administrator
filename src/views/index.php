@@ -6,14 +6,83 @@
  * 비주얼 무결성과 현대화된 데이터 처리 효율을 동시에 충족시킵니다.
  */
 ?>
-<div id="admin_page" class="with_sidebar" x-data="adminController">
-	<div id="sidebar">
-		<div class="panel sidebar_section" id="filters_sidebar_section">
-			<?php echo view("administrator::templates.filters")?>
+<style>[x-cloak] { display: none !important; }</style>
+<div id="admin_page" class="with_sidebar" x-data="adminController" style="position: relative; min-height: 500px;">
+	<!-- 1. 스켈레톤 로더 (Alpine.js 및 데이터 초기 마운트 전 노출) -->
+	<div x-show="!initialized" 
+		 style="width: 100%; padding: 20px; box-sizing: border-box; background-color: #f8fafc;">
+		
+		<!-- 메인 그리드 리스트 스켈레톤 영역 (단일 리스트 스켈레톤으로 통합) -->
+		<div style="width: 100%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+			<!-- 상단 헤더 스켈레톤 -->
+			<div style="display: flex; justify-content: space-between; align-items: center;">
+				<div class="skeleton-shimmer" style="height: 24px; width: 180px; border-radius: 4px;"></div>
+				<div style="display: flex; gap: 8px;">
+					<div class="skeleton-shimmer" style="height: 30px; width: 80px; border-radius: 4px;"></div>
+					<div class="skeleton-shimmer" style="height: 30px; width: 80px; border-radius: 4px;"></div>
+				</div>
+			</div>
+			
+			<!-- 그리드 헤더 스크롤 바디 스켈레톤 -->
+			<div style="display: flex; gap: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-top: 10px;">
+				<div class="skeleton-shimmer" style="height: 14px; width: 5%; border-radius: 3px;"></div>
+				<div class="skeleton-shimmer" style="height: 14px; width: 35%; border-radius: 3px;"></div>
+				<div class="skeleton-shimmer" style="height: 14px; width: 20%; border-radius: 3px;"></div>
+				<div class="skeleton-shimmer" style="height: 14px; width: 15%; border-radius: 3px;"></div>
+				<div class="skeleton-shimmer" style="height: 14px; width: 25%; border-radius: 3px;"></div>
+			</div>
+
+			<!-- 그리드 개별 레코드 행 스켈레톤 -->
+			<div style="display: flex; flex-direction: column; gap: 16px;">
+				<div style="display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #f8fafc; padding-bottom: 12px;">
+					<div class="skeleton-shimmer" style="height: 12px; width: 5%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 35%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 20%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 15%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 25%; border-radius: 3px;"></div>
+				</div>
+				<div style="display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #f8fafc; padding-bottom: 12px;">
+					<div class="skeleton-shimmer" style="height: 12px; width: 5%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 35%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 20%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 15%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 25%; border-radius: 3px;"></div>
+				</div>
+				<div style="display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #f8fafc; padding-bottom: 12px;">
+					<div class="skeleton-shimmer" style="height: 12px; width: 5%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 35%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 20%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 15%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 25%; border-radius: 3px;"></div>
+				</div>
+				<div style="display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #f8fafc; padding-bottom: 12px;">
+					<div class="skeleton-shimmer" style="height: 12px; width: 5%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 35%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 20%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 15%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 25%; border-radius: 3px;"></div>
+				</div>
+				<div style="display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #f8fafc; padding-bottom: 12px;">
+					<div class="skeleton-shimmer" style="height: 12px; width: 5%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 35%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 20%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 15%; border-radius: 3px;"></div>
+					<div class="skeleton-shimmer" style="height: 12px; width: 25%; border-radius: 3px;"></div>
+				</div>
+			</div>
 		</div>
 	</div>
-	<div id="content">
-		<?php echo view("administrator::templates.admin", array('config' => $config))?>
+
+	<!-- 2. 실제 데이터 렌더링 영역 (인스턴스 초기 구성이 완비되면 페이드인 노출) -->
+	<div x-show="initialized" x-cloak class="fade-in-content" style="display: none; width: 100%;" :style="initialized ? 'display: flex !important;' : 'display: none !important;'">
+		<div id="sidebar" :class="{ 'shown': mobileFiltersOpen }">
+			<div class="panel sidebar_section" id="filters_sidebar_section">
+				<?php echo view("administrator::templates.filters")?>
+			</div>
+		</div>
+		<div id="content" :class="{ 'hidden': mobileFiltersOpen }">
+			<?php echo view("administrator::templates.admin", array('config' => $config))?>
+		</div>
 	</div>
 </div>
 
@@ -50,8 +119,37 @@
 </script>
 
 <style type="text/css">
+	/* 1. 스켈레톤 로더용 Shimmer 애니메이션 및 클래스 선언 */
+	@keyframes shimmer {
+		0% {
+			background-position: -200% 0;
+		}
+		100% {
+			background-position: 200% 0;
+		}
+	}
+	.skeleton-shimmer {
+		background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+		background-size: 200% 100%;
+		animation: shimmer 1.5s infinite linear;
+	}
+	[x-cloak] {
+		display: none !important;
+	}
+	.fade-in-content {
+		animation: fadeInContent 0.25s ease-out forwards;
+	}
+	@keyframes fadeInContent {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
 	div.item_edit form.edit_form select, div.item_edit form.edit_form input[type=hidden], div.item_edit form.edit_form .select2-container {
-		width: <?php echo $formWidth - 59 ?>px !important;
+		width: <?php echo $formWidth - 75 ?>px !important;
 	}
 
 	div.item_edit form.edit_form .cke {
@@ -67,7 +165,7 @@
 		width: <?php echo intval(($formWidth - 75) / 2) ?>px !important;
 	}
 
-	div.item_edit form.edit_form input[type="text"], div.item_edit form.edit_form input[type="password"], div.item_edit form.edit_form textarea {
+	div.item_edit form.edit_form input[type="text"], div.item_edit form.edit_form input[type="password"], div.item_edit form.edit_form textarea, div.item_edit form.edit_form .relation-combobox-wrapper {
 		max-width: <?php echo $formWidth - 75 ?>px !important;
 		width: <?php echo $formWidth - 75 ?>px !important;
 	}

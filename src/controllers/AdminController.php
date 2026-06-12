@@ -397,10 +397,42 @@ class AdminController extends Controller
 	 */
 	public function displayFile()
 	{
-		//get the stored path of the original
 		$path = $this->request->input('path');
-		$data = File::get($path);
-		$file = new SFile($path);
+		if (empty($path)) {
+			abort(400, '파일 경로가 누락되었습니다.');
+		}
+
+		$realPath = realpath($path);
+		if (!$realPath || !is_file($realPath)) {
+			abort(404, '파일을 찾을 수 없습니다.');
+		}
+
+		// 해당 모델/설정에 정의된 파일 필드들의 upload_path(location)를 검수하여 하위 경로에 위치하는지 검증
+		$config = app('itemconfig');
+		$fieldFactory = app('admin_field_factory');
+		$fields = $fieldFactory->getEditFields();
+		$isValidPath = false;
+
+		foreach ($fields as $field) {
+			if (is_a($field, \SaAkSin\Administrator\Fields\File::class)) {
+				$location = realpath($field->getOption('location'));
+				if ($location) {
+					// 디렉토리 구분자를 끝에 추가하여 접두사 우회(Prefix Bypass) 차단
+					$location .= DIRECTORY_SEPARATOR;
+					if (strpos($realPath, $location) === 0) {
+						$isValidPath = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if (!$isValidPath) {
+			abort(403, '허용되지 않은 파일 경로 접근입니다.');
+		}
+
+		$file = new SFile($realPath);
+		$data = File::get($realPath);
 
 		$headers = array(
 			'Content-Type' => $file->getMimeType(),
