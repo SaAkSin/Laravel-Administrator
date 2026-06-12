@@ -3,20 +3,20 @@
 		<a href="{{route('admin_dashboard')}}">{{config('administrator.title')}}</a>
 	</h1>
 
-	<a href="#" id="menu_button"><div></div></a>
-	<a href="#" id="filter_button" class="{{$configType === 'model' ? '' : 'hidden'}}"><div></div></a>
+	<a href="#" id="menu_button" @click.prevent="mobileMenuOpen = !mobileMenuOpen; mobileFiltersOpen = false"><div></div></a>
+	<a href="#" id="filter_button" class="{{$configType === 'model' ? '' : 'hidden'}}" @click.prevent="mobileFiltersOpen = !mobileFiltersOpen; mobileMenuOpen = false"><div></div></a>
 
-	<div id="mobile_menu_wrapper">
+	<div id="mobile_menu_wrapper" x-show="mobileMenuOpen" x-cloak>
 		<ul id="mobile_menu">
 			@foreach ($menu as $key => $item)
-				@include('administrator::partials.menu_item')
+				@include('administrator::partials.menu_item', ['isMobile' => true])
 			@endforeach
 		</ul>
 	</div>
 
 	<ul id="menu">
 		@foreach ($menu as $key => $item)
-			@include('administrator::partials.menu_item')
+			@include('administrator::partials.menu_item', ['isMobile' => false])
 		@endforeach
 	</ul>
 	<div id="right_nav">

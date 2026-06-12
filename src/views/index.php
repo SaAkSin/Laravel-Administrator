@@ -75,12 +75,12 @@
 
 	<!-- 2. 실제 데이터 렌더링 영역 (인스턴스 초기 구성이 완비되면 페이드인 노출) -->
 	<div x-show="initialized" x-cloak class="fade-in-content" style="display: none; width: 100%;" :style="initialized ? 'display: flex !important;' : 'display: none !important;'">
-		<div id="sidebar">
+		<div id="sidebar" :class="{ 'shown': mobileFiltersOpen }">
 			<div class="panel sidebar_section" id="filters_sidebar_section">
 				<?php echo view("administrator::templates.filters")?>
 			</div>
 		</div>
-		<div id="content">
+		<div id="content" :class="{ 'hidden': mobileFiltersOpen }">
 			<?php echo view("administrator::templates.admin", array('config' => $config))?>
 		</div>
 	</div>

@@ -63,7 +63,7 @@ export class AdminController {
     public itemLink: string | null = null;
     public autocompleteData: Record<string, any> = {};
     public columnHidePoints: Record<number, number> = {};
-    public dataTableScrollable = false;
+    public dataTableScrollable = true;
     public historyStarted = false;
     public showFilters = true;
 
@@ -1355,31 +1355,8 @@ export class AdminController {
     }
 
     private resizeDataTable(): void {
-        const winWidth = window.innerWidth;
-        const tableContainer = document.querySelector('div.table_container') as HTMLElement | null;
-        const dataTable = tableContainer ? tableContainer.querySelector('table.results') as HTMLElement | null : null;
-
-        if (!dataTable || !tableContainer) return;
-
-        this.columns.forEach((col, i) => {
-            const hidePoint = this.columnHidePoints[i];
-            if (hidePoint && hidePoint < winWidth) {
-                col.visible = true;
-            }
+        this.columns.forEach((col) => {
+            col.visible = true;
         });
-
-        for (let i = this.columns.length - 1; i >= 2; i--) {
-            const containerWidth = tableContainer.offsetWidth;
-            const tableWidth = dataTable.offsetWidth;
-
-            if (this.columns.length >= 2 && dataTable.offsetWidth > 0 && containerWidth < tableWidth) {
-                if (i <= 1) return;
-                if (this.columns[i].visible) {
-                    this.columns[i].visible = false;
-                    this.columnHidePoints[i] = winWidth;
-                    break;
-                }
-            }
-        }
     }
 }

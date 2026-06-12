@@ -997,12 +997,13 @@ a {
   background: url(../img/filter-icon.png) no-repeat center center;
 }
 #wrapper header #mobile_menu_wrapper {
-  display: none;
   position: fixed;
   top: 36px;
   bottom: 0;
   left: 0;
   min-width: 300px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 #wrapper header #mobile_menu_wrapper .mobileMenuPadding {
   padding: 12px 14px;
@@ -1938,20 +1939,81 @@ a {
  * Media queries
  */
 @media only screen and (max-width: 949px) {
+  /* 모바일 토글 애니메이션 키프레임 정의 */
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes slideIn {
+    from {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes slideDown {
+    from {
+      transform: scaleY(0);
+      opacity: 0;
+    }
+    to {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+  }
+
+  /* 헤더 높이 확장 및 터치 타겟 최적화 */
+  #wrapper header {
+    height: 44px;
+  }
+  #wrapper header h1 a {
+    height: 44px;
+    line-height: 44px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
   #wrapper header a#menu_button,
   #wrapper header a#filter_button {
     display: inline-block;
+    padding: 4px 8px; /* 터치 타겟 확장 */
+  }
+  #wrapper header a#menu_button > div,
+  #wrapper header a#filter_button > div {
+    height: 36px;
   }
   #wrapper header ul#menu {
     display: none;
   }
+
+  /* 모바일 메뉴 래퍼 위치 조정 및 슬라이드인 애니메이션 */
+  #wrapper header #mobile_menu_wrapper {
+    top: 45px;
+    animation: slideInLeft 0.3s ease-out forwards;
+  }
+  
+  /* 아코디언 메뉴 애니메이션 */
+  #wrapper header #mobile_menu_wrapper ul#mobile_menu li.menu ul {
+    animation: slideDown 0.2s ease-out forwards;
+    transform-origin: top;
+  }
+
+  /* 사이드바 필터 위치 조정 및 슬라이드인 애니메이션 */
   #wrapper div#sidebar {
     display: none;
     position: absolute;
     background: #fff;
     z-index: 830;
     margin: 0;
-    top: 36px;
+    top: 45px;
     left: 0;
     right: 0;
     width: auto;
@@ -1960,12 +2022,18 @@ a {
   }
   #wrapper div#sidebar.shown {
     display: block;
+    animation: slideIn 0.3s ease-out forwards;
   }
   #wrapper #content.hidden {
     display: none;
   }
   #wrapper #content div.table_container {
     margin-right: 0 !important;
+  }
+  
+  /* 가로 스크롤 레이아웃 깨짐 방지 */
+  #admin_page #content div.table_container div.results_header div.action_message {
+    margin-left: 0 !important;
   }
   #wrapper #content div.item_edit_container {
     left: 0;

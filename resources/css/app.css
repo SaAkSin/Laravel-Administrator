@@ -602,5 +602,26 @@ table.results td {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
 }
 
+/* =========================================================================
+ * 📱 모바일 다단계 아코디언 메뉴 활성화 스타일 (Zero-!important)
+ * =========================================================================
+ * Alpine.js 클래스 바인딩(.shown)을 활용하여, CSS specificity(우선순위 점수)를 
+ * 높임으로써 !important 남용 없이 모바일 서브메뉴의 display: block을 완벽히 보장합니다.
+ */
+#wrapper header #mobile_menu_wrapper ul#mobile_menu li.menu ul.shown {
+    display: block;
+}
+
+/* =========================================================================
+ * 📱 모바일 및 태블릿용 Edit Form 패딩 최적화
+ * =========================================================================
+ * 모바일 화면의 좁은 가용 폭을 확보하기 위해 왼쪽 패딩 여백을 27px -> 8px 로 축소합니다.
+ */
+@media only screen and (max-width: 949px) {
+    #admin_page #content div.item_edit_container div.item_edit {
+        padding-left: 8px !important;
+    }
+}
+
 
 
