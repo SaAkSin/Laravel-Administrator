@@ -692,15 +692,31 @@ class Factory {
 	{
 		$query->whereIn($relatedKeyTable, $selectedItems);
 
-		//if this is a BelongsToMany and a sort field is set, order it by the sort field
+		$model = $query->getModel();
+
+		// BelongsToMany 관계이고 정렬 필드가 지정된 경우 해당 필드로 정렬 (가상 필드 검사)
 		if ($fieldObject->getOption('multiple_values') && $fieldObject->getOption('sort_field'))
 		{
-			$query->orderBy($fieldObject->getOption('sort_field'));
+			$sortField = $fieldObject->getOption('sort_field');
+			$isAccessor = method_exists($model, 'hasGetMutator') && $model->hasGetMutator($sortField);
+			$isNewAttribute = method_exists($model, 'hasAttributeMutator') && $model->hasAttributeMutator($sortField);
+			
+			if (!$isAccessor && !$isNewAttribute && !method_exists($model, $sortField))
+			{
+				$query->orderBy($sortField);
+			}
 		}
-		//otherwise order it by the name field
+		// 그렇지 않은 경우 name_field로 정렬 (가상 필드 검사하여 에러 방지)
 		else
 		{
-			$query->orderBy($fieldObject->getOption('name_field'));
+			$nameField = $fieldObject->getOption('name_field');
+			$isAccessor = method_exists($model, 'hasGetMutator') && $model->hasGetMutator($nameField);
+			$isNewAttribute = method_exists($model, 'hasAttributeMutator') && $model->hasAttributeMutator($nameField);
+			
+			if (!$isAccessor && !$isNewAttribute && !method_exists($model, $nameField))
+			{
+				$query->orderBy($nameField);
+			}
 		}
 	}
 

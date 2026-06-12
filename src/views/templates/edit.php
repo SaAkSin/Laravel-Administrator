@@ -452,7 +452,6 @@
 										   class="combobox-search-input" 
 										   placeholder="검색어를 입력하세요..." 
 										   x-model="search"
-										   @input="if (field.autocomplete) fetchAutocomplete()"
 										   @keydown.up.prevent="moveFocus(-1)"
 										   @keydown.down.prevent="moveFocus(1)"
 										   @keydown.enter.prevent="selectFocused()"

@@ -70,6 +70,7 @@ export class AdminController {
     // 객체 지향 캡슐화 인스턴스
     private apiService!: AdminApiService;
     private editorContext: EditorContext;
+    private selfProxy: any = null;
 
     // Alpine.js 매직 헬퍼 참조용 선언
     private $watch!: (path: string, callback: (val: any) => void) => void;
@@ -83,6 +84,16 @@ export class AdminController {
         Object.keys(defaultModel).forEach(key => {
             (this as any)[key] = defaultModel[key];
         });
+
+        // 모든 edit_fields를 생성자 시점에 미리 정의하여 완벽한 반응형 속성(reactivity)을 보장합니다.
+        const editFields = (window.adminData && window.adminData.edit_fields) || [];
+        const fieldsArray = Array.isArray(editFields) ? editFields : Object.values(editFields);
+        fieldsArray.forEach((field: any) => {
+            if (field && field.field_name && !(field.field_name in this)) {
+                const isMultiple = field.type === 'belongs_to_many' || field.type === 'has_many' || !!field.multiple_values;
+                (this as any)[field.field_name] = isMultiple ? [] : '';
+            }
+        });
     }
 
     get isFirstPage(): boolean {
@@ -94,6 +105,10 @@ export class AdminController {
     }
 
     public init(): void {
+        const el = document.getElementById('admin_page');
+        this.selfProxy = el && (window as any).Alpine ? (window as any).Alpine.$data(el) : this;
+        console.log('[디버그] AdminController init 호출됨. selfProxy 설정됨 (Alpine.$data):', this.selfProxy !== this);
+
         if (!window.adminData) {
             console.error('글로벌 adminData 객체를 찾을 수 없습니다.');
             return;
@@ -525,49 +540,50 @@ export class AdminController {
     }
 
     public async getItem(id: any): Promise<void> {
-        this.loadingItem = true;
+        const self = this.selfProxy || this;
+        self.loadingItem = true;
 
-        window.adminData.edit_fields = this.originalEditFields;
-        this.editFields = this.prepareEditFields(this.originalEditFields);
+        window.adminData.edit_fields = self.originalEditFields;
+        self.editFields = self.prepareEditFields(self.originalEditFields);
 
-        this.holdConstraintsQueue = true;
+        self.holdConstraintsQueue = true;
 
         const defaultModel = window.adminData.data_model || {};
         Object.keys(defaultModel).forEach(key => {
-            (this as any)[key] = defaultModel[key];
+            (self as any)[key] = defaultModel[key];
         });
-        this.originalData = {};
+        self.originalData = {};
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         if (!id) {
-            this.setUpNewItem();
+            self.setUpNewItem();
             return;
         }
 
-        this.freezeConstraints = true;
-        this.itemLoadingId = id;
+        self.freezeConstraints = true;
+        self.itemLoadingId = id;
 
-        const url = `${window.base_url}${this.modelName}/${id}`;
+        const url = `${window.base_url}${self.modelName}/${id}`;
 
         try {
-            const data = await this.apiService.request<any>(url);
+            const data = await self.apiService.request<any>(url);
 
             if (data.success === false && data.errors) {
                 alert(data.errors);
                 return;
             }
 
-            if (this.itemLoadingId !== id) {
-                if (this.itemLoadingId === null) {
-                    this.loadingItem = false;
-                    this.clearItem();
+            if (self.itemLoadingId !== id) {
+                if (self.itemLoadingId === null) {
+                    self.loadingItem = false;
+                    self.clearItem();
                 }
             } else {
-                this.setData(data);
+                self.setData(data);
             }
         } catch (error) {
-            this.loadingItem = false;
+            self.loadingItem = false;
             console.error('[어드민 에러] 상세 조회 실패:', error);
             alert('데이터를 가져오는 중 오류가 발생했습니다.');
         }
@@ -585,88 +601,89 @@ export class AdminController {
     }
 
     private setData(data: any): void {
-        this.activeItem = data[this.primaryKey];
-        this.loadingItem = false;
+        const self = this.selfProxy || this;
+        self.activeItem = data[self.primaryKey];
+        self.loadingItem = false;
 
         window.adminData.edit_fields = data.administrator_edit_fields || [];
-        this.editFields = this.prepareEditFields(window.adminData.edit_fields);
+        self.editFields = self.prepareEditFields(window.adminData.edit_fields);
 
-        if (this.editFields) {
-            this.editFields.forEach(field => {
-                if (field && field.field_name && !(field.field_name in this)) {
-                    (this as any)[field.field_name] = field.type === 'belongs_to_many' || field.type === 'has_many' ? [] : '';
+        if (self.editFields) {
+            self.editFields.forEach(field => {
+                if (field && field.field_name && !(field.field_name in self)) {
+                    (self as any)[field.field_name] = field.type === 'belongs_to_many' || field.type === 'has_many' ? [] : '';
                 }
             });
         }
 
-        this.actions = data.administrator_actions || [];
-        this.actionPermissions = data.administrator_action_permissions || {};
+        self.actions = data.administrator_actions || [];
+        self.actionPermissions = data.administrator_action_permissions || {};
 
-        this.originalData = data;
+        self.originalData = data;
 
         const fields = window.adminData.edit_fields || [];
         const fieldsArray = Array.isArray(fields) ? fields : Object.values(fields);
         fieldsArray.forEach(el => {
             if (el && el.relationship && el.autocomplete) {
                 const autoKey = el.field_name + '_autocomplete';
-                this.autocompleteData[autoKey] = data[autoKey] || {};
+                self.autocompleteData[autoKey] = data[autoKey] || {};
             }
         });
 
         if (data.admin_item_link) {
-            this.itemLink = data.admin_item_link;
+            self.itemLink = data.admin_item_link;
         }
 
-        this.lastItem = data[this.primaryKey];
+        self.lastItem = data[self.primaryKey];
 
         const defaultModel = window.adminData.data_model || {};
         Object.keys(defaultModel).forEach(key => {
-            (this as any)[key] = defaultModel[key];
+            (self as any)[key] = defaultModel[key];
         });
 
         Object.keys(data).forEach(key => {
-            const isField = key in defaultModel || key === this.primaryKey || (this.editFields && this.editFields.some(f => f.field_name === key));
+            const isField = key in defaultModel || key === self.primaryKey || (self.editFields && self.editFields.some(f => f.field_name === key));
             if (isField) {
-                (this as any)[key] = data[key];
+                (self as any)[key] = data[key];
             }
         });
 
-        if (this.editFields) {
-            this.editFields.forEach((field, ind) => {
+        if (self.editFields) {
+            self.editFields.forEach((field, ind) => {
                 if (field && field.relationship) {
                     const optKey = field.field_name + '_options';
                     if (data[optKey]) {
-                        this.listOptions['edit_' + field.field_name] = data[optKey] || [];
-                        this.listOptions[field.field_name] = data[optKey] || [];
-                        this.listOptions[ind] = data[optKey] || [];
+                        self.listOptions['edit_' + field.field_name] = data[optKey] || [];
+                        self.listOptions[field.field_name] = data[optKey] || [];
+                        self.listOptions[ind] = data[optKey] || [];
                     }
                 }
             });
         }
         
-        if (this.editFields) {
-            this.editFields.forEach(field => {
-                if (field && field.field_name && (this as any)[field.field_name]) {
-                    let val = String((this as any)[field.field_name]);
+        if (self.editFields) {
+            self.editFields.forEach(field => {
+                if (field && field.field_name && (self as any)[field.field_name]) {
+                    let val = String((self as any)[field.field_name]);
                     if (field.type === 'datetime') {
                         val = val.replace(' ', 'T');
                         if (val.length > 16) {
                             val = val.substring(0, 16);
                         }
-                        (this as any)[field.field_name] = val;
+                        (self as any)[field.field_name] = val;
                     } else if (field.type === 'time') {
                         if (val.length > 5) {
                             val = val.substring(0, 5);
                         }
-                        (this as any)[field.field_name] = val;
+                        (self as any)[field.field_name] = val;
                     }
                 }
             });
         }
 
-        this.freezeConstraints = false;
-        this.resizePage();
-        this.runConstraintsQueue();
+        self.freezeConstraints = false;
+        self.resizePage();
+        self.runConstraintsQueue();
     }
 
     public closeItem(): void {
