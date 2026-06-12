@@ -6,7 +6,32 @@
  * 데이터 바인딩 동작만 Alpine.js 지시어로 안전하게 포팅했습니다.
  */
 ?>
-<div class="table_container" :style="{ marginRight: (activeItem !== null || loadingItem) ? (expandWidth + 5) + 'px' : '290px' }">
+<div class="table_container" 
+	 :style="{ marginRight: (activeItem !== null || loadingItem) ? (expandWidth + 5) + 'px' : '290px' }"
+	 x-data="{
+		tbodyHeight: 0,
+		tbodyWidth: 0,
+		tbodyTop: 0
+	 }"
+	 x-init="
+		const updateDims = () => {
+			const tbody = $el.querySelector('tbody');
+			if (tbody) {
+				tbodyHeight = tbody.offsetHeight;
+				tbodyWidth = tbody.offsetWidth;
+				tbodyTop = tbody.offsetTop;
+			}
+		};
+		$watch('loadingRows', value => {
+			if (value) {
+				$nextTick(() => updateDims());
+			}
+		});
+		$watch('rows', () => {
+			$nextTick(() => updateDims());
+		});
+		window.addEventListener('resize', () => updateDims());
+	">
 
 	<div class="results_header">
 		<h2 x-text="modelTitle"></h2>
@@ -100,7 +125,18 @@
 	</table>
 
 	<!-- 로딩창 -->
-	<div class="loading_rows" x-show="loadingRows">
+	<div class="loading_rows" 
+		 x-show="loadingRows"
+		 :style="{
+			 position: 'absolute',
+			 top: tbodyTop + 'px',
+			 left: '0px',
+			 width: tbodyWidth + 'px',
+			 height: tbodyHeight + 'px',
+			 right: 'auto',
+			 bottom: 'auto',
+			 display: loadingRows ? 'flex' : 'none'
+		 }">
 		<div class="loading_spinner_wrapper">
 			<div class="loading_spinner"></div>
 			<div class="loading_text"><?php echo trans('administrator::administrator.loading') ?></div>

@@ -42,13 +42,106 @@
 				</select>
 			</template>
 
-			<!-- 4. enum (Zero-jQuery 순수 Alpine.js 셀렉트) -->
-			<template x-if="filter.type === 'enum'">
-				<select x-model="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
-					<template x-for="opt in filter.options" :key="opt.id">
-						<option :value="opt.id" x-text="opt.text || opt.name" :selected="opt.id == filter.value"></option>
-					</template>
-				</select>
+			<!-- 4. enum -->
+			<template x-if="initialized && filter.type === 'enum'">
+				<div class="relative w-full"
+					 x-data="relationSelect({ field: filter, type: 'filter', multiple: false, autocomplete: false, filterIndex: index })"
+					 style="position: relative; width: 225px; box-sizing: border-box;">
+					
+					<div class="relation-combobox-wrapper" :class="{ 'open': open }" @click.away="open = false" style="position: relative; width: 100%;">
+						
+						<!-- 단일/다중 통합 프리미엄 콤보박스 컨테이너 -->
+						<div class="combobox-container" 
+							 :class="{ 'open': open }"
+							 style="position: relative; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: border-color 0.15s ease, box-shadow 0.15s ease; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;">
+							
+							<!-- 상단 값 노출/트리거 행 -->
+							<div class="combobox-value-row" 
+								 @click="open = !open"
+								 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
+								
+								<!-- 선택된 값 또는 플레이스홀더 표시 (선택되지 않았을 때는 빈 값으로 출력) -->
+								<span class="selected-text" 
+									  x-text="(selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : ''" 
+									  :style="{
+										  fontSize: '12px',
+										  color: (selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? '#1f2937' : '#9ca3af',
+										  whiteSpace: 'nowrap',
+										  overflow: 'hidden',
+										  textOverflow: 'ellipsis',
+										  maxWidth: 'calc(100% - 70px)'
+									  }"></span>
+								
+								<!-- 우측 액션 영역 -->
+								<div class="value-actions" style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+									<!-- 값 초기화 x 버튼 -->
+									<span class="clear-btn" 
+										  x-show="selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null" 
+										  @click.stop="clearSelection()"
+										  style="color: #9ca3af; font-size: 16px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.1s ease; outline: none; display: inline-block;">×</span>
+									
+									<!-- 그라데이션 화살표 인디케이터 -->
+									<span class="arrow-indicator" 
+										  :class="{ 'button-style': !open }"
+										  style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px;">
+										<svg xmlns="http://www.w3.org/2000/svg" class="arrow-svg" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="#475569" stroke-width="2.5" style="width: 11px; height: 11px; transition: transform 0.2s ease; transform-origin: center;">
+											<path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+										</svg>
+									</span>
+								</div>
+							</div>
+							
+							<!-- 하단 검색 입력창 행 (open 일 때만 렌더링/노출) -->
+							<div class="combobox-search-row" 
+								 x-show="open" 
+								 style="border-top: 1px solid #edf2f7; padding: 6px 10px; background-color: #f8fafc; box-sizing: border-box; display: flex; align-items: center; position: relative;">
+								
+								<input type="text" 
+									   class="combobox-search-input" 
+									   placeholder="검색어를 입력하세요..." 
+									   x-model="search"
+									   @keydown.up.prevent="moveFocus(-1)"
+									   @keydown.down.prevent="moveFocus(1)"
+									   @keydown.enter.prevent="selectFocused()"
+									   x-ref="searchInput"
+									   style="width: 100% !important; height: 26px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 2px 28px 2px 8px !important; font-size: 12px !important; box-sizing: border-box !important; outline: none !important; background-color: #ffffff !important;" />
+								
+								<!-- 돋보기 아이콘 -->
+								<svg xmlns="http://www.w3.org/2000/svg" 
+									 class="search-icon-svg" 
+									 fill="none" 
+									 viewBox="0 0 24 24" 
+									 stroke="#9ca3af" 
+									 stroke-width="2.5" 
+									 style="width: 13px; height: 13px; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+								</svg>
+							</div>
+						</div>
+						
+						<!-- 모던 드롭다운 옵션 보드 -->
+						<div class="combobox-dropdown" 
+							 x-show="open" 
+							 style="position: absolute; left: 0; right: 0; top: 100%; z-index: 9999; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.08); max-height: 180px; overflow-y: auto; margin-top: 4px; box-sizing: border-box; padding: 4px 0; width: 100%;">
+							
+							<div class="options-list" x-ref="optionsList">
+								<!-- 검색 결과 없음 -->
+								<template x-if="filteredOptions.length === 0">
+									<div style="padding: 10px 14px; color: #9ca3af; font-size: 12px; text-align: center;">결과 없음</div>
+								</template>
+								
+								<template x-for="(opt, index) in filteredOptions" :key="opt.id">
+									<div @click="selectItem(opt)" 
+										 class="combobox-option-item"
+										 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)), 'focus-active': index === focusedIndex }"
+										 x-text="opt.text || opt.name"
+										 :style="index === focusedIndex ? 'background-color: #f1f5f9; color: #1e293b;' : ''">
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
+				</div>
 			</template>
 
 			<!-- 5. date, time, datetime (네이티브 피커 혹은 슬림 플랫) -->

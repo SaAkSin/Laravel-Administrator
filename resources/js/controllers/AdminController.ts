@@ -80,7 +80,7 @@ export class AdminController {
         this.editorContext = new EditorContext();
 
         // Laravel의 기본 모델 속성들을 주입받을 수 있도록 최상위 데이터 로드 설정
-        const defaultModel = (window.adminData && window.adminData.data_model) || {};
+        const defaultModel = (window.adminData && (window.adminData.data_model || window.adminData.data)) || {};
         Object.keys(defaultModel).forEach(key => {
             (this as any)[key] = defaultModel[key];
         });
@@ -102,6 +102,10 @@ export class AdminController {
 
     get isLastPage(): boolean {
         return parseInt(this.pagination.page as any) === parseInt(this.pagination.last as any);
+    }
+
+    get settingsTitle(): string {
+        return this.modelTitle;
     }
 
     public init(): void {
@@ -389,6 +393,58 @@ export class AdminController {
             event.target.value = '';
             console.error('[어드민 에러] 파일 업로드 실패:', error);
             alert('파일 업로드 중 네트워크 오류가 발생했습니다.');
+        }
+    };
+
+    public save = async (event?: any): Promise<void> => {
+        const self = this.selfProxy || this;
+        const saveData: Record<string, any> = {};
+
+        self.editFields.forEach(field => {
+            if (field && field.field_name) {
+                let val = (self as any)[field.field_name];
+                if (Array.isArray(val)) {
+                    val = val.join(',');
+                }
+                saveData[field.field_name] = val;
+            }
+        });
+
+        saveData._token = window.csrf || (window.adminData && window.adminData.csrf);
+
+        self.statusMessage = self.languages['saving'] || 'Saving...';
+        self.statusMessageType = '';
+        self.freezeForm = true;
+
+        const url = window.save_url || `${window.base_url}${self.modelName}/save`;
+
+        try {
+            const response = await self.apiService.request<any>(url, {
+                method: 'POST',
+                data: saveData
+            });
+
+            self.freezeForm = false;
+
+            if (response.success) {
+                const savedMsg = self.languages['saved'] || 'Settings saved.';
+                self.statusMessage = savedMsg;
+                self.statusMessageType = 'success';
+                
+                setTimeout(() => {
+                    if (self.statusMessage === savedMsg) {
+                        self.statusMessage = '';
+                        self.statusMessageType = '';
+                    }
+                }, 3000);
+            } else {
+                self.statusMessage = response.errors || 'Save failed';
+                self.statusMessageType = 'error';
+            }
+        } catch (error) {
+            self.freezeForm = false;
+            self.statusMessage = 'A network error occurred.';
+            self.statusMessageType = 'error';
         }
     };
 
