@@ -393,16 +393,17 @@ export class AdminController {
     };
 
     public saveItem = async (): Promise<void> => {
+        const self = this.selfProxy || this;
         const saveData: Record<string, any> = {};
-        const modelKeys = Object.keys(window.adminData.data_model || {});
-        
-        modelKeys.forEach(key => {
-            saveData[key] = (this as any)[key];
+
+        const fields = window.adminData.data_model || {};
+        Object.keys(fields).forEach(key => {
+            saveData[key] = (self as any)[key];
         });
 
-        this.editFields.forEach(field => {
+        self.editFields.forEach(field => {
             if (field && field.field_name) {
-                let val = (this as any)[field.field_name];
+                let val = (self as any)[field.field_name];
                 if (Array.isArray(val)) {
                     val = val.join(',');
                 }
@@ -412,119 +413,120 @@ export class AdminController {
 
         saveData._token = window.csrf || (window.adminData && window.adminData.csrf);
 
-        if (!saveData[this.primaryKey]) {
-            delete saveData[this.primaryKey];
+        if (!saveData[self.primaryKey]) {
+            delete saveData[self.primaryKey];
         }
 
-        this.editFields.forEach(field => {
+        self.editFields.forEach(field => {
             if (field.relationship && !field.external && saveData[field.field_name] === '') {
                 saveData[field.field_name] = false;
             }
         });
 
-        this.statusMessage = this.languages['saving'] || 'Saving...';
-        this.statusMessageType = '';
-        this.freezeForm = true;
+        self.statusMessage = self.languages['saving'] || 'Saving...';
+        self.statusMessageType = '';
+        self.freezeForm = true;
 
-        const url = `${window.base_url}${this.modelName}/${(this as any)[this.primaryKey] || 0}/save`;
+        const url = `${window.base_url}${self.modelName}/${(self as any)[self.primaryKey] || 0}/save`;
 
         try {
-            const response = await this.apiService.request<any>(url, {
+            const response = await self.apiService.request<any>(url, {
                 method: 'POST',
                 data: saveData
             });
 
-            this.freezeForm = false;
-            this.resizePage();
+            self.freezeForm = false;
+            self.resizePage();
 
             if (response.success) {
-                const savedMsg = this.languages['saved'] || 'Item saved.';
-                this.statusMessage = savedMsg;
-                this.statusMessageType = 'success';
+                const savedMsg = self.languages['saved'] || 'Item saved.';
+                self.statusMessage = savedMsg;
+                self.statusMessageType = 'success';
                 
                 setTimeout(() => {
-                    if (this.statusMessage === savedMsg) {
-                        this.statusMessage = '';
-                        this.statusMessageType = '';
+                    if (self.statusMessage === savedMsg) {
+                        self.statusMessage = '';
+                        self.statusMessageType = '';
                     }
                 }, 3000);
                 
-                this.freezeUpdateRows = true;
+                self.freezeUpdateRows = true;
                 
-                this.setData(response.data);
-                await this.updateSelfRelationships();
+                self.setData(response.data);
+                await self.updateSelfRelationships();
                 
                 setTimeout(async () => {
-                    this.freezeUpdateRows = false;
-                    await this.updateRows();
+                    self.freezeUpdateRows = false;
+                    await self.updateRows();
                 }, 50);
 
                 setTimeout(() => {
                     if (window.History && window.History.pushState) {
-                        window.History.pushState({ modelName: this.modelName }, null, window.route + this.modelName);
+                        window.History.pushState({ modelName: self.modelName }, null, window.route + self.modelName);
                     }
                 }, 200);
             } else {
-                this.statusMessage = response.errors || 'Save failed';
-                this.statusMessageType = 'error';
+                self.statusMessage = response.errors || 'Save failed';
+                self.statusMessageType = 'error';
             }
         } catch (error) {
-            this.freezeForm = false;
-            this.statusMessage = 'A network error occurred.';
-            this.statusMessageType = 'error';
-            this.resizePage();
+            self.freezeForm = false;
+            self.statusMessage = 'A network error occurred.';
+            self.statusMessageType = 'error';
+            self.resizePage();
         }
     };
 
     public deleteItem = async (): Promise<boolean | void> => {
-        const conf = confirm(this.languages['delete_active_item'] || 'Are you sure you want to delete this item?');
+        const self = this.selfProxy || this;
+        const conf = confirm(self.languages['delete_active_item'] || 'Are you sure you want to delete this item?');
         if (!conf) return false;
 
-        this.statusMessage = this.languages['deleting'] || 'Deleting...';
-        this.statusMessageType = '';
-        this.freezeForm = true;
+        self.statusMessage = self.languages['deleting'] || 'Deleting...';
+        self.statusMessageType = '';
+        self.freezeForm = true;
 
-        const url = `${window.base_url}${this.modelName}/${(this as any)[this.primaryKey]}/delete`;
+        const url = `${window.base_url}${self.modelName}/${(self as any)[self.primaryKey]}/delete`;
 
         try {
-            const response = await this.apiService.request<any>(url, {
+            const response = await self.apiService.request<any>(url, {
                 method: 'POST',
                 data: { _token: window.csrf || (window.adminData && window.adminData.csrf) }
             });
 
-            this.freezeForm = false;
-            this.resizePage();
+            self.freezeForm = false;
+            self.resizePage();
 
             if (response.success) {
-                const deletedMsg = this.languages['deleted'] || 'Item deleted.';
-                this.statusMessage = deletedMsg;
-                this.statusMessageType = 'success';
+                const deletedMsg = self.languages['deleted'] || 'Item deleted.';
+                self.statusMessage = deletedMsg;
+                self.statusMessageType = 'success';
                 
                 setTimeout(() => {
-                    if (this.statusMessage === deletedMsg) {
-                        this.statusMessage = '';
-                        this.statusMessageType = '';
+                    if (self.statusMessage === deletedMsg) {
+                        self.statusMessage = '';
+                        self.statusMessageType = '';
                     }
                 }, 3000);
                 
-                await this.updateRows();
-                await this.updateSelfRelationships();
+                await self.updateRows();
+                await self.updateSelfRelationships();
 
                 setTimeout(() => {
-                    this.clearItem();
+                    self.clearItem();
                     if (window.History && window.History.pushState) {
-                        window.History.pushState({ modelName: this.modelName }, null, window.route + this.modelName);
+                        window.History.pushState({ modelName: self.modelName }, null, window.route + self.modelName);
                     }
                 }, 500);
             } else {
-                this.statusMessage = response.error || 'Delete failed';
-                this.statusMessageType = 'error';
+                self.statusMessage = response.error || 'Delete failed';
+                self.statusMessageType = 'error';
             }
         } catch (error) {
-            this.freezeForm = false;
-            this.statusMessage = 'A network error occurred.';
-            this.statusMessageType = 'error';
-            this.resizePage();
+            self.freezeForm = false;
+            self.statusMessage = 'A network error occurred.';
+            self.statusMessageType = 'error';
+            self.resizePage();
         }
     };
 
@@ -709,6 +711,7 @@ export class AdminController {
     }
 
     public customAction = async (isItem: boolean, action: string, messages: any, confirmation: string, reload: boolean): Promise<boolean | void> => {
+        const self = this.selfProxy || this;
         const data: Record<string, any> = {
             _token: window.csrf || (window.adminData && window.adminData.csrf),
             action_name: action
@@ -720,49 +723,49 @@ export class AdminController {
         }
 
         if (isItem) {
-            url = `${window.base_url}${this.modelName}/${(this as any)[this.primaryKey]}/custom_action`;
-            this.statusMessage = messages.active || 'Performing action...';
-            this.statusMessageType = '';
+            url = `${window.base_url}${self.modelName}/${(self as any)[self.primaryKey]}/custom_action`;
+            self.statusMessage = messages.active || 'Performing action...';
+            self.statusMessageType = '';
         } else {
-            url = `${window.base_url}${this.modelName}/custom_action`;
-            data.sortOptions = this.sortOptions;
-            data.filters = this.getFilters();
-            data.page = this.pagination.page;
-            this.globalStatusMessage = messages.active || 'Performing action...';
-            this.globalStatusMessageType = '';
+            url = `${window.base_url}${self.modelName}/custom_action`;
+            data.sortOptions = self.sortOptions;
+            data.filters = self.getFilters();
+            data.page = self.pagination.page;
+            self.globalStatusMessage = messages.active || 'Performing action...';
+            self.globalStatusMessageType = '';
         }
 
-        this.freezeForm = true;
+        self.freezeForm = true;
 
         try {
-            const response = await this.apiService.request<any>(url, {
+            const response = await self.apiService.request<any>(url, {
                 method: 'POST',
                 data: data
             });
 
-            this.freezeForm = false;
+            self.freezeForm = false;
 
             if (response.success) {
                 const actionSuccessMsg = messages.success || 'Action completed';
                 if (isItem) {
-                    this.statusMessage = actionSuccessMsg;
-                    this.statusMessageType = 'success';
-                    this.setData(response.data);
+                    self.statusMessage = actionSuccessMsg;
+                    self.statusMessageType = 'success';
+                    self.setData(response.data);
                     
                     setTimeout(() => {
-                        if (this.statusMessage === actionSuccessMsg) {
-                            this.statusMessage = '';
-                            this.statusMessageType = '';
+                        if (self.statusMessage === actionSuccessMsg) {
+                            self.statusMessage = '';
+                            self.statusMessageType = '';
                         }
                     }, 3000);
                 } else {
-                    this.globalStatusMessage = actionSuccessMsg;
-                    this.globalStatusMessageType = 'success';
+                    self.globalStatusMessage = actionSuccessMsg;
+                    self.globalStatusMessageType = 'success';
                     
                     setTimeout(() => {
-                        if (this.globalStatusMessage === actionSuccessMsg) {
-                            this.globalStatusMessage = '';
-                            this.globalStatusMessageType = '';
+                        if (self.globalStatusMessage === actionSuccessMsg) {
+                            self.globalStatusMessage = '';
+                            self.globalStatusMessageType = '';
                         }
                     }, 3000);
                 }
@@ -774,32 +777,32 @@ export class AdminController {
                 }
 
                 if (response.download) {
-                    this.downloadFile(response.download);
+                    self.downloadFile(response.download);
                 }
 
-                await this.updateRows();
+                await self.updateRows();
 
                 if (reload) {
-                    this.page(this.pagination.page);
+                    self.page(self.pagination.page);
                 }
             } else {
                 if (isItem) {
-                    this.statusMessage = response.error || '작업 실패';
-                    this.statusMessageType = 'error';
+                    self.statusMessage = response.error || '작업 실패';
+                    self.statusMessageType = 'error';
                 } else {
-                    this.globalStatusMessage = response.error || '작업 실패';
-                    this.globalStatusMessageType = 'error';
+                    self.globalStatusMessage = response.error || '작업 실패';
+                    self.globalStatusMessageType = 'error';
                 }
             }
         } catch (error) {
-            this.freezeForm = false;
+            self.freezeForm = false;
             const errText = '오류가 발생했습니다.';
             if (isItem) {
-                this.statusMessage = errText;
-                this.statusMessageType = 'error';
+                self.statusMessage = errText;
+                self.statusMessageType = 'error';
             } else {
-                this.globalStatusMessage = errText;
-                this.globalStatusMessageType = 'error';
+                self.globalStatusMessage = errText;
+                self.globalStatusMessageType = 'error';
             }
         }
     };
@@ -819,47 +822,60 @@ export class AdminController {
     }
 
     public updateRows = async (): Promise<void> => {
-        if (this.freezeUpdateRows) return;
+        const self = this.selfProxy || this;
+        console.log('[디버그] updateRows 진입. rowLoadingId:', self.rowLoadingId, 'initialized:', self.initialized, 'freezeUpdateRows:', self.freezeUpdateRows);
+        if (self.freezeUpdateRows) return;
 
-        const id = ++this.rowLoadingId;
+        const id = ++self.rowLoadingId;
         const data = {
             _token: window.csrf || (window.adminData && window.adminData.csrf),
-            sortOptions: this.sortOptions,
-            filters: this.getFilters(),
-            page: this.pagination.page
+            sortOptions: self.sortOptions,
+            filters: self.getFilters(),
+            page: self.pagination.page
         };
 
-        if (!this.initialized) return;
+        if (!self.initialized) return;
 
         if (!data.page) {
             data.page = 1;
         }
 
-        this.loadingRows = true;
+        self.setLoadingRows(true);
 
-        const url = `${window.base_url}${this.modelName}/results`;
+        const url = `${window.base_url}${self.modelName}/results`;
 
         try {
-            const response = await this.apiService.request<any>(url, {
+            const response = await self.apiService.request<any>(url, {
                 method: 'POST',
                 data: data
             });
 
-            if (this.rowLoadingId !== id) {
+            if (self.rowLoadingId !== id) {
+                console.log('[디버그] rowLoadingId 불일치로 갱신 스킵. rowLoadingId:', self.rowLoadingId, 'id:', id);
                 return;
             }
 
-            this.pagination.page = parseInt(response.last ? response.page : response.last) || 1;
-            this.pagination.last = parseInt(response.last) || 1;
-            this.pagination.total = parseInt(response.total) || 0;
-            this.rows = response.results || [];
-            this.loadingRows = false;
+            self.applyRowsUpdate(response);
         } catch (error) {
-            if (this.rowLoadingId === id) {
-                this.loadingRows = false;
+            console.error('[디버그] updateRows API 요청 실패:', error);
+            if (self.rowLoadingId === id) {
+                self.setLoadingRows(false);
             }
         }
     };
+
+    public applyRowsUpdate(response: any): void {
+        this.pagination.page = parseInt(response.last ? response.page : response.last) || 1;
+        this.pagination.last = parseInt(response.last) || 1;
+        this.pagination.total = parseInt(response.total) || 0;
+        this.rows = response.results || [];
+        this.loadingRows = false;
+        console.log('[디버그] applyRowsUpdate 완료. rows 개수:', this.rows.length);
+    }
+
+    public setLoadingRows(loading: boolean): void {
+        this.loadingRows = loading;
+    }
 
     public setSortOptions(field: string): boolean | void {
         let found = false;
@@ -915,9 +931,10 @@ export class AdminController {
     }
 
     public updateRowsPerPage = async (rows: number): Promise<void> => {
+        const self = this.selfProxy || this;
         const url = window.rows_per_page_url || '';
         try {
-            await this.apiService.request<any>(url, {
+            await self.apiService.request<any>(url, {
                 method: 'POST',
                 data: {
                     _token: window.csrf || (window.adminData && window.adminData.csrf),
@@ -927,7 +944,7 @@ export class AdminController {
         } catch (error) {
             console.error(error);
         } finally {
-            this.updateRows();
+            self.updateRows();
         }
     };
 
@@ -963,15 +980,16 @@ export class AdminController {
     }
 
     public updateSelfRelationships = async (): Promise<void> => {
-        const filterPromises = this.filters.map(async (filter, ind) => {
+        const self = this.selfProxy || this;
+        const filterPromises = self.filters.map(async (filter, ind) => {
             const fieldName = filter.field_name;
 
             if ((!filter.constraints || !filter.constraints.length) && filter.self_relationship) {
-                this.filters[ind].loadingOptions = true;
+                self.filters[ind].loadingOptions = true;
 
-                const url = `${window.base_url}${this.modelName}/update_options`;
+                const url = `${window.base_url}${self.modelName}/update_options`;
                 try {
-                    const response = await this.apiService.request<any>(url, {
+                    const response = await self.apiService.request<any>(url, {
                         method: 'POST',
                         data: {
                             fields: [{
@@ -982,40 +1000,40 @@ export class AdminController {
                         }
                     });
 
-                    this.listOptions['filter_' + fieldName] = response[fieldName];
+                    self.listOptions['filter_' + fieldName] = response[fieldName];
                 } catch (error) {
                     console.error(error);
                 } finally {
-                    this.filters[ind].loadingOptions = false;
+                    self.filters[ind].loadingOptions = false;
                 }
             }
         });
 
-        const fieldPromises = this.editFields.map(async (field, ind) => {
+        const fieldPromises = self.editFields.map(async (field, ind) => {
             const fieldName = field.field_name;
 
             if ((!field.constraints || !field.constraints.length) && field.self_relationship) {
-                this.editFields[ind].loadingOptions = true;
+                self.editFields[ind].loadingOptions = true;
 
-                const url = `${window.base_url}${this.modelName}/update_options`;
+                const url = `${window.base_url}${self.modelName}/update_options`;
                 try {
-                    const response = await this.apiService.request<any>(url, {
+                    const response = await self.apiService.request<any>(url, {
                         method: 'POST',
                         data: {
                             fields: [{
                                 type: 'edit',
                                 field: fieldName,
-                                selectedItems: (this as any)[fieldName]
+                                selectedItems: (self as any)[fieldName]
                             }]
                         }
                     });
 
-                    this.listOptions['edit_' + fieldName] = response[fieldName];
-                    this.listOptions[fieldName] = response[fieldName];
+                    self.listOptions['edit_' + fieldName] = response[fieldName];
+                    self.listOptions[fieldName] = response[fieldName];
                 } catch (error) {
                     console.error(error);
                 } finally {
-                    this.editFields[ind].loadingOptions = false;
+                    self.editFields[ind].loadingOptions = false;
                 }
             }
         });
@@ -1057,32 +1075,35 @@ export class AdminController {
     }
 
     private setConstrainerFreeze(key: string, freeze: boolean): void {
-        this.editFields.forEach((field, ind) => {
+        const self = this.selfProxy || this;
+        self.editFields.forEach((field, ind) => {
             if (field.field_name === key) {
-                this.editFields[ind].constraintLoading = freeze;
+                self.editFields[ind].constraintLoading = freeze;
             }
         });
     }
 
     private setFieldLoadingOptions(fieldName: string, type: boolean): void {
-        this.editFields.forEach((field, ind) => {
+        const self = this.selfProxy || this;
+        self.editFields.forEach((field, ind) => {
             if (field.field_name === fieldName) {
-                this.editFields[ind].loadingOptions = type;
+                self.editFields[ind].loadingOptions = type;
             }
         });
     }
 
     public runConstraintsQueue = async (): Promise<void> => {
-        const fields = this.buildConstraintsFromQueue();
+        const self = this.selfProxy || this;
+        const fields = self.buildConstraintsFromQueue();
 
         if (!fields.length) return;
 
-        this.freezeActions = true;
+        self.freezeActions = true;
 
-        const url = `${window.base_url}${this.modelName}/update_options`;
+        const url = `${window.base_url}${self.modelName}/update_options`;
 
         try {
-            const response = await this.apiService.request<any>(url, {
+            const response = await self.apiService.request<any>(url, {
                 method: 'POST',
                 data: { fields: fields }
             });
@@ -1096,48 +1117,62 @@ export class AdminController {
                 });
 
                 const autoKey = fieldName + '_autocomplete';
-                this.autocompleteData[autoKey] = data;
-                this.listOptions[fieldName] = el;
+                self.autocompleteData[autoKey] = data;
+                self.listOptions[fieldName] = el;
+
+                const editFields = self.editFields;
+                editFields.forEach((field, ind) => {
+                    if (field.field_name === fieldName) {
+                        const currentVal = (self as any)[fieldName];
+                        if (Array.isArray(currentVal)) {
+                            const filtered = currentVal.filter(id => data[id]);
+                            (self as any)[fieldName] = filtered;
+                        } else if (currentVal && !data[currentVal]) {
+                            (self as any)[fieldName] = '';
+                        }
+                    }
+                });
             });
         } catch (error) {
             console.error(error);
         } finally {
-            this.freezeActions = false;
+            self.freezeActions = false;
 
-            Object.keys(this.constraintsQueue).forEach(key => {
-                const fieldConstraints = this.constraintsQueue[key];
+            Object.keys(self.constraintsQueue).forEach(key => {
+                const fieldConstraints = self.constraintsQueue[key];
                 Object.keys(fieldConstraints).forEach(fieldName => {
-                    this.setFieldLoadingOptions(fieldName, false);
-                    this.setConstrainerFreeze(key, false);
+                    self.setFieldLoadingOptions(fieldName, false);
+                    self.setConstrainerFreeze(key, false);
                 });
             });
 
-            this.constraintsQueue = {};
-            this.holdConstraintsQueue = false;
+            self.constraintsQueue = {};
+            self.holdConstraintsQueue = false;
         }
     };
 
     private buildConstraintsFromQueue(): any[] {
+        const self = this.selfProxy || this;
         const allConstraints: any[] = [];
 
-        Object.keys(this.constraintsQueue).forEach(key => {
-            const fieldConstraints = this.constraintsQueue[key];
+        Object.keys(self.constraintsQueue).forEach(key => {
+            const fieldConstraints = self.constraintsQueue[key];
             Object.keys(fieldConstraints).forEach(fieldName => {
                 const field = fieldConstraints[fieldName];
                 const constraints: Record<string, any> = {};
 
-                this.setFieldLoadingOptions(fieldName, true);
-                this.setConstrainerFreeze(key, true);
+                self.setFieldLoadingOptions(fieldName, true);
+                self.setConstrainerFreeze(key, true);
 
                 Object.keys(field.constraints).forEach(ckey => {
-                    constraints[ckey] = (this as any)[ckey];
+                    constraints[ckey] = (self as any)[ckey];
                 });
 
                 allConstraints.push({
                     constraints: constraints,
                     type: 'edit',
                     field: fieldName,
-                    selectedItems: (this as any)[fieldName]
+                    selectedItems: (self as any)[fieldName]
                 });
             });
         });
