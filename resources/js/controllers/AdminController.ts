@@ -330,11 +330,12 @@ export class AdminController {
 
     // this 안전 보장을 위한 멤버 화살표 함수 선언
     public uploadFile = async (event: any, field: any): Promise<void> => {
+        const self = this.selfProxy || this;
         const file = event.target.files[0];
         if (!file) return;
 
         if (field.size_limit && file.size > field.size_limit * 1024 * 1024) {
-            alert((this.languages['file_too_large'] || '파일 용량이 너무 큽니다. 제한: ') + field.size_limit + 'MB');
+            alert((self.languages['file_too_large'] || '파일 용량이 너무 큽니다. 제한: ') + field.size_limit + 'MB');
             event.target.value = '';
             return;
         }
@@ -346,7 +347,7 @@ export class AdminController {
         formData.append('file', file);
         formData.append('_token', window.csrf || (window.adminData && window.adminData.csrf) || '');
 
-        const url = `${window.base_url}${this.modelName}/${field.field_name}/file_upload`;
+        const url = `${window.base_url}${self.modelName}/${field.field_name}/file_upload`;
 
         try {
             const response = await new Promise<any>((resolve, reject) => {
@@ -384,7 +385,7 @@ export class AdminController {
             event.target.value = '';
 
             if (response.filename && (!response.errors || Object.keys(response.errors).length === 0)) {
-                (this as any)[field.field_name] = response.filename;
+                (self as any)[field.field_name] = response.filename;
             } else {
                 alert(response.errors ? JSON.stringify(response.errors) : '업로드 실패');
             }
