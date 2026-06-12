@@ -19,16 +19,16 @@
 
 			<!-- 1. key, text, text_quick, fulltext_mysql, color -->
 			<template x-if="['key', 'text', 'text_quick', 'fulltext_mysql', 'color'].includes(filter.type)">
-				<input type="text" x-model="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box;" />
+				<input type="text" x-model.debounce.500ms="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box;" />
 			</template>
 
 			<!-- 2. number -->
 			<template x-if="filter.type === 'number'">
 				<div class="inline-block" style="display: inline-flex; align-items: center; gap: 4px; width: 225px; box-sizing: border-box;">
 					<span class="symbol" x-text="filter.symbol"></span>
-					<input type="text" x-model="filter.min_value" :id="filter.field_id + '_min'" style="flex: 1; min-width: 0; box-sizing: border-box;" />
+					<input type="text" x-model.debounce.500ms="filter.min_value" :id="filter.field_id + '_min'" style="flex: 1; min-width: 0; box-sizing: border-box;" />
 					<span>-</span>
-					<input type="text" x-model="filter.max_value" :id="filter.field_id + '_max'" style="flex: 1; min-width: 0; box-sizing: border-box;" />
+					<input type="text" x-model.debounce.500ms="filter.max_value" :id="filter.field_id + '_max'" style="flex: 1; min-width: 0; box-sizing: border-box;" />
 				</div>
 			</template>
 
