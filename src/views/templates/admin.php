@@ -15,11 +15,12 @@
 	 }"
 	 x-init="
 		const updateDims = () => {
-			const tbody = $el.querySelector('tbody');
-			if (tbody) {
-				tbodyHeight = tbody.offsetHeight;
-				tbodyWidth = tbody.offsetWidth;
-				tbodyTop = tbody.offsetTop;
+			const scrollable = $el.querySelector('.table_scrollable');
+			const thead = $el.querySelector('thead');
+			if (scrollable) {
+				tbodyWidth = scrollable.offsetWidth;
+				tbodyTop = thead ? thead.offsetHeight : 0;
+				tbodyHeight = thead ? (scrollable.offsetHeight - thead.offsetHeight) : scrollable.offsetHeight;
 			}
 		};
 		$watch('loadingRows', value => {
@@ -91,7 +92,7 @@
 	</div>
 
 	<!-- 오리지널 격자 테이블 표출 -->
-	<div class="table_scrollable" style="position: relative;">
+	<div class="table_scrollable" style="position: relative; min-height: 400px;">
 		<table class="results" border="0" cellspacing="0" id="customers" cellpadding="0">
 			<thead>
 				<tr>

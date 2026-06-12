@@ -188,6 +188,14 @@ class Multup {
 		$filename = '';
 		$resizes = '';
 
+		// 위험 실행 파일 확장자 블랙리스트를 통한 원격 코드 실행(RCE) 차단 필터
+		$ext = strtolower(File::extension($original_name));
+		$dangerousExtensions = array('php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar', 'sh', 'htaccess', 'cgi', 'pl', 'exe', 'asp', 'aspx', 'jsp');
+		if (in_array($ext, $dangerousExtensions)) {
+			$errors = '보안 정책에 따라 업로드가 허용되지 않는 파일 확장자입니다.';
+			return compact('errors', 'path', 'filename', 'original_name', 'resizes');
+		}
+
 		if($validation->fails()){
 			/* use the messages object for the erros */
 			$errors = implode('. ', $validation->messages()->all());

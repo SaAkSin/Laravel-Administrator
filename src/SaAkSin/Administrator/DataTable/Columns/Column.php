@@ -63,6 +63,8 @@ class Column
 		'external' => false,
 		'belongs_to_many' => false,
 		'visible' => true,
+		'sanitize' => true,
+		'is_html' => false,
 	);
 
 	/**
@@ -244,10 +246,23 @@ class Column
 		$output = $this->getOption('output');
 		
 		if (is_callable($output)) {
-			return $output($value, $item);
+			$rawOutput = $output($value, $item);
+		} else {
+			$rawOutput = str_replace('(:value)', $value ?: '', $output);
 		}
-		
-		return str_replace('(:value)', $value ?: '', $output);
+
+		// 칼럼 설정에서 'sanitize'가 활성화되어 있고, 'is_html'이 지정되지 않은 경우 e()로 이스케이프
+		if ($this->getOption('sanitize', true) && !$this->getOption('is_html', false)) {
+			return e($rawOutput);
+		}
+
+		// HTML이 허용된 칼럼인 경우 HTML Purifier를 사용하여 XSS 클렌징 적용 후 반환
+		// clean() 헬퍼 함수가 존재하지 않는 호스트 프로젝트 환경을 위해 안전 분기 처리
+		if (function_exists('clean')) {
+			return clean($rawOutput);
+		}
+
+		return $rawOutput;
 	}
 
 	/**
