@@ -133,7 +133,7 @@
 				 top: tbodyTop + 'px',
 				 left: '0px',
 				 width: tbodyWidth + 'px',
-				 height: tbodyHeight + 'px',
+				 height: (tbodyHeight > 120 ? tbodyHeight : 120) + 'px',
 				 right: 'auto',
 				 bottom: 'auto',
 				 display: loadingRows ? 'flex' : 'none'
