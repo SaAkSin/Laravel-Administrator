@@ -91,55 +91,57 @@
 	</div>
 
 	<!-- 오리지널 격자 테이블 표출 -->
-	<table class="results" border="0" cellspacing="0" id="customers" cellpadding="0">
-		<thead>
-			<tr>
-				<template x-for="column in columns" :key="column.column_name">
-					<th x-show="column.visible"
-						@click="column.sortable && setSortOptions(column.sort_field ? column.sort_field : column.column_name)"
-						:class="{
-							sortable: column.sortable,
-							'sorted-asc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'asc',
-							'sorted-desc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'desc'
-						}">
-						<div x-text="column.title"></div>
-					</th>
-				</template>
-			</tr>
-		</thead>
-		<tbody>
-			<template x-for="(row, index) in rows" :key="(row[primaryKey] && row[primaryKey].raw) ? row[primaryKey].raw : index">
-				<tr @click="if (row[primaryKey]) { clickItem(row[primaryKey].raw); } return true"
-					:class="{
-						result: true, 
-						even: index % 2 === 1, 
-						odd: index % 2 !== 1,
-						selected: (row[primaryKey] && row[primaryKey].raw) == itemLoadingId
-					}">
+	<div class="table_scrollable" style="position: relative;">
+		<table class="results" border="0" cellspacing="0" id="customers" cellpadding="0">
+			<thead>
+				<tr>
 					<template x-for="column in columns" :key="column.column_name">
-						<td x-show="column.visible" x-html="row[column.column_name] ? row[column.column_name].rendered : ''"></td>
+						<th x-show="column.visible"
+							@click="column.sortable && setSortOptions(column.sort_field ? column.sort_field : column.column_name)"
+							:class="{
+								sortable: column.sortable,
+								'sorted-asc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'asc',
+								'sorted-desc': (column.column_name == sortOptions.field || column.sort_field == sortOptions.field) && sortOptions.direction === 'desc'
+							}">
+							<div x-text="column.title"></div>
+						</th>
 					</template>
 				</tr>
-			</template>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				<template x-for="(row, index) in rows" :key="(row[primaryKey] && row[primaryKey].raw) ? row[primaryKey].raw : index">
+					<tr @click="if (row[primaryKey]) { clickItem(row[primaryKey].raw); } return true"
+						:class="{
+							result: true, 
+							even: index % 2 === 1, 
+							odd: index % 2 !== 1,
+							selected: (row[primaryKey] && row[primaryKey].raw) == itemLoadingId
+						}">
+						<template x-for="column in columns" :key="column.column_name">
+							<td x-show="column.visible" x-html="row[column.column_name] ? row[column.column_name].rendered : ''"></td>
+						</template>
+					</tr>
+				</template>
+			</tbody>
+		</table>
 
-	<!-- 로딩창 -->
-	<div class="loading_rows" 
-		 x-show="loadingRows"
-		 :style="{
-			 position: 'absolute',
-			 top: tbodyTop + 'px',
-			 left: '0px',
-			 width: tbodyWidth + 'px',
-			 height: tbodyHeight + 'px',
-			 right: 'auto',
-			 bottom: 'auto',
-			 display: loadingRows ? 'flex' : 'none'
-		 }">
-		<div class="loading_spinner_wrapper">
-			<div class="loading_spinner"></div>
-			<div class="loading_text"><?php echo trans('administrator::administrator.loading') ?></div>
+		<!-- 로딩창 -->
+		<div class="loading_rows" 
+			 x-show="loadingRows"
+			 :style="{
+				 position: 'absolute',
+				 top: tbodyTop + 'px',
+				 left: '0px',
+				 width: tbodyWidth + 'px',
+				 height: tbodyHeight + 'px',
+				 right: 'auto',
+				 bottom: 'auto',
+				 display: loadingRows ? 'flex' : 'none'
+			 }">
+			<div class="loading_spinner_wrapper">
+				<div class="loading_spinner"></div>
+				<div class="loading_text"><?php echo trans('administrator::administrator.loading') ?></div>
+			</div>
 		</div>
 	</div>
 

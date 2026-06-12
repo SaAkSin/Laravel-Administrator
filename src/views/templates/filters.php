@@ -60,16 +60,16 @@
 								 @click="open = !open"
 								 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
 								
-								<!-- 선택된 값 또는 플레이스홀더 표시 (선택되지 않았을 때는 빈 값으로 출력) -->
+								<!-- 선택된 값 또는 플레이스홀더 표시 (선택되지 않았을 때는 플레이스홀더 출력) -->
 								<span class="selected-text" 
-									  x-text="(selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : ''" 
+									  x-text="(selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : '-- Select Some Options --'" 
 									  :style="{
 										  fontSize: '12px',
 										  color: (selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? '#1f2937' : '#9ca3af',
 										  whiteSpace: 'nowrap',
 										  overflow: 'hidden',
 										  textOverflow: 'ellipsis',
-										  maxWidth: 'calc(100% - 70px)'
+										  maxWidth: '170px'
 									  }"></span>
 								
 								<!-- 우측 액션 영역 -->
@@ -134,7 +134,7 @@
 									<div @click="selectItem(opt)" 
 										 class="combobox-option-item"
 										 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)), 'focus-active': index === focusedIndex }"
-										 x-text="opt.text || opt.name"
+										 x-html="highlight(opt.text || opt.name)"
 										 :style="index === focusedIndex ? 'background-color: #f1f5f9; color: #1e293b;' : ''">
 									</div>
 								</template>
@@ -185,16 +185,15 @@
 								 style="height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 0 0 10px; cursor: pointer; box-sizing: border-box; user-select: none;">
 								
 								<!-- 단일 선택일 때의 값 또는 플레이스홀더 표시 -->
-								<!-- 단일 선택일 때 유효한 값이 존재할 때만 텍스트를 출력하고, 그렇지 않으면 비워둡니다. -->
 								<span class="selected-text" 
-									  x-text="(filter.type !== 'belongs_to_many' && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : ''" 
+									  x-text="(filter.type !== 'belongs_to_many' && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? selectedItems[0].text : '-- Select Some Options --'" 
 									  :style="{
 										  fontSize: '12px',
 										  color: (filter.type !== 'belongs_to_many' && selectedItems.length > 0 && selectedItems[0].id !== '' && selectedItems[0].id != null) ? '#1f2937' : '#9ca3af',
 										  whiteSpace: 'nowrap',
 										  overflow: 'hidden',
 										  textOverflow: 'ellipsis',
-										  maxWidth: 'calc(100% - 70px)'
+										  maxWidth: '170px'
 									  }"></span>
 								
 								<!-- 우측 액션 영역 -->
@@ -266,7 +265,7 @@
 									<div @click="selectItem(opt)" 
 										 class="combobox-option-item"
 										 :class="{ 'selected-active': selectedItems.some(item => String(item.id) === String(opt.id)), 'focus-active': index === focusedIndex }"
-										 x-text="opt.text || opt.name"
+										 x-html="highlight(opt.text || opt.name)"
 										 :style="index === focusedIndex ? 'background-color: #f1f5f9; color: #1e293b;' : ''">
 									</div>
 								</template>

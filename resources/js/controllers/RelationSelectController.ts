@@ -304,4 +304,14 @@ export class RelationSelectController {
             self.options = [];
         }
     }
+
+    public highlight(text: string): string {
+        const self = this.selfProxy || this;
+        if (!self.search || !text) {
+            return text;
+        }
+        const q = self.search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(`(${q})`, 'gi');
+        return text.replace(regex, '<span style="color: #ef4444; text-decoration: underline;">$1</span>');
+    }
 }
