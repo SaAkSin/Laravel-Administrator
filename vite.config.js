@@ -4,7 +4,7 @@ import { resolve } from 'path';
 // Vite 빌드 및 에셋 번들러 설정 정의
 export default defineConfig({
   // 라라벨 패키지 퍼블리싱 에셋의 실제 절대 경로 배포 위치를 base로 지정하여 CSS 내 폰트/이미지 404 예방
-  base: '/packages/saaksin/administrator/dist/',
+  base: './',
   // publicDir를 false로 지정하여 outDir과 public 디렉토리가 겹쳐 발생하는 Vite 경고를 방지합니다.
   publicDir: false,
   build: {
