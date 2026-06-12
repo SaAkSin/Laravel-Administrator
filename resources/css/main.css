@@ -1699,11 +1699,11 @@ a {
 }
 #admin_page #content div.table_container div.loading_rows {
   position: absolute;
-  top: 40px;
+  top: 41px;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(15, 23, 42, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1720,13 +1720,13 @@ a {
 #admin_page #content div.table_container div.loading_rows .loading_spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(94, 100, 105, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.15);
   border-radius: 50%;
-  border-top-color: #5e6469;
+  border-top-color: #ffffff;
   animation: admin-spin 0.8s linear infinite;
 }
 #admin_page #content div.table_container div.loading_rows .loading_text {
-  color: #5e6469;
+  color: #ffffff;
   font-size: 14px;
   font-weight: bold;
   letter-spacing: 0.5px;
