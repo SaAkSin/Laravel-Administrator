@@ -16,30 +16,30 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 ## 2. 작업 이행 내역
 
 ### 1차 이행 내역
-- **PHPUnit 테스트 정합성 복구**: [FieldFactoryTest.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/tests/Fields/FieldFactoryTest.php)의 `testFilterQueryBySelectedItems` 모의 객체(Mock) 설정을 보강하고, accessor/mutator 필드 회피 동작 및 정렬 필드에 대한 다차원적 분기 검증 테스트 케이스들을 추가 작성했습니다.
+- **PHPUnit 테스트 정합성 복구**: [FieldFactoryTest.php](../../tests/Fields/FieldFactoryTest.php)의 `testFilterQueryBySelectedItems` 모의 객체(Mock) 설정을 보강하고, accessor/mutator 필드 회피 동작 및 정렬 필드에 대한 다차원적 분기 검증 테스트 케이스들을 추가 작성했습니다.
 - **PHP 8.3 Deprecation 경고 해소**: 
-  - [Config.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/src/SaAkSin/Administrator/Config/Model/Config.php)의 `getModel()` 시그니처 필수 변수화
-  - [BelongsToTest.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/tests/Fields/Relationships/BelongsToTest.php) 내 `BelongsToEloquentStub`에 `public $rel_id`를 선언하여 dynamic property 할당 에러 방지
-  - [Validator.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/src/SaAkSin/Administrator/Validator.php)의 `validateDirectory` 및 `validateEloquent`에 `is_string` 타입 가드 추가
+  - [Config.php](../../src/SaAkSin/Administrator/Config/Model/Config.php)의 `getModel()` 시그니처 필수 변수화
+  - [BelongsToTest.php](../../tests/Fields/Relationships/BelongsToTest.php) 내 `BelongsToEloquentStub`에 `public $rel_id`를 선언하여 dynamic property 할당 에러 방지
+  - [Validator.php](../../src/SaAkSin/Administrator/Validator.php)의 `validateDirectory` 및 `validateEloquent`에 `is_string` 타입 가드 추가
 - **TS6 컴파일 오류 해결**:
-  - [tsconfig.json](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/tsconfig.json)의 `moduleResolution`을 `"bundler"`로 수정
-  - [global.d.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/types/global.d.ts)에 CSS 모듈 정의를 삽입 및 누락 타입 보강
+  - [tsconfig.json](../../tsconfig.json)의 `moduleResolution`을 `"bundler"`로 수정
+  - [global.d.ts](../../resources/js/types/global.d.ts)에 CSS 모듈 정의를 삽입 및 누락 타입 보강
   - `AdminController` 및 `RelationSelectController` 클래스의 프록시 객체 `self` 참조에 올바른 클래스 타입을 캐스팅하여 제네릭 함수 호출 오류 전면 해결
 - **레거시 의존성 CDN 제거**:
-  - [viewComposers.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/src/viewComposers.php)에서 불필요하게 CDN으로 주입되던 `jquery`, `jquery-ui`, `select2` 로딩 코드를 제거 (CKEditor는 유지)
+  - [viewComposers.php](../../src/viewComposers.php)에서 불필요하게 CDN으로 주입되던 `jquery`, `jquery-ui`, `select2` 로딩 코드를 제거 (CKEditor는 유지)
 - **프론트엔드 최적화 및 보안 보강**:
-  - [AdminController.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/controllers/AdminController.ts) 및 [RelationSelectController.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/controllers/RelationSelectController.ts) 내 디버그용 `console.log` 전량 삭제
-  - [RelationSelectController.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/controllers/RelationSelectController.ts)의 `highlight` 함수에 HTML-escape 처리를 도입하여 드롭다운 드롭 시 발생 가능한 Stored XSS 차단
-  - [composer.json](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/composer.json)에 `"prefer-stable": true` 추가
+  - [AdminController.ts](../../resources/js/controllers/AdminController.ts) 및 [RelationSelectController.ts](../../resources/js/controllers/RelationSelectController.ts) 내 디버그용 `console.log` 전량 삭제
+  - [RelationSelectController.ts](../../resources/js/controllers/RelationSelectController.ts)의 `highlight` 함수에 HTML-escape 처리를 도입하여 드롭다운 드롭 시 발생 가능한 Stored XSS 차단
+  - [composer.json](../../composer.json)에 `"prefer-stable": true` 추가
 
 ### 2차 및 3차 보완 이행 내역
 - **마크다운 XSS 방지 커스텀 렌더러 도입**:
-  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `marked.use()`를 연동하여 `html` 토큰 파싱 시 HTML Entity로 escape 처리하도록 커스텀 HTML 렌더러를 탑재했습니다.
+  - [app.ts](../../resources/js/app.ts) 파일에 `marked.use()`를 연동하여 `html` 토큰 파싱 시 HTML Entity로 escape 처리하도록 커스텀 HTML 렌더러를 탑재했습니다.
   - 마크다운 링크/이미지 프로토콜을 세척하여 `javascript:`, `data:` 등의 스키마가 로딩되는 클릭 기반 XSS를 필터링했습니다.
 
 ### 4차 보완 이행 내역 (Sanitizer 정교화 및 XSS 회귀 검증)
 - **마크다운 URL Sanitizer 정교화**:
-  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `decodeHtmlEntities` (HTML Entity 우회 방어), `normalizeUrlForPolicy` (제어문자 및 공백 우회 제거), `hasExplicitScheme`, `sanitizeUrl`을 추가 구현하고 허용 프로토콜 allowlist를 강제했습니다.
+  - [app.ts](../../resources/js/app.ts) 파일에 `decodeHtmlEntities` (HTML Entity 우회 방어), `normalizeUrlForPolicy` (제어문자 및 공백 우회 제거), `hasExplicitScheme`, `sanitizeUrl`을 추가 구현하고 허용 프로토콜 allowlist를 강제했습니다.
 - **Attribute Injection 방어**:
   - `marked` 의 custom `link` 및 `image` 렌더러에 의해 반환되는 HTML 태그의 모든 속성(`href`, `src`, `title`, `alt`) 값을 최종적으로 `escapeHtml()` 처리하여 속성 탈출(따옴표 주입 XSS)을 원천 차단했습니다.
 
@@ -49,17 +49,17 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
   - 로딩 시점 즉시 실행부는 Vite의 환경변수 `import.meta.env.DEV` 분기를 통해 조건부 기동하게 수정했습니다. 이에 따라 프로덕션 컴파일(`npm run build`) 시 해당 테스트 기동 코드가 Dead Code로 인식되어 운영 번들(`public/dist/js/app-*.js`) 내부에서 원천 탈락(제거)되도록 최적화했습니다.
 
 ## 3. 변경 파일
-- [global.d.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/types/global.d.ts)
-- [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts)
-- [AdminController.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/controllers/AdminController.ts)
-- [RelationSelectController.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/controllers/RelationSelectController.ts)
-- [tsconfig.json](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/tsconfig.json)
-- [Config.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/src/SaAkSin/Administrator/Config/Model/Config.php)
-- [Validator.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/src/SaAkSin/Administrator/Validator.php)
-- [viewComposers.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/src/viewComposers.php)
-- [FieldFactoryTest.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/tests/Fields/FieldFactoryTest.php)
-- [BelongsToTest.php](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/tests/Fields/Relationships/BelongsToTest.php)
-- [composer.json](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/composer.json)
+- [global.d.ts](../../resources/js/types/global.d.ts)
+- [app.ts](../../resources/js/app.ts)
+- [AdminController.ts](../../resources/js/controllers/AdminController.ts)
+- [RelationSelectController.ts](../../resources/js/controllers/RelationSelectController.ts)
+- [tsconfig.json](../../tsconfig.json)
+- [Config.php](../../src/SaAkSin/Administrator/Config/Model/Config.php)
+- [Validator.php](../../src/SaAkSin/Administrator/Validator.php)
+- [viewComposers.php](../../src/viewComposers.php)
+- [FieldFactoryTest.php](../../tests/Fields/FieldFactoryTest.php)
+- [BelongsToTest.php](../../tests/Fields/Relationships/BelongsToTest.php)
+- [composer.json](../../composer.json)
 
 ## 4. 테스트 결과
 - **PHPUnit 테스트**: 286개 테스트 전체 통과 (오류 0, Deprecation 경고 0)
@@ -96,10 +96,11 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 
 ## 7. 검수 요청 사항
 - **대상 브랜치**: `dev`
-- **커밋 해시**: 96444437
+- **커밋 해시**: 94a8426c
 - **보완 이력**:
   - `458f63b9` (1차 검수 요청 커밋)
   - `81063847` (2차 마크다운 HTML 토큰 XSS 방어 보완 커밋)
   - `d8a40046` (3차 마크다운 링크/이미지 프로토콜 XSS 방어 보완 커밋)
   - `82d37a28` (4차 URL Sanitizer 정교화 및 DOMParser 회귀 테스트 탑재 커밋)
-  - `96444437` (5차 운영 번들 회귀 테스트 격리 및 성공 로그 억제 완료 커밋)
+  - `94a8426c` (5차 운영 번들 회귀 테스트 격리 및 성공 로그 억제 완료 커밋)
+  - `6차` (결과보고서 커밋 해시 정합성 수정 완료 커밋)
