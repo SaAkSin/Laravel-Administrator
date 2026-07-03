@@ -130,7 +130,7 @@ class Validator extends \Illuminate\Validation\Validator
 	 */
 	public function validateDirectory($attribute, $value, $parameters)
 	{
-		return is_dir($value);
+		return is_string($value) && is_dir($value);
 	}
 
 	/**
@@ -194,7 +194,7 @@ class Validator extends \Illuminate\Validation\Validator
 	 */
 	public function validateEloquent($attribute, $value, $parameters)
 	{
-		return class_exists($value) && is_a(new $value, Model::class);
+		return is_string($value) && class_exists($value) && is_a(new $value, Model::class);
 	}
 
 }

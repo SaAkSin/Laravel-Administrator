@@ -1,3 +1,5 @@
+import { AdminController } from './AdminController';
+
 export class RelationSelectController {
     public open = false;
     public search = '';
@@ -21,7 +23,7 @@ export class RelationSelectController {
         this.config = config;
         Object.defineProperty(this, 'filteredOptions', {
             get: function(this: any) {
-                const self = this.selfProxy || this;
+                const self: RelationSelectController = this.selfProxy || this;
                 if (self.config.autocomplete) {
                     return self.options;
                 }
@@ -41,9 +43,7 @@ export class RelationSelectController {
 
     public init(): void {
         this.selfProxy = (window as any).Alpine ? (window as any).Alpine.$data(this.$el) : this;
-        const self = this.selfProxy || this;
-
-        console.log(`[RelationSelect:init] field_name: ${self.config.field.field_name}, type: ${self.config.type}, autocomplete: ${self.config.autocomplete}, selfProxy: ${this.selfProxy !== this}`);
+        const self: RelationSelectController = this.selfProxy || this;
 
         // 부모 모델 속성 변경 및 autocompleteData 변경 감시 (Alpine.effect로 반응성 완전 보장)
         if ((window as any).Alpine && typeof (window as any).Alpine.effect === 'function') {
@@ -55,10 +55,6 @@ export class RelationSelectController {
                     ? innerSelf.$root.filters[innerSelf.config.filterIndex]?.value
                     : innerSelf.$root[innerSelf.config.field.field_name];
                 
-                const autoKey = innerSelf.config.field.field_name + '_autocomplete';
-                const autoData = innerSelf.$root.autocompleteData[autoKey];
-                
-                console.log(`[RelationSelect:effect] Triggered. field: ${innerSelf.config.field.field_name}, modelVal:`, modelVal, `autoData keys:`, autoData ? Object.keys(autoData) : 'null');
                 innerSelf.syncValueFromModel();
             });
         } else {
@@ -73,7 +69,6 @@ export class RelationSelectController {
             self.options = self.$root.listOptions[optKey] || self.config.field.options || [];
 
             self.$watch(`$root.listOptions.${optKey}`, (newVal) => {
-                console.log(`[RelationSelect:$watch listOptions] key: ${optKey}`, newVal);
                 self.options = newVal || [];
                 self.syncValueFromModel();
             });
@@ -109,7 +104,7 @@ export class RelationSelectController {
     }
 
     public moveFocus(step: number): void {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         const max = (self as any).filteredOptions.length - 1;
         if (max < 0) return;
         
@@ -126,7 +121,7 @@ export class RelationSelectController {
     }
 
     public selectFocused(): void {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         const opts = (self as any).filteredOptions;
         if (self.focusedIndex >= 0 && self.focusedIndex < opts.length) {
             self.selectItem(opts[self.focusedIndex]);
@@ -136,12 +131,10 @@ export class RelationSelectController {
     }
 
     public syncValueFromModel(): void {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         const modelVal = self.config.type === 'filter'
             ? self.$root.filters[self.config.filterIndex]?.value
             : self.$root[self.config.field.field_name];
-
-        console.log(`[RelationSelect:syncValueFromModel] field: ${self.config.field.field_name}, modelVal:`, modelVal);
 
         let ids: string[] = [];
         if (Array.isArray(modelVal)) {
@@ -153,27 +146,20 @@ export class RelationSelectController {
         const autoKey = self.config.field.field_name + '_autocomplete';
         const autoData = self.$root.autocompleteData[autoKey] || {};
 
-        console.log(`[RelationSelect:syncValueFromModel] parsed ids:`, ids, `autoData keys:`, Object.keys(autoData));
-
         self.selectedItems = ids.map(id => {
             if (autoData[id]) {
-                console.log(`[RelationSelect:syncValueFromModel] Found in autoData:`, id, autoData[id]);
                 return { id: id, text: autoData[id].text || autoData[id].name || id };
             }
             const found = self.options.find(opt => String(opt.id) === id);
             if (found) {
-                console.log(`[RelationSelect:syncValueFromModel] Found in options:`, id, found);
                 return { id: id, text: found.text || found.name || id };
             }
-            console.log(`[RelationSelect:syncValueFromModel] Not found anywhere, fallback to id:`, id);
             return { id: id, text: id };
         });
-
-        console.log(`[RelationSelect:syncValueFromModel] Result selectedItems:`, JSON.stringify(self.selectedItems));
     }
 
     public async fetchAutocomplete(): Promise<void> {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         if (!self.config.autocomplete) return;
         // 검색어가 빈 값인 경우 비동기 요청을 전송하지 않습니다.
         if (!self.search) {
@@ -198,11 +184,12 @@ export class RelationSelectController {
             });
         }
 
-        const url = `${window.base_url}${self.$root.modelName}/update_options`;
+        const root = self.$root as AdminController;
+        const url = `${window.base_url}${root.modelName}/update_options`;
 
         try {
             // AdminController 내의 apiService 인스턴스를 직접 활용하여 통신
-            const response = await self.$root.apiService.request<any>(url, {
+            const response = await root.apiService.request<any>(url, {
                 method: 'POST',
                 data: { fields: [data] }
             });
@@ -211,8 +198,8 @@ export class RelationSelectController {
             self.options = results;
 
             const autoKey = self.config.field.field_name + '_autocomplete';
-            if (!self.$root.autocompleteData[autoKey]) {
-                self.$root.autocompleteData[autoKey] = {};
+            if (!root.autocompleteData[autoKey]) {
+                root.autocompleteData[autoKey] = {};
             }
             results.forEach((item: any) => {
                 self.$root.autocompleteData[autoKey][item.id] = item;
@@ -225,7 +212,7 @@ export class RelationSelectController {
     }
 
     public selectItem(item: any): void {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         const fieldName = self.config.field.field_name;
         
         if (self.config.multiple) {
@@ -264,7 +251,7 @@ export class RelationSelectController {
     }
 
     public removeItem(item: any): void {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         const fieldName = self.config.field.field_name;
         
         const currentVal = self.config.type === 'filter'
@@ -289,7 +276,7 @@ export class RelationSelectController {
     }
 
     public clearSelection(): void {
-        const self = this.selfProxy || this;
+        const self: RelationSelectController = this.selfProxy || this;
         const fieldName = self.config.field.field_name;
         if (self.config.type === 'filter') {
             // 부모의 filters[index].value 감시자에서 updateRows()를 자동 호출하므로 할당만 진행합니다.
@@ -305,13 +292,30 @@ export class RelationSelectController {
         }
     }
 
+    private escapeHtml(text: string): string {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     public highlight(text: string): string {
-        const self = this.selfProxy || this;
-        if (!self.search || !text) {
-            return text;
+        const self: RelationSelectController = this.selfProxy || this;
+        if (!text) {
+            return '';
         }
-        const q = self.search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        const regex = new RegExp(`(${q})`, 'gi');
-        return text.replace(regex, '<span style="color: #ef4444; text-decoration: underline;">$1</span>');
+        const escapedText = this.escapeHtml(text);
+        if (!self.search) {
+            return escapedText;
+        }
+        const escapedSearch = this.escapeHtml(self.search);
+        const escapedQuery = escapedSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        if (!escapedQuery) {
+            return escapedText;
+        }
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
+        return escapedText.replace(regex, '<span style="color: #ef4444; text-decoration: underline;">$1</span>');
     }
 }

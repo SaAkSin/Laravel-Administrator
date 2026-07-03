@@ -68,7 +68,7 @@ export class AdminController {
     public showFilters = true;
 
     // 객체 지향 캡슐화 인스턴스
-    private apiService!: AdminApiService;
+    public apiService!: AdminApiService;
     private editorContext: EditorContext;
     private selfProxy: any = null;
 
@@ -111,7 +111,6 @@ export class AdminController {
     public init(): void {
         const el = document.getElementById('admin_page');
         this.selfProxy = el && (window as any).Alpine ? (window as any).Alpine.$data(el) : this;
-        console.log('[디버그] AdminController init 호출됨. selfProxy 설정됨 (Alpine.$data):', this.selfProxy !== this);
 
         if (!window.adminData) {
             console.error('글로벌 adminData 객체를 찾을 수 없습니다.');
@@ -330,7 +329,7 @@ export class AdminController {
 
     // this 안전 보장을 위한 멤버 화살표 함수 선언
     public uploadFile = async (event: any, field: any): Promise<void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const file = event.target.files[0];
         if (!file) return;
 
@@ -398,7 +397,7 @@ export class AdminController {
     };
 
     public save = async (event?: any): Promise<void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const saveData: Record<string, any> = {};
 
         self.editFields.forEach(field => {
@@ -450,7 +449,7 @@ export class AdminController {
     };
 
     public saveItem = async (): Promise<void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const saveData: Record<string, any> = {};
 
         const fields = window.adminData.data_model || {};
@@ -535,7 +534,7 @@ export class AdminController {
     };
 
     public deleteItem = async (): Promise<boolean | void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const conf = confirm(self.languages['delete_active_item'] || 'Are you sure you want to delete this item?');
         if (!conf) return false;
 
@@ -588,7 +587,6 @@ export class AdminController {
     };
 
     public clickItem(id: any): void {
-        console.log('[디버그] clickItem 호출됨 - id:', id, 'loadingItem:', this.loadingItem, 'activeItem:', this.activeItem, 'viewPermission:', this.actionPermissions.view);
         if (!this.loadingItem && this.activeItem !== id && this.actionPermissions.view) {
             this.getItem(id);
 
@@ -599,7 +597,7 @@ export class AdminController {
     }
 
     public async getItem(id: any): Promise<void> {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         self.loadingItem = true;
 
         window.adminData.edit_fields = self.originalEditFields;
@@ -660,7 +658,7 @@ export class AdminController {
     }
 
     private setData(data: any): void {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         self.activeItem = data[self.primaryKey];
         self.loadingItem = false;
 
@@ -768,7 +766,7 @@ export class AdminController {
     }
 
     public customAction = async (isItem: boolean, action: string, messages: any, confirmation: string, reload: boolean): Promise<boolean | void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const data: Record<string, any> = {
             _token: window.csrf || (window.adminData && window.adminData.csrf),
             action_name: action
@@ -879,8 +877,7 @@ export class AdminController {
     }
 
     public updateRows = async (): Promise<void> => {
-        const self = this.selfProxy || this;
-        console.log('[디버그] updateRows 진입. rowLoadingId:', self.rowLoadingId, 'initialized:', self.initialized, 'freezeUpdateRows:', self.freezeUpdateRows);
+        const self: AdminController = this.selfProxy || this;
         if (self.freezeUpdateRows) return;
 
         const id = ++self.rowLoadingId;
@@ -908,7 +905,6 @@ export class AdminController {
             });
 
             if (self.rowLoadingId !== id) {
-                console.log('[디버그] rowLoadingId 불일치로 갱신 스킵. rowLoadingId:', self.rowLoadingId, 'id:', id);
                 return;
             }
 
@@ -927,7 +923,6 @@ export class AdminController {
         this.pagination.total = parseInt(response.total) || 0;
         this.rows = response.results || [];
         this.loadingRows = false;
-        console.log('[디버그] applyRowsUpdate 완료. rows 개수:', this.rows.length);
     }
 
     public setLoadingRows(loading: boolean): void {
@@ -988,7 +983,7 @@ export class AdminController {
     }
 
     public updateRowsPerPage = async (rows: number): Promise<void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const url = window.rows_per_page_url || '';
         try {
             await self.apiService.request<any>(url, {
@@ -1037,7 +1032,7 @@ export class AdminController {
     }
 
     public updateSelfRelationships = async (): Promise<void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const filterPromises = self.filters.map(async (filter, ind) => {
             const fieldName = filter.field_name;
 
@@ -1132,7 +1127,7 @@ export class AdminController {
     }
 
     private setConstrainerFreeze(key: string, freeze: boolean): void {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         self.editFields.forEach((field, ind) => {
             if (field.field_name === key) {
                 self.editFields[ind].constraintLoading = freeze;
@@ -1141,7 +1136,7 @@ export class AdminController {
     }
 
     private setFieldLoadingOptions(fieldName: string, type: boolean): void {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         self.editFields.forEach((field, ind) => {
             if (field.field_name === fieldName) {
                 self.editFields[ind].loadingOptions = type;
@@ -1150,7 +1145,7 @@ export class AdminController {
     }
 
     public runConstraintsQueue = async (): Promise<void> => {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const fields = self.buildConstraintsFromQueue();
 
         if (!fields.length) return;
@@ -1209,7 +1204,7 @@ export class AdminController {
     };
 
     private buildConstraintsFromQueue(): any[] {
-        const self = this.selfProxy || this;
+        const self: AdminController = this.selfProxy || this;
         const allConstraints: any[] = [];
 
         Object.keys(self.constraintsQueue).forEach(key => {
@@ -1270,7 +1265,6 @@ export class AdminController {
                 if (isUnloading) return;
 
                 const state = window.History.getState();
-                console.log('[디버그] statechange 발생 - state.data:', state.data);
 
                 if (state.data.ignore || (state.data.init && !this.historyStarted)) return;
 
@@ -1282,11 +1276,9 @@ export class AdminController {
 
                 if ('id' in state.data) {
                     if (state.data.id !== this.activeItem) {
-                        console.log('[디버그] getItem 비동기 패치 시작 - id:', state.data.id);
                         this.getItem(state.data.id);
                     }
                 } else {
-                    console.log('[디버그] id 속성 없음. clearItem() 기동');
                     this.clearItem();
                 }
             });

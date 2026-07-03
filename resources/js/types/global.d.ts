@@ -1,3 +1,5 @@
+declare module '*.css';
+
 interface AdminData {
     primary_key: string;
     id?: string | number;
@@ -21,6 +23,7 @@ interface AdminData {
     filters?: any;
     edit_fields?: any[];
     data_model?: any;
+    data?: any;
     column_model?: any[];
     action_permissions?: any;
     languages?: any;
@@ -31,6 +34,7 @@ interface Window {
     adminData: AdminData;
     csrf?: string;
     base_url?: string;
+    save_url?: string;
     route?: string;
     file_url?: string;
     rows_per_page_url?: string;

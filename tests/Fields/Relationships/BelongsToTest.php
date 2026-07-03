@@ -5,6 +5,7 @@ use Mockery as m;
 
 class BelongsToEloquentStub {
 	public $rel;
+	public $rel_id;
 	public function __unset($rel) {unset($this->{$rel});}
 }
 

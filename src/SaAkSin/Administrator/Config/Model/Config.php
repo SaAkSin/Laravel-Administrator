@@ -115,7 +115,7 @@ class Config extends ConfigBase implements ConfigInterface {
 	 *
 	 * @return \Illuminate\Database\Eloquent\Model
 	 */
-	public function getModel($id = 0, array $fields, array $columns)
+	public function getModel($id, array $fields, array $columns)
 	{
 		//if we're getting an existing model, we'll want to first get the edit fields without the relationships loaded
 		$originalModel = $model = $this->getDataModel();
