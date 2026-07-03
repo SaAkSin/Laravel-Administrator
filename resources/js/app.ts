@@ -197,12 +197,13 @@ export const runMarkdownXssRegressionTests = (): void => {
             }
         }
     }
-    console.log('[보안 검증] 모든 마크다운 XSS 회귀 테스트 케이스를 무사히 통과했습니다.');
 };
 
-// 로딩 시점에 회귀 테스트 즉시 기동하여 실시간 안전성 담보
-try {
-    runMarkdownXssRegressionTests();
-} catch (error) {
-    console.error('[보안 경고] 마크다운 XSS 회귀 테스트 실패:', error);
+// 로딩 시점에 회귀 테스트 즉시 기동하여 실시간 안전성 담보 (개발 환경 한정)
+if (import.meta.env.DEV) {
+    try {
+        runMarkdownXssRegressionTests();
+    } catch (error) {
+        console.error('[보안 경고] 마크다운 XSS 회귀 테스트 실패:', error);
+    }
 }

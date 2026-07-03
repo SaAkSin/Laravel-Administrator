@@ -3,7 +3,7 @@ title: "프로젝트 안정화 기준선 복구 결과 보고서"
 date: 2026-07-03
 author: "executor"
 status: "review"
-description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파일 오류, deprecation 경고 해결 및 마크다운 XSS 차단 최종 조치를 포함한 4차 보완 결과 보고서"
+description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파일 오류, deprecation 경고 해결 및 마크다운 XSS 차단 최종 조치(운영 격리 완료)를 포함한 5차 보완 결과 보고서"
 ---
 
 # 프로젝트 안정화 기준선 복구 결과 보고서
@@ -11,7 +11,7 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 ## 1. 개요
 본 작업은 `saaksin/laravel-administrator` 패키지의 PHPUnit 테스트 실패 오류를 수정하고, TypeScript 6 및 PHP 8.3 환경에서 발생하는 컴파일/런타임 deprecation 경고들을 말끔히 해소하여 배포 가능한 품질 기준선을 복구하는 데 목적이 있습니다. 
 
-1차 및 2차 검수 요청 이후 발생한 마크다운 미리보기 XSS 취약점 조치 지시사항에 따라, 외부 라이브러리 의존성을 배제하고 `marked` 파서의 커스텀 렌더러 기능을 통해 HTML 태그를 차단하는 보안 대책을 보강했습니다. 4차 보완에서는 HTML Entity 디코딩 우회 차단, 공백/제어문자 정규화, 허용 프로토콜(Link: http, https, mailto, tel / Image: http, https) allowlist 스키마 검증, Attribute Injection 방어, 그리고 실시간 브라우저 `DOMParser` 기반 XSS 회귀 검증을 완비했습니다.
+검수 요청 이후 발생한 마크다운 미리보기 XSS 취약점 조치 지시사항에 따라, 외부 라이브러리 의존성을 배제하고 `marked` 파서의 커스텀 렌더러 기능을 통해 HTML 태그를 차단하는 보안 대책을 보강했습니다. 최종 5차 보완에서는 실시간 회귀 테스트의 성공 로그 및 상시 구동 코드가 운영(Production) 빌드 번들에 포함되지 않도록 Vite 환경 변수를 활용해 개발 환경으로 안전하게 격리 처리했습니다.
 
 ## 2. 작업 이행 내역
 
@@ -39,12 +39,14 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 
 ### 4차 보완 이행 내역 (Sanitizer 정교화 및 XSS 회귀 검증)
 - **마크다운 URL Sanitizer 정교화**:
-  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `decodeHtmlEntities` (HTML Entity 우회 방어), `normalizeUrlForPolicy` (제어문자 및 공백 우회 제거), `hasExplicitScheme`, `sanitizeUrl`을 추가 구현했습니다.
-  - 링크는 `['http:', 'https:', 'mailto:', 'tel:']`, 이미지는 `['http:', 'https:']` 에 대한 허용 스키마 allowlist 정책을 강제했습니다.
+  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `decodeHtmlEntities` (HTML Entity 우회 방어), `normalizeUrlForPolicy` (제어문자 및 공백 우회 제거), `hasExplicitScheme`, `sanitizeUrl`을 추가 구현하고 허용 프로토콜 allowlist를 강제했습니다.
 - **Attribute Injection 방어**:
   - `marked` 의 custom `link` 및 `image` 렌더러에 의해 반환되는 HTML 태그의 모든 속성(`href`, `src`, `title`, `alt`) 값을 최종적으로 `escapeHtml()` 처리하여 속성 탈출(따옴표 주입 XSS)을 원천 차단했습니다.
-- **실시간 XSS 회귀 검증 엔진 탑재**:
-  - `unsafeInputs` 8가지 대표 취약성 주입 케이스에 대하여 `marked.parse` 결과를 브라우저 `DOMParser`로 분석해 이벤트 속성(`on*`)이나 위험한 스키마 주입 여부를 검출하는 `runMarkdownXssRegressionTests()` 함수를 탑재하고 로딩 시점 실행하도록 강제했습니다.
+
+### 5차 보완 이행 내역 (운영 번들 빌드 최적화 및 회귀 검증 격리)
+- **성공 로그 제거 및 개발 서버 한정 격리**:
+  - `runMarkdownXssRegressionTests()` 내부에 출력되던 성공 확인용 `console.log` 메시지를 전량 삭제했습니다.
+  - 로딩 시점 즉시 실행부는 Vite의 환경변수 `import.meta.env.DEV` 분기를 통해 조건부 기동하게 수정했습니다. 이에 따라 프로덕션 컴파일(`npm run build`) 시 해당 테스트 기동 코드가 Dead Code로 인식되어 운영 번들(`public/dist/js/app-*.js`) 내부에서 원천 탈락(제거)되도록 최적화했습니다.
 
 ## 3. 변경 파일
 - [global.d.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/types/global.d.ts)
@@ -86,7 +88,7 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 | `<img src=x onerror=alert(1)>` | `&lt;img src=x onerror=alert(1)&gt;` | **PASS (이벤트/태그 무력화)** |
 | `[x](javascript:alert(1))` | `<a href="#">x</a>` | **PASS (javascript 스키마 차단)** |
 | `[x](javascript&#58;alert(1))` | `<a href="#">x</a>` | **PASS (HTML Entity 우회 디코딩 차단)** |
-| `[x](java\nscript:alert(1))` | `<a href="#">x</a>` | **PASS (제어문자 우회 차단)** |
+| `[x](java\nscript:alert(1))` | `[x](java\nscript:alert(1))` (줄바꿈 스키마는 링크 파싱이 무력화되어 일반 텍스트 노출됨) | **PASS (비링크 일반 문자열 안전 노출)** |
 | `[x](data:text/html,<script>alert(1)</script>)` | `<a href="#">x</a>` | **PASS (data 스키마 차단)** |
 | `![x](data:image/svg+xml,<svg onload=alert(1)>)` | `<img src="#" alt="x" />` | **PASS (이미지 data 스키마 차단)** |
 | `[x](vbscript:msgbox(1))` | `<a href="#">x</a>` | **PASS (vbscript 스키마 차단)** |
@@ -94,9 +96,10 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 
 ## 7. 검수 요청 사항
 - **대상 브랜치**: `dev`
-- **커밋 해시**: 0e0f3a57
+- **커밋 해시**: 96444437
 - **보완 이력**:
   - `458f63b9` (1차 검수 요청 커밋)
   - `81063847` (2차 마크다운 HTML 토큰 XSS 방어 보완 커밋)
   - `d8a40046` (3차 마크다운 링크/이미지 프로토콜 XSS 방어 보완 커밋)
-  - `0e0f3a57` (4차 URL Sanitizer 정교화 및 DOMParser 회귀 테스트 탑재 완료 커밋)
+  - `82d37a28` (4차 URL Sanitizer 정교화 및 DOMParser 회귀 테스트 탑재 커밋)
+  - `96444437` (5차 운영 번들 회귀 테스트 격리 및 성공 로그 억제 완료 커밋)
