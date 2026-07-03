@@ -37,7 +37,7 @@ features:
 ## 빠른 설치
 
 ```bash
-composer require "saaksin/laravel-administrator:10.6.*"
+composer require "saaksin/laravel-administrator:10.7.*"
 ```
 
 서비스 프로바이더를 등록한 뒤 설정 파일을 배포합니다.
