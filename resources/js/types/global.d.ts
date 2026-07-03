@@ -45,7 +45,6 @@ interface Window {
     };
     Quill?: any;
     CKEDITOR?: any;
-    History?: any;
     Alpine?: any;
 }
 

@@ -174,7 +174,7 @@
   background: -ms-linear-gradient(top, #818181 0%, #646464 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #818181 0%, #646464 100%);
+  background: linear-gradient(to bottom, #818181 0%, #646464 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -215,7 +215,7 @@
   background: -ms-linear-gradient(top, #929292 0%, #646464 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #929292 0%, #646464 100%);
+  background: linear-gradient(to bottom, #929292 0%, #646464 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -254,7 +254,7 @@
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -303,8 +303,7 @@
   width: 98%;
 }
 .editForm > div select,
-.editForm > div input[type=hidden],
-.editForm > div .select2-container {
+.editForm > div input[type=hidden] {
   width: 226px;
 }
 .editForm > div div.characters_left {
@@ -473,8 +472,7 @@
   width: 98%;
 }
 #settings_page form.settings_form > div select,
-#settings_page form.settings_form > div input[type=hidden],
-#settings_page form.settings_form > div .select2-container {
+#settings_page form.settings_form > div input[type=hidden] {
   width: 226px;
 }
 #settings_page form.settings_form > div div.characters_left {
@@ -757,14 +755,6 @@ a {
   display: block;
   margin-bottom: 5px;
 }
-/* Fix for datetimepicker partially being covered by top menu*/
-#ui-datepicker-div {
-  margin-top: 40px !important;
-  z-index: 999 !important;
-}
-#ui-timepicker-div dl dd {
-  margin: 0px 10px 10px 85px;
-}
 /* common structure */
 #wrapper header {
   background: #5a6064;
@@ -785,7 +775,7 @@ a {
   background: -ms-linear-gradient(top, #5a6064 0%, #4a4f52 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #5a6064 0%, #4a4f52 100%);
+  background: linear-gradient(to bottom, #5a6064 0%, #4a4f52 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -837,7 +827,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -863,7 +853,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -902,7 +892,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -938,7 +928,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -979,7 +969,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1027,7 +1017,7 @@ a {
   background: -ms-linear-gradient(top, #333333 0%, #444444 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #333333 0%, #444444 100%);
+  background: linear-gradient(to bottom, #333333 0%, #444444 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1077,7 +1067,7 @@ a {
   background: -ms-linear-gradient(top, #5a6064 0%, #4a4f52 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #5a6064 0%, #4a4f52 100%);
+  background: linear-gradient(to bottom, #5a6064 0%, #4a4f52 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1115,7 +1105,7 @@ a {
   background: -ms-linear-gradient(top, #333333 0%, #444444 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #333333 0%, #444444 100%);
+  background: linear-gradient(to bottom, #333333 0%, #444444 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1171,7 +1161,7 @@ a {
   background: -ms-linear-gradient(top, #333333 0%, #444444 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #333333 0%, #444444 100%);
+  background: linear-gradient(to bottom, #333333 0%, #444444 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1206,7 +1196,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1252,7 +1242,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1284,7 +1274,7 @@ a {
   background: -ms-linear-gradient(top, #444444 0%, #333333 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #444444 0%, #333333 100%);
+  background: linear-gradient(to bottom, #444444 0%, #333333 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1384,7 +1374,7 @@ a {
   background: -ms-linear-gradient(top, #efefef 0%, #dfe1e2 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #efefef 0%, #dfe1e2 100%);
+  background: linear-gradient(to bottom, #efefef 0%, #dfe1e2 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1440,7 +1430,7 @@ a {
   background: -ms-linear-gradient(top, #818181 0%, #646464 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #818181 0%, #646464 100%);
+  background: linear-gradient(to bottom, #818181 0%, #646464 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1485,7 +1475,7 @@ a {
   background: -ms-linear-gradient(top, #929292 0%, #646464 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #929292 0%, #646464 100%);
+  background: linear-gradient(to bottom, #929292 0%, #646464 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1523,7 +1513,7 @@ a {
   background: -ms-linear-gradient(top, #efefef 0%, #dfe1e2 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #efefef 0%, #dfe1e2 100%);
+  background: linear-gradient(to bottom, #efefef 0%, #dfe1e2 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1606,7 +1596,7 @@ a {
   background: -ms-linear-gradient(top, #efefef 0%, #dfe1e2 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #efefef 0%, #dfe1e2 100%);
+  background: linear-gradient(to bottom, #efefef 0%, #dfe1e2 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1665,7 +1655,7 @@ a {
   background: -ms-linear-gradient(top, #e2e2e2 0%, #d2d4d6 100%);
   /* IE10+ */
 
-  background: linear-gradient(top, #e2e2e2 0%, #d2d4d6 100%);
+  background: linear-gradient(to bottom, #e2e2e2 0%, #d2d4d6 100%);
   /* W3C */
 
   /* IE6-9 */
@@ -1930,9 +1920,6 @@ a {
 }
 .lw-colorpicker {
   z-index: 807;
-}
-.select2-search input {
-  width: 100% !important;
 }
 /* media queries */
 /**

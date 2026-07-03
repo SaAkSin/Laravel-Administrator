@@ -114,7 +114,7 @@
 			data_model: <?php echo json_encode($dataModel) ?>,
 			column_model: <?php echo json_encode($columnModel) ?>,
 			action_permissions: <?php echo json_encode($actionPermissions) ?>,
-			languages: <?php echo json_encode(trans('administrator::knockout')) ?>
+			languages: <?php echo json_encode(trans('administrator::frontend')) ?>
 		};
 </script>
 
@@ -148,7 +148,7 @@
 		}
 	}
 
-	div.item_edit form.edit_form select, div.item_edit form.edit_form input[type=hidden], div.item_edit form.edit_form .select2-container {
+	div.item_edit form.edit_form select, div.item_edit form.edit_form input[type=hidden] {
 		width: <?php echo $formWidth - 75 ?>px !important;
 	}
 

@@ -7,7 +7,7 @@
 <a name="introduction"></a>
 ## Introduction
 
-Any Eloquent model (or any object that ultimately extends from an Eloquent model) can be represented by a model configuration file. These files can be kept anywhere in your application directory structure. All you do is provide the path to their location in the `app/config/packages/frozennode/administrator/administrator.php` config file with the [`model_config_path`](/docs/configuration#model-config-path) option. The **file names** of these files correspond to the values supplied in the [`menu`](/docs/configuration#menu) option, also in the `administrator.php` config.
+Any Eloquent model can be represented by a model configuration file. These files can be kept anywhere in your application structure. Provide their directory through the [`model_config_path`](/docs/configuration#model-config-path) option in `config/administrator.php`. The **file names** of these files correspond to the values supplied in the [`menu`](/docs/configuration#menu) option.
 
 > **Note**: These are also the **uris** for each model in the admin interface.
 
@@ -20,7 +20,7 @@ There are several required fields that must be supplied in order for a model con
 <a name="examples"></a>
 ## Examples
 
-For some example config files, check out the `/examples` directory on [Administrator's GitHub repo](https://github.com/FrozenNode/Laravel-Administrator/tree/master/examples).
+For working examples, see the [tutorials](/docs/tutorials) and the [GitHub repository](https://github.com/SaAkSin/Laravel-Administrator).
 
 <a name="options"></a>
 ## Options
@@ -145,7 +145,6 @@ These are the columns that will be displayed in your result set. As you can see 
 
 The `edit_fields` array lets you define the editable fields for a model. There are many types of fields, including most primitive types and more complex fields like relationships. If you want to represent a field on the model's table, the item's key in the `edit_fields` array should be the attribute name. If the column you want to show is either a custom select or a relationship column, the item's key will be the column's alias.
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/edit-form.png" />
 
 > For a detailed description of all the edit field types and options, see the **[field docs](/docs/fields)**
 
@@ -261,7 +260,6 @@ Action permissions can be supplied to give you access control over the four prim
 
 You can define custom actions for your model if you want to provide the administrative user buttons to perform custom code. In the above example, there will be two buttons produced that look like this:
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/custom-actions.png" />
 
 When the user clicks on either button, the `action` property above is called and passed the relevant Eloquent model.
 
@@ -362,7 +360,6 @@ The validation messages for your models can be set using the `messages` option. 
 
 The `sort` option should be an array with two keys: `field` and `direction`. `field` must be a column in the `columns` array. `direction` must be either `asc` or `desc`.
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/sorting.png" />
 
 <a name="form-width"></a>
 ## Form Width

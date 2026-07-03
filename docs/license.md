@@ -6,7 +6,7 @@
 <a name="introduction"></a>
 ## Introduction
 
-Administrator is distributed under the MIT license, so you are free to [fork it](https://github.com/FrozenNode/Laravel-Administrator) and do whatever you like with it. All of the libraries used by Administrator are also open source and free for commercial use.
+Administrator is distributed under the MIT license, so you are free to [fork it](https://github.com/SaAkSin/Laravel-Administrator) and use it under the license terms. Keep the original copyright notice and any third-party license notices when redistributing the package.
 
 <a name="license"></a>
 ## MIT License

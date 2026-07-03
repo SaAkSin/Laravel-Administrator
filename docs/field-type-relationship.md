@@ -17,7 +17,6 @@ Relationship field types allow you to manage the `belongsTo` and `belongsToMany`
 <a name="belongs-to"></a>
 ## Belongs To
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-relation-single.png" />
 
 	'user' => array(
 		'type' => 'relationship',
@@ -38,14 +37,12 @@ The `name_field` option lets you define which column or accessor on the other ta
 <a name="belongs-to-filter"></a>
 ## Belongs To Filter
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-relation-single-filter.png" />
 
 The `belongsTo` filter lets you filter a result set for items that are related to the selection you make.
 
 <a name="belongs-to-many"></a>
 ## Belongs To Many
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-relation-multi.png" />
 
 	'actors' => array(
 		'type' => 'relationship',
@@ -82,7 +79,6 @@ Now the individual items in the multi-select box will be sortable via drag and d
 <a name="belongs-to-many-filter"></a>
 ## Belongs To Many Filter
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-relation-multi-filter.png" />
 
 The `belongsToMany` filter lets you filter a result set for items that are related to the selection you make. This is an inclusive filter, not a progressively exclusive filter.
 

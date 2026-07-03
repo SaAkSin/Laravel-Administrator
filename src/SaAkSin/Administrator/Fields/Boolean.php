@@ -23,7 +23,7 @@ class Boolean extends Field {
 
 		$value = $this->validator->arrayGet($this->suppliedOptions, 'value', true);
 
-		//we need to set the value to 'false' when it is falsey so it plays nicely with select2
+		//we need to set the value to 'false' when it is falsey so it serializes consistently
 		if (!$value && $value !== '')
 		{
 			$this->suppliedOptions['value'] = 'false';

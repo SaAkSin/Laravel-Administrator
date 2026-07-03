@@ -18,7 +18,7 @@ Settings are saved as JSON files in the storage subdirectory `administrator_sett
 <a name="examples"></a>
 ## Examples
 
-For some example config files, check out the `/examples` directory on [Administrator's GitHub repo](https://github.com/FrozenNode/Laravel-Administrator/tree/master/examples).
+For working examples, see the [tutorials](/docs/tutorials) and the [GitHub repository](https://github.com/SaAkSin/Laravel-Administrator).
 
 <a name="options"></a>
 ## Options
@@ -76,7 +76,6 @@ This is the title of the settings page used in the menu and as the page's primar
 
 The `edit_fields` array lets you define the editable fields for a settings page. All field types are allowed with the exception of key and relationship fields. This works much like the [`edit_fields`](/docs/model-configuration#edit-fields) option in model config files. When an admin chooses to save a settings page, an array will be provided to the [`before_save callback`](#before-save) containing all of your data. The indexes of the data values will be the same as the indexes you provide in the `edit_fields` array.
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/settings-overview.png" />
 
 > For a detailed description of all the edit field types and options, see the **[field docs](/docs/fields)**
 
@@ -166,7 +165,6 @@ The permission option lets you define a closure that determines whether or not t
 
 You can define custom actions for your settings page if you want to provide the administrative user buttons to perform custom code. In the above example, there will be two buttons produced that look like this:
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/custom-actions-settings.png" />
 
 When the user clicks on either button, the `action` property for that button is called. The currently-saved settings data is passed into the function by reference with the `$data` parameter. This means that you can change the data however you like prior to it being saved in the JSON.
 

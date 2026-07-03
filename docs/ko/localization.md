@@ -10,7 +10,7 @@
 <a name="introduction"></a>
 ## 소개
 
-Administrator는 Laravel의 다국어 지원 기능을 그대로 사용합니다. 패키지 내부 번역 파일은 `src/lang/{locale}/administrator.php`와 `src/lang/{locale}/knockout.php`에 있으며, 애플리케이션의 기본 로케일과 Administrator 전역 설정의 `locales` 옵션에 따라 화면 언어가 결정됩니다.
+Administrator는 Laravel의 다국어 지원 기능을 그대로 사용합니다. 패키지 내부 번역 파일은 `src/lang/{locale}/administrator.php`와 `src/lang/{locale}/frontend.php`에 있으며, 애플리케이션의 기본 로케일과 Administrator 전역 설정의 `locales` 옵션에 따라 화면 언어가 결정됩니다.
 
 <a name="default-locale"></a>
 ## 기본 로케일
@@ -80,12 +80,12 @@ ar az bg ca da de en es eu fi fr hr hu it ja nb nl pl pt pt-BR ro ru se si sk sr
 <a name="contributing"></a>
 ## 언어 추가
 
-새 언어를 추가하려면 `src/lang/{locale}/administrator.php`와 `src/lang/{locale}/knockout.php`를 함께 추가합니다. 기존 `src/lang/en` 파일을 복사해 번역하면 구조를 맞추기 쉽습니다.
+새 언어를 추가하려면 `src/lang/{locale}/administrator.php`와 `src/lang/{locale}/frontend.php`를 함께 추가합니다. 기존 `src/lang/en` 파일을 복사해 번역하면 구조를 맞추기 쉽습니다.
 
 ```text {2-3}
 src/lang/ko/
   administrator.php
-  knockout.php
+  frontend.php
 ```
 
 번역 개선은 [GitHub 이슈](https://github.com/SaAkSin/Laravel-Administrator/issues) 또는 Pull Request로 제안할 수 있습니다. 기여 절차는 [기여하기 문서](/docs/ko/contributing)를 참고하십시오.

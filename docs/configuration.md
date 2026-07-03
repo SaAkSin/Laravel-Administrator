@@ -6,16 +6,13 @@
 <a name="introduction"></a>
 ## Introduction
 
-Once the package is installed, you can publish the config file with:
+Once the package is installed, publish the config file and package assets with:
 
-### Laravel 5
-    php artisan vendor:publish --provider='SaAkSin\Administrator\AdministratorServiceProvider'
+```bash
+php artisan vendor:publish --tag=laravel-administrator --force
+```
 
-### Laravel 4
-	php artisan config:publish frozennode/administrator
-
-This will create the file `app/config/packages/saaksin/administrator/administrator.php` and seed it with some defaults. This [config file](http://administrator.frozennode.com/docs/configuration) is the primary way you interact with Administrator.
-
+This creates `config/administrator.php` in the host application and publishes the assets used by the administrator UI. This configuration file is the primary way you interact with Administrator.
 
 All of the configuration options are used, but not all of them must be supplied.
 
@@ -166,7 +163,6 @@ You can also specify custom view pages that preserve the header navigation of Ad
 
 If you want to have a submenu, instead of passing in a string, pass in an array of strings. The index of this slot will be the submenu's title in the UI. Submenus can themselves have submenus and there is no depth limit.
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/menu.png" />
 
 > For a detailed description of all the model configuration options, see the **[model configuration docs](/docs/model-configuration)**
 
@@ -267,7 +263,6 @@ Provide any value that would work with Laravel's `URL::to()` method.
 
 If you would like to give your administrative users the option to log out from the admin interface, you can specify a string `logout_path`. When provided, an anchor will show up at the top right of the screen that will send the user to your specified path. By default, the `logout_path` option is set to `false`.
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/logout-button.png" />
 
 <a name="redirect-key"></a>
 ### Redirect Key
@@ -293,7 +288,6 @@ When a user is redirected to the `login_path`, the redirect path is sent with th
 
 Your admin users have the ability to set the rows per page in each model with this dropdown:
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/rows-per-page.png" />
 
 This is persistent across page loads until the user's session expires. The `global_rows_per_page` option is the default value for when the user hasn't yet set the number they want for any particular model.
 
@@ -310,6 +304,5 @@ This is persistent across page loads until the user's session expires. The `glob
 
 When provided, this array of locale strings gives the administrative user the choice of various locales in the locales menu at the top right of the Administrator interface:
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/localization.png" />
 
 The user's choice of locale will persist across page loads until a user's session expires.

@@ -7,10 +7,9 @@
 
 /* 
  * =========================================================================
- * 🌿 Zero-jQuery 모던 어드민: 클래식 jQuery UI 실버/연그레이 테마 CSS 복원 명세서
+ * 모던 어드민: 클래식 실버/연그레이 테마 CSS 명세서
  * =========================================================================
- * 제이쿼리 의존성 없이 순수 CSS3를 사용하여, 과거 jQuery UI가 입혀주던 
- * 특유의 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 현대적으로 재해석하여 완벽히 복원합니다.
+ * 순수 CSS3를 사용하여 은은하고 정갈한 실버 그라데이션 및 곡률 테마를 제공합니다.
  */
 
 /* 1. 폼 컨트롤 명세서 (텍스트 인풋, 셀렉트 프리미엄 현대화 및 30px 보정) */
@@ -242,7 +241,7 @@ table.results th.sortable:hover {
 
 /* 테이블 바디 행 하이라이트 효과 */
 table.results tbody tr.result:hover td {
-    background-color: #f0f7fc !important; /* jQuery UI 클래식 스카이블루 하이라이트 복원 */
+    background-color: #f0f7fc !important; /* 스카이블루 행 하이라이트 */
     cursor: pointer !important;
 }
 
@@ -347,7 +346,7 @@ table.results td {
 
 /* 옵션 항목 마우스 호버 스타일 (순수 CSS 처리로 Alpine 마크업 최소화) */
 .combobox-option-item:hover {
-    background-color: #f0f7fc !important; /* jQuery 클래식 스카이블루 계열 호버 스킨 */
+    background-color: #f0f7fc !important; /* 스카이블루 계열 호버 스킨 */
     color: #0284c7 !important; /* 맑은 블루 포커스 HSL 이식 */
 }
 
@@ -518,7 +517,7 @@ table.results td {
 }
 
 /* =========================================================================
- * 📦 프리미엄 Combobox 컴포넌트 2단 레이아웃 CSS 명세서 (Zero-jQuery)
+ * 프리미엄 Combobox 컴포넌트 2단 레이아웃 CSS 명세서
  * =========================================================================
  */
 
@@ -622,6 +621,5 @@ table.results td {
         padding-left: 8px !important;
     }
 }
-
 
 

@@ -173,7 +173,7 @@ export class AdminController {
         // 4. 연관 관계 리스트 바인딩
         this.initRelationships();
 
-        // 5. history.js 히스토리 상태 및 브라우저 이벤트 리스너 바인딩
+        // 5. 브라우저 히스토리 상태 및 이벤트 리스너 바인딩
         this.initHistory();
         this.initEvents();
 
@@ -517,9 +517,7 @@ export class AdminController {
                 }, 50);
 
                 setTimeout(() => {
-                    if (window.History && window.History.pushState) {
-                        window.History.pushState({ modelName: self.modelName }, null, window.route + self.modelName);
-                    }
+                    self.pushHistoryState({ modelName: self.modelName }, window.route + self.modelName);
                 }, 200);
             } else {
                 self.statusMessage = response.errors || 'Save failed';
@@ -570,9 +568,7 @@ export class AdminController {
 
                 setTimeout(() => {
                     self.clearItem();
-                    if (window.History && window.History.pushState) {
-                        window.History.pushState({ modelName: self.modelName }, null, window.route + self.modelName);
-                    }
+                    self.pushHistoryState({ modelName: self.modelName }, window.route + self.modelName);
                 }, 500);
             } else {
                 self.statusMessage = response.error || 'Delete failed';
@@ -590,9 +586,7 @@ export class AdminController {
         if (!this.loadingItem && this.activeItem !== id && this.actionPermissions.view) {
             this.getItem(id);
 
-            if (window.History && window.History.pushState) {
-                window.History.pushState({ modelName: this.modelName, id: id }, null, window.route + this.modelName + '/' + id);
-            }
+            this.pushHistoryState({ modelName: this.modelName, id: id }, window.route + this.modelName + '/' + id);
         }
     }
 
@@ -746,9 +740,7 @@ export class AdminController {
     public closeItem(): void {
         this.clearItem();
 
-        if (window.History && window.History.pushState) {
-            window.History.pushState({ modelName: this.modelName }, null, window.route + this.modelName);
-        }
+        this.pushHistoryState({ modelName: this.modelName }, window.route + this.modelName);
     }
 
     public clearItem(): void {
@@ -1237,9 +1229,7 @@ export class AdminController {
             const target = (e.target as HTMLElement).closest('div.results_header a.new_item');
             if (target) {
                 e.preventDefault();
-                if (window.History && window.History.pushState) {
-                    window.History.pushState({ modelName: this.modelName, id: 0 }, null, window.route + this.modelName + '/new');
-                }
+                this.pushHistoryState({ modelName: this.modelName, id: 0 }, window.route + this.modelName + '/new');
             }
 
             // 메뉴 클릭 감지 시 isUnloading 플래그 조기 활성화 (중복 리로드 방지)
@@ -1260,29 +1250,26 @@ export class AdminController {
         document.body.addEventListener('mouseup', this.resizePage.bind(this));
         document.body.addEventListener('keypress', this.resizePage.bind(this));
 
-        if (window.History && window.History.Adapter) {
-            window.History.Adapter.bind(window, 'statechange', () => {
-                if (isUnloading) return;
+        window.addEventListener('popstate', (event) => {
+            if (isUnloading) return;
 
-                const state = window.History.getState();
+            const state = event.state || { modelName: this.modelName };
 
-                if (state.data.ignore || (state.data.init && !this.historyStarted)) return;
+            if (state.ignore || (state.init && !this.historyStarted)) return;
 
-                if ('modelName' in state.data) {
-                    if (state.data.modelName !== this.modelName) {
-                        window.location.reload();
-                    }
+            if ('modelName' in state && state.modelName !== this.modelName) {
+                window.location.reload();
+                return;
+            }
+
+            if ('id' in state) {
+                if (state.id !== this.activeItem) {
+                    this.getItem(state.id);
                 }
-
-                if ('id' in state.data) {
-                    if (state.data.id !== this.activeItem) {
-                        this.getItem(state.data.id);
-                    }
-                } else {
-                    this.clearItem();
-                }
-            });
-        }
+            } else {
+                this.clearItem();
+            }
+        });
     }
 
     private initHistory(): void {
@@ -1299,16 +1286,28 @@ export class AdminController {
                     historyData.id = window.adminData.id;
                     uri += '/' + (historyData.id ? historyData.id : 'new');
 
-                    if (window.History && window.History.pushState) {
-                        window.History.pushState(historyData, null, uri);
-                    }
+                    this.replaceHistoryState(historyData, uri);
 
                     clearInterval(timer);
                 }
             }, 100);
+        } else {
+            this.replaceHistoryState(historyData, uri);
         }
 
         this.historyStarted = true;
+    }
+
+    private pushHistoryState(data: Record<string, any>, uri: string): void {
+        if (window.history && window.history.pushState) {
+            window.history.pushState(data, '', uri);
+        }
+    }
+
+    private replaceHistoryState(data: Record<string, any>, uri: string): void {
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(data, '', uri);
+        }
     }
 
     public resizePage(): void {

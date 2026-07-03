@@ -10,7 +10,6 @@
 - [대시보드와 홈 페이지](#dashboard)
 - [이동 경로](#paths)
 - [목록과 로케일](#list-and-locales)
-- [레거시 프론트엔드](#legacy-frontend)
 
 <a name="introduction"></a>
 ## 소개
@@ -60,7 +59,6 @@ return array(
     'logout_path' => false,
     'global_rows_per_page' => 20,
     'locales' => array('ko', 'en'),
-    'enable_knockout' => false,
 );
 ```
 
@@ -202,14 +200,5 @@ false로 평가되면 `login_path`로 리다이렉트되고, 세션에는 `login
 ```
 
 `global_rows_per_page`는 모델 목록의 기본 페이지당 행 수입니다. `locales`에 둘 이상의 로케일을 넣으면 관리자 화면에서 언어 선택 UI를 사용할 수 있습니다.
-
-<a name="legacy-frontend"></a>
-## 레거시 프론트엔드
-
-```php {1}
-'enable_knockout' => false,
-```
-
-현재 패키지는 Vite, Alpine.js, Tailwind CSS 기반 UI를 기본으로 사용합니다. 과거 Knockout.js 기반 뷰 컴포넌트를 함께 유지해야 하는 마이그레이션 상황에서만 `enable_knockout`을 `true`로 변경하십시오.
 
 다음 단계는 [모델 설정](/docs/ko/model-configuration), [세팅 설정](/docs/ko/settings-configuration), [필드](/docs/ko/fields)를 참고하십시오.

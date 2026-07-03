@@ -5,7 +5,6 @@
 <a name="usage"></a>
 ## Usage
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-wysiwyg.png" />
 
 The `wysiwyg` field type should be a TEXT type in your database.
 
