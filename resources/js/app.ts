@@ -18,10 +18,36 @@ const escapeHtml = (text: string): string => {
         .replace(/'/g, "&#039;");
 };
 
+// 위험한 URL 프로토콜 방지를 위한 클린 URL 헬퍼 함수
+const cleanUrl = (href: string): string => {
+    try {
+        const cleanHref = href.replace(/[^\x20-\x7E]/g, '').trim();
+        const lowerHref = cleanHref.toLowerCase();
+        if (lowerHref.startsWith('javascript:') || lowerHref.startsWith('data:') || lowerHref.startsWith('vbscript:')) {
+            return '#';
+        }
+        return href;
+    } catch (e) {
+        return '#';
+    }
+};
+
 marked.use({
     renderer: {
         html(token: any) {
             return escapeHtml(token.text || token.raw || '');
+        },
+        link(this: any, token: any) {
+            const href = cleanUrl(token.href || '');
+            const title = token.title ? ` title="${escapeHtml(token.title)}"` : '';
+            const text = this.parser.parse(token.tokens || []);
+            return `<a href="${href}"${title}>${text}</a>`;
+        },
+        image(token: any) {
+            const href = cleanUrl(token.href || '');
+            const title = token.title ? ` title="${escapeHtml(token.title)}"` : '';
+            const alt = token.text ? ` alt="${escapeHtml(token.text)}"` : '';
+            return `<img src="${href}"${alt}${title} />`;
         }
     }
 });

@@ -3,7 +3,7 @@ title: "프로젝트 안정화 기준선 복구 결과 보고서"
 date: 2026-07-03
 author: "executor"
 status: "review"
-description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파일 오류, deprecation 경고 해결 및 마크다운 XSS 조치를 포함한 보완 결과 보고서"
+description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파일 오류, deprecation 경고 해결 및 마크다운 XSS 링크 필터링 조치를 포함한 3차 보완 결과 보고서"
 ---
 
 # 프로젝트 안정화 기준선 복구 결과 보고서
@@ -11,7 +11,7 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 ## 1. 개요
 본 작업은 `saaksin/laravel-administrator` 패키지의 PHPUnit 테스트 실패 오류를 수정하고, TypeScript 6 및 PHP 8.3 환경에서 발생하는 컴파일/런타임 deprecation 경고들을 말끔히 해소하여 배포 가능한 품질 기준선을 복구하는 데 목적이 있습니다. 
 
-1차 검수 요청 이후 발생한 마크다운 미리보기 XSS 취약점 조치 지시사항에 따라, 외부 라이브러리 의존성을 배제하고 `marked` 파서의 커스텀 렌더러 기능을 통해 HTML 태그를 차단하는 보안 대책을 보강했습니다.
+1차 및 2차 검수 요청 이후 발생한 마크다운 미리보기 XSS 취약점 조치 지시사항에 따라, 외부 라이브러리 의존성을 배제하고 `marked` 파서의 커스텀 렌더러 기능을 통해 HTML 태그를 차단하는 보안 대책을 보강했습니다. 3차 보완에서는 마크다운 링크 및 이미지 내 `javascript:`, `data:` 등의 위험한 프로토콜이 주입되는 클릭 기반 XSS 시나리오를 완벽하게 무력화하는 URL 필터링 장치를 연동했습니다.
 
 ## 2. 작업 이행 내역
 
@@ -34,8 +34,12 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 
 ### 2차 보완 이행 내역 (XSS 보강)
 - **마크다운 XSS 방지 커스텀 렌더러 도입**:
-  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `marked.use()`를 연동하여 `html` 토큰 파싱 시 HTML Entity로 escape 처리하도록 커스텀 HTML 렌더러를 탑재했습니다.
-  - 이를 통해 날것의 `<script>` 및 `<img onerror>` 같은 악성 스크립트 실행이 완전히 원천 차단됩니다. (마크다운 고유의 굵게, 기울임, 링크 및 이미지 마크업 렌더링은 안전하게 동작합니다.)
+  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `marked.use()`를 연동하여 `html` 토큰 파싱 시 HTML Entity로 escape 처리하도록 커스텀 HTML 렌더러를 탑재했습니다. 날것의 `<script>` 나 `<img onerror>` 같은 악성 스크립트 실행이 완전히 원천 차단됩니다.
+
+### 3차 보완 이행 내역 (URL 프로토콜 필터링 보강)
+- **마크다운 링크/이미지 프로토콜 세척**:
+  - [app.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/app.ts) 파일에 `cleanUrl` 헬퍼 함수를 신설하고, `marked.use()`의 `link` 및 `image` 렌더러를 확장 적용했습니다.
+  - 마크다운 링크 또는 이미지 경로에 `javascript:`, `data:`, `vbscript:` 스키마가 감지되면 자동으로 `#`으로 치환하여 클릭 시 발생하는 XSS 위협을 차단합니다.
 
 ## 3. 변경 파일
 - [global.d.ts](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/resources/js/types/global.d.ts)
@@ -64,7 +68,7 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 - **Vite 프론트엔드 빌드**: 빌드 자체는 성공적이나 CSS gradient 방향 구문 경고가 식별됨
   ```bash
   npm run build
-  # 결과: built in 1.17s (정상 종료)
+  # 결과: built in 1.09s (정상 종료)
   ```
 
 ## 5. 남은 리스크
@@ -72,7 +76,8 @@ description: "Laravel Administrator 패키지의 테스트 실패 및 TS6 컴파
 
 ## 6. 검수 요청 사항
 - **대상 브랜치**: `dev`
-- **커밋 해시**: c44550b5
+- **커밋 해시**: 31714664
 - **보완 이력**:
   - `458f63b9` (1차 검수 요청 커밋)
-  - `c44550b5` (2차 마크다운 미리보기 XSS 방어 보완 완료 커밋)
+  - `81063847` (2차 마크다운 HTML 토큰 XSS 방어 보완 커밋)
+  - `31714664` (3차 마크다운 링크/이미지 프로토콜 XSS 방어 보완 완료 커밋)
