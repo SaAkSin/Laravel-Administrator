@@ -8,12 +8,12 @@
 <a name="introduction"></a>
 ## 소개
 
-Administrator의 소스코드는 [GitHub](https://github.com/FrozenNode/Laravel-Administrator)에서 관리되고 있습니다. MIT 라이선스 하에 배포되므로 자유롭게 포크(fork)하여 원하는 대로 수정 및 사용하실 수 있습니다. Administrator를 활용하여 멋진 프로젝트를 개발하고 계신다면, 언제든 저희에게 공유해 주세요!
+Administrator의 소스코드는 [GitHub](https://github.com/SaAkSin/Laravel-Administrator)에서 관리되고 있습니다. MIT 라이선스 하에 배포되므로 자유롭게 포크(fork)하여 원하는 대로 수정 및 사용하실 수 있습니다.
 
 <a name="issues"></a>
 ## 버그, 질문 및 기능 요청
 
-Administrator에서 버그를 발견하셨거나, 문의 사항이 있거나, 새로운 기능을 제안하고 싶으신 경우, 가장 좋은 방법은 [GitHub 이슈 트래커](https://github.com/FrozenNode/Laravel-Administrator/issues)에 이슈를 등록하는 것입니다. Administrator의 수많은 기능 중 상당 부분은 누군가 필요한 기능에 대해 질문하고 제안한 것에서 시작되어 개발되었습니다. 그러니 주저하지 말고 언제든 제안해 주세요!
+Administrator에서 버그를 발견했거나, 문의 사항 또는 기능 제안이 있다면 [GitHub 이슈 트래커](https://github.com/SaAkSin/Laravel-Administrator/issues)에 등록해 주십시오.
 
 <a name="pull-requests"></a>
 ## 풀 리퀘스트

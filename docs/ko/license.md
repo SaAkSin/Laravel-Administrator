@@ -6,7 +6,7 @@
 <a name="introduction"></a>
 ## 소개
 
-Administrator는 MIT 라이선스 하에 배포되므로 자유롭게 [포크(fork)](https://github.com/FrozenNode/Laravel-Administrator)하여 원하는 대로 사용할 수 있습니다. Administrator에서 사용하는 모든 라이브러리 역시 오픈 소스이며 상업적 용도로 무료로 사용할 수 있습니다.
+Administrator는 MIT 라이선스 하에 배포되므로 자유롭게 [포크(fork)](https://github.com/SaAkSin/Laravel-Administrator)하여 원하는 대로 사용할 수 있습니다. Administrator에서 사용하는 라이브러리 역시 각 라이선스 조건에 따라 사용할 수 있습니다.
 
 <a name="license"></a>
 ## MIT 라이선스

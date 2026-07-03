@@ -11,4 +11,6 @@ nbproject
 .phpunit.result.cache
 /examples
 /node_modules/
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/
 GEMINI.md

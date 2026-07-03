@@ -1,46 +1,99 @@
 # 소개
 
 - [개요](#overview)
-- [커스터마이징](#customization)
+- [주요 특징](#features)
 - [인증](#authentication)
 - [Eloquent](#eloquent)
-- [설치 / 가이드](#installation-guidance)
-
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/overview.jpg" />
+- [설정 페이지](#settings-pages)
+- [다음 단계](#next)
 
 <a name="overview"></a>
 ## 개요
 
-Administrator는 [Laravel](http://laravel.com)을 위한 관리자 인터페이스 빌더입니다. Administrator를 사용하면 Eloquent 모델과 그 관계들을 시각적으로 관리할 수 있으며, 사이트 데이터를 저장하고 사이트 작업을 수행하기 위한 독립적인 설정 페이지를 생성할 수도 있습니다.
+Laravel Administrator는 Laravel 10 기반 프로젝트에서 Eloquent 모델과 운영 설정을 선언형 PHP 설정으로 관리하는 관리자 페이지 빌더입니다.
 
-각 Eloquent 모델에 대해 관리자가 편집할 수 있는 필드, 결과 테이블에 표시할 컬럼, 커스텀 액션 버튼, 그리고 사용할 수 있는 필터를 정의할 수 있습니다. 이러한 필드는 "belongsTo" 및 "belongsToMany" 관계일 수도 있으며("hasOne" 및 "hasMany" 관계는 지원하지 않음), 이를 통해 사용자가 사이트의 데이터 관계를 손쉽게 관리할 수 있도록 지원합니다.
+기존 FrozenNode Administrator를 기반으로 현대 Laravel 환경에 맞게 패키지 구조, PHP 요구 버전, Vite 기반 프론트엔드, Alpine.js/Tailwind CSS UI, Quill 기반 `wysiwyg2` 필드 등을 정비한 배포판입니다.
 
+```php {3,6,10}
+return array(
+    'title' => '사용자',
+    'model' => App\Models\User::class,
+    'columns' => array(
+        'name',
+        'email',
+    ),
+    'edit_fields' => array(
+        'name',
+        'email',
+    ),
+);
+```
+
+<a name="features"></a>
+## 주요 특징
+
+- Laravel 10과 PHP 8.1 이상 지원
+- 모델, 컬럼, 필드, 필터, 액션을 PHP 배열로 선언
+- `belongsTo`, `belongsToMany`, `hasOne`, `hasMany` 관계 필드 지원
+- 모델 목록 컬럼, 관계 컬럼, 커스텀 출력 포맷 지원
+- 모델과 별개인 세팅 페이지 지원
+- Vite, Alpine.js, Tailwind CSS 기반 관리자 UI
+- CKEditor 4 기반 `wysiwyg`와 Quill 기반 `wysiwyg2` 필드 제공
+- MySQL FULLTEXT 검색용 `fulltext_mysql`, 접두어 빠른 검색용 `text_quick` 필터 제공
 
 <a name="authentication"></a>
 ## 인증
 
-다른 많은 관리자 인터페이스 시스템과 달리, Administrator에는 자체 인증 기능이 내장되어 있지 않습니다. 기존 시스템 위에 불필요한 추가 인증 레이어를 제공하는 대신, Administrator는 여러분이 이미 사용 중인 기존 인증 시스템과 직접 연동됩니다. "permission" 익명 함수를 활용하여 현재 사용자에게 특정 리소스에 대한 접근 권한이 있는지 여부를 기존 인증 시스템을 통해 직접 결정할 수 있습니다.
+Administrator는 별도 인증 시스템을 제공하지 않습니다. 대신 기존 Laravel 인증과 권한 정책을 전역 `permission`, 모델별 `permission`, `action_permissions`로 연결합니다.
 
+```php {2}
+return array(
+    'permission' => function () {
+        return auth()->check() && auth()->user()->can('admin.access');
+    },
+);
+```
+
+전역 권한 검사는 실패하면 `login_path`로 리다이렉트합니다. 모델별 권한과 액션 권한은 해당 모델 화면과 버튼 노출에 반영됩니다.
 
 <a name="eloquent"></a>
 ## Eloquent
 
-가장 중요한 점은 Administrator가 [Eloquent ORM](http://laravel.com/docs/eloquent)을 염두에 두고 설계되었다는 것입니다. 따라서 접근자(Accessors), 설정자(Mutators), 이벤트(Events) 등 일반적인 Eloquent 기능을 사용하는 데 아무런 방해를 받지 않습니다.
+Administrator는 Eloquent 모델을 전제로 동작합니다. 접근자, mutator, 관계 메서드, 모델 이벤트는 일반 Laravel 코드와 같은 방식으로 사용할 수 있습니다.
 
-> Administrator에서 Eloquent 모델을 설정하는 자세한 방법은 [모델 설정 문서](/docs/model-configuration)를 참고해 주십시오.
+```php {3}
+public function role()
+{
+    return $this->belongsTo(Role::class);
+}
+```
 
+모델 화면 구성은 [모델 설정 문서](/docs/ko/model-configuration)를 참고하십시오.
 
 <a name="settings-pages"></a>
 ## 설정 페이지
 
-검증 규칙(Validation rules), 필드 및 액션을 직접 정의할 수 있는 단순한 설정 페이지를 원하신다면, 그렇게 하실 수 있습니다! 사이트의 온라인/오프라인 여부를 결정하는 체크박스나 "캐시 지우기" 버튼 등, 필드나 커스텀 액션을 임의로 조합하여 설정 페이지를 만드는 것은 매우 쉽습니다.
+사이트 이름, 관리자 이메일, 로고, 캐시 설정처럼 특정 Eloquent 모델로 표현하기 어려운 값은 세팅 페이지로 관리할 수 있습니다.
 
-> 설정 페이지를 생성하는 자세한 방법은 [설정(Settings) 구성 문서](/docs/settings-configuration)를 참고해 주십시오.
+```php {5-12}
+return array(
+    'title' => '사이트 설정',
+    'edit_fields' => array(
+        'site_name' => array(
+            'title' => '사이트 이름',
+            'type' => 'text',
+        ),
+        'maintenance_mode' => array(
+            'title' => '점검 모드',
+            'type' => 'bool',
+        ),
+    ),
+);
+```
 
+세팅 페이지 작성법은 [세팅 설정 문서](/docs/ko/settings-configuration)를 참고하십시오.
 
-<a name="installation-guidance"></a>
-## 설치 / 가이드
+<a name="next"></a>
+## 다음 단계
 
-Administrator를 시작하려면 [설치 가이드](/docs/installation)를 확인해 주십시오.
-
-도움이 필요하시다면 [튜토리얼](/docs/tutorials)을 확인해 주십시오.
+처음 설치하는 경우 [설치 문서](/docs/ko/installation)를 먼저 확인하십시오. 전역 옵션은 [설정 문서](/docs/ko/configuration), 필드별 옵션은 [필드 문서](/docs/ko/fields)에서 확인할 수 있습니다.

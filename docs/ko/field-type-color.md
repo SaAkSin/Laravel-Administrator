@@ -1,17 +1,12 @@
 # 필드 타입 - Color
 
-- [사용법](#usage)
+`color`는 16진수 색상 값을 입력하는 필드입니다. 데이터베이스 컬럼은 VARCHAR 또는 TEXT 계열을 사용합니다.
 
-<a name="usage"></a>
-## 사용법
+```php {2}
+'hex' => array(
+    'type' => 'color',
+    'title' => '색상',
+);
+```
 
-`color` 필드 타입은 데이터베이스에서 VARCHAR 또는 TEXT 필드여야 합니다.
-
-	'hex' => array(
-		'type' => 'color',
-		'title' => 'Color',
-	)
-
-수정 폼에서 관리자 사용자에게는 # 기호로 시작하는 16진수(hex) 값으로 텍스트 필드를 채워주는 컬러 피커(color picker)가 표시됩니다.
-
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-color.png" />
+관리자 화면에서는 색상 선택 UI와 함께 `#000000` 형식의 값이 저장됩니다.

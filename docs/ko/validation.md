@@ -1,58 +1,95 @@
-# 유효성 검사 (Validation)
+# 유효성 검사
 
 - [소개](#introduction)
+- [모델 설정의 rules](#model-rules)
+- [모델 정적 rules](#static-rules)
+- [Form Request](#form-request)
+- [세팅 설정의 rules](#settings-rules)
 - [사용자 정의 메시지](#custom-messages)
-- [Aware 사용하기](#using-aware)
 
 <a name="introduction"></a>
-## 소개 (Introduction)
+## 소개
 
-Administrator는 모델의 유효성을 검사하기 위해 [Laravel의 유효성 검사(Laravel's validation)](http://laravel.com/docs/validation)를 사용합니다. 설정 파일에서 [`rules`](/docs/model-configuration#validation-rules) 옵션을 제공할 수 있습니다:
+Administrator는 Laravel validation 규칙을 사용해 모델 저장과 세팅 저장 데이터를 검증합니다. 검증 실패 시 저장하지 않고 관리자 화면에 오류를 반환합니다.
 
-	'rules' => array(
-		'name' => 'required',
-		'age' => 'required|integer|min:18',
-	)
+<a name="model-rules"></a>
+## 모델 설정의 rules
 
- 또는 모델 페이지의 경우, 다음과 같이 Eloquent 모델에 static `$rules` 속성을 정의할 수 있습니다:
+모델 설정 파일에 `rules`와 `messages`를 직접 정의할 수 있습니다.
 
-	class Movie extends Eloquent {
+```php {2-5}
+return array(
+    'rules' => array(
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+    ),
+    'messages' => array(
+        'name.required' => '이름을 입력하십시오.',
+    ),
+);
+```
 
-		/**
-		 * 유효성 검사 규칙
-		 */
-		public static $rules = array(
-			'name' => 'required',
-			'age' => 'required|integer|min:18',
-		);
-	}
+설정 파일의 `rules`가 있으면 모델 정적 속성보다 우선합니다.
 
-이제 관리자 사용자가 나이(age) 없이 혹은 18세 미만인 상태로 영화(Movie) 모델을 저장하려고 하면, Administrator가 사용자에게 오류를 알리고 저장이 수행되지 않도록 차단합니다.
+<a name="static-rules"></a>
+## 모델 정적 rules
+
+설정 파일에 `rules`를 두지 않으면 Eloquent 모델의 정적 `$rules`, `$messages`를 사용할 수 있습니다.
+
+```php {4-7}
+class User extends Model
+{
+    public static $rules = array(
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+    );
+
+    public static $messages = array(
+        'email.email' => '올바른 이메일 주소를 입력하십시오.',
+    );
+}
+```
+
+<a name="form-request"></a>
+## Form Request
+
+모델 설정에는 Laravel Form Request 클래스를 지정할 수 있습니다.
+
+```php {2}
+return array(
+    'form_request' => App\Http\Requests\Admin\UserSaveRequest::class,
+);
+```
+
+저장 요청에서 Form Request 검증 오류가 있으면 Administrator는 저장을 중단하고 오류를 JSON 응답으로 반환합니다. Form Request의 `authorize()`와 `rules()`는 일반 Laravel 요청 검증과 같은 방식으로 작성합니다.
+
+<a name="settings-rules"></a>
+## 세팅 설정의 rules
+
+세팅 설정 파일도 같은 형식의 `rules`, `messages`를 지원합니다.
+
+```php {2-5}
+return array(
+    'rules' => array(
+        'site_name' => 'required|max:50',
+        'admin_email' => 'required|email',
+    ),
+    'messages' => array(
+        'site_name.required' => '사이트 이름을 입력하십시오.',
+    ),
+);
+```
 
 <a name="custom-messages"></a>
-## 사용자 정의 메시지 (Custom Messages)
+## 사용자 정의 메시지
 
-사용자에게 제공하는 각 모델에 대해 사용자 정의 유효성 검사 메시지를 사용해야 할 가능성이 높습니다. 이를 위해 설정 파일에 [`messages`](/docs/model-configuration#validation-messages) 옵션을 제공할 수 있습니다:
+메시지 키는 Laravel의 사용자 정의 메시지 형식을 따릅니다.
 
-	'messages' => array(
-		'name.required' => '이름 필드는 필수입니다',
-		'age.min' => '최소 나이는 18세입니다',
-	)
+```php
+'messages' => array(
+    'name.required' => '이름 필드는 필수입니다.',
+    'email.email' => '이메일 형식이 올바르지 않습니다.',
+);
+```
 
-또는 모델 페이지의 경우, 다음과 같이 Eloquent 모델에 static `$messages` 속성을 정의할 수 있습니다:
-
-	class Movie extends Eloquent {
-
-		/**
-		 * 유효성 검사 규칙
-		 */
-		public static $messages = array(
-			'name.required' => '이름 필드는 필수입니다',
-			'age.min' => '최소 나이는 18세입니다',
-		);
-	}
-
-<a name="using-aware"></a>
-## Aware 사용하기 (Using Aware)
-
-이미 [Aware](https://github.com/awareness/aware)를 사용하고 계시다면 따로 하실 작업이 없습니다! Aware를 사용하면 Eloquent 모델에 static `$rules` 속성을 정의할 수 있으며, 이는 Administrator에서 작동하는 방식과 정확히 일치합니다.
+모델 설정과 세팅 설정의 전체 옵션은 [모델 설정 문서](/docs/ko/model-configuration#validation)와 [세팅 설정 문서](/docs/ko/settings-configuration#validation)를 참고하십시오.

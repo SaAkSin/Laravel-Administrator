@@ -5,12 +5,8 @@
 Administrator를 사용하면 Eloquent 모델과 관계(Relations)를 선언적으로 관리할 수 있으며, 독립적인 사이트 설정 페이지나 대시보드 커스텀 작업을 손쉽게 구축할 수 있습니다.
 
 - **Author:** 이기석 (GiSeok Lee)
-- **Website:** [https://github.com/SaAkSin/Laravel-Administrator](https://github.com/SaAkSin/Laravel-Administrator)
+- **Website:** [https://administrator.artgrammer.co.kr](https://administrator.artgrammer.co.kr)
 - **Version:** `10.6.0`
-
-[![Build Status](https://travis-ci.org/FrozenNode/Laravel-Administrator.png?branch=master)](https://travis-ci.org/FrozenNode/Laravel-Administrator)
-
-<img src="https://raw.github.com/SaAkSin/Laravel-Administrator/master/examples/images/overview.jpg" />
 
 ---
 
@@ -54,10 +50,20 @@ composer require "saaksin/laravel-administrator:10.6.*"
 ]
 ```
 
-이 후, `php artisan vendor:publish --tag=laravel-administrator` 을 실행합니다. `config/administrator.php` [설정파일](https://github.com/SaAkSin/Laravel-Administrator/blob/dev-10/docs/configuration.md)이 추가 되고, public 디렉토리에 관련 에셋(CKEditor 4 에셋 포함), 뷰, 언어 파일 등이 복사됩니다. 
+이 후, 서비스 프로바이더 기준 publish 명령을 실행합니다.
+
+```sh
+php artisan vendor:publish --provider="SaAkSin\Administrator\AdministratorServiceProvider" --force
+```
+
+`config/administrator.php` [설정파일](https://administrator.artgrammer.co.kr/docs/ko/configuration)이 추가 되고, public 디렉토리에 관련 에셋(CKEditor 4 에셋 포함), 뷰, 언어 파일 등이 복사됩니다.
 
 > [!IMPORTANT]  
 > 설정 파일들은 config 디렉토리 하위가 아닌, **프로젝트 루트 디렉토리**의 `administrator/`, `administrator/settings/`에 위치합니다.
+
+```sh
+mkdir -p administrator/settings
+```
 
 ---
 
@@ -72,45 +78,44 @@ return array(
     'title' => '사용자 관리',
     'single' => '사용자',
     'model' => App\Models\User::class,
-        
-        // 데이터 목록에 노출할 컬럼 정의
-        'columns' => array(
-            'id' => array(
-                'title' => 'ID',
-            ),
-            'name' => array(
-                'title' => '이름',
-            ),
-            'email' => array(
-                'title' => '이메일',
-            ),
-        ),
 
-        // 데이터 필터링 조건 정의
-        'filters' => array(
-            'name' => array(
-                'title' => '이름 검색',
-                'type'  => 'text',
-            ),
+    // 데이터 목록에 노출할 컬럼 정의
+    'columns' => array(
+        'id' => array(
+            'title' => 'ID',
         ),
+        'name' => array(
+            'title' => '이름',
+        ),
+        'email' => array(
+            'title' => '이메일',
+        ),
+    ),
 
-        // 등록 및 수정 폼 필드 구성
-        'edit_fields' => array(
-            'name' => array(
-                'title' => '이름',
-                'type'  => 'text',
-            ),
-            'email' => array(
-                'title' => '이메일',
-                'type'  => 'text',
-            ),
-            'password' => array(
-                'title' => '비밀번호',
-                'type'  => 'password',
-            ),
+    // 데이터 필터링 조건 정의
+    'filters' => array(
+        'name' => array(
+            'title' => '이름 검색',
+            'type'  => 'text',
         ),
-    );
-}
+    ),
+
+    // 등록 및 수정 폼 필드 구성
+    'edit_fields' => array(
+        'name' => array(
+            'title' => '이름',
+            'type'  => 'text',
+        ),
+        'email' => array(
+            'title' => '이메일',
+            'type'  => 'text',
+        ),
+        'password' => array(
+            'title' => '비밀번호',
+            'type'  => 'password',
+        ),
+    ),
+);
 ```
 
 ### 🎨 사용자 정의 js 파일 지정
@@ -140,7 +145,7 @@ public function boot(UrlGenerator $url)
 ```
 
 asset url 에 https 주소를 사용하도록 `.env` 에 `ASSET_URL` 을 지정합니다.
-```env
+```dotenv
 ASSET_URL=https://도메인주소
 ```
 
@@ -215,7 +220,7 @@ npm run build
 
 ## 📖 8. Documentation
 
-Administrator에 대한 원본 전체 문서는 [http://administrator.frozennode.com](http://administrator.frozennode.com)에서 확인할 수 있습니다. 또한, 이 패키지의 루트 디렉토리에 있는 [docs/](file:///Users/galahan/SaAkSin/artgrammer/laravel-administrator/docs) 디렉토리에서도 한국어 설명 문서를 포함한 상세 가이드를 찾아보실 수 있습니다.
+Administrator 공식 문서는 [https://administrator.artgrammer.co.kr](https://administrator.artgrammer.co.kr)에서 확인할 수 있습니다. 이 패키지의 루트 디렉토리에 있는 [docs/](docs/) 디렉토리에서도 한국어 설명 문서를 포함한 상세 가이드를 찾아볼 수 있습니다.
 
 ---
 

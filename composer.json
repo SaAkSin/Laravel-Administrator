@@ -1,7 +1,7 @@
 {
 	"name": "saaksin/laravel-administrator",
 	"description": "데이터베이스 기반 라라벨 관리자 페이지",
-	"homepage": "https://github.com/SaAkSin/Laravel-Administrator",
+	"homepage": "https://administrator.artgrammer.co.kr",
 	"keywords": ["administrator", "admin", "laravel-administrator", "laravel"],
 	"license": "MIT",
 	"authors": [
