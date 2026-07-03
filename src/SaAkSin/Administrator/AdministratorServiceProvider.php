@@ -27,10 +27,6 @@ class AdministratorServiceProvider extends ServiceProvider {
 	{
 		$this->loadViewsFrom(__DIR__.'/../../views', 'administrator');
 
-		$this->mergeConfigFrom(
-			__DIR__.'/../../config/administrator.php', 'administrator'
-		);
-
 		$this->loadTranslationsFrom(__DIR__.'/../../lang', 'administrator');
 
 		$this->loadRoutesFrom(__DIR__.'/../../routes.php');
@@ -60,6 +56,10 @@ class AdministratorServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
+		$this->mergeConfigFrom(
+			__DIR__.'/../../config/administrator.php', 'administrator'
+		);
+
 		//include our view composers to avoid issues with catch-all routes defined by users
 		include __DIR__.'/../../viewComposers.php';
 

@@ -24,9 +24,13 @@ description: "Laravel 13 및 설정 기반 디자인 테마 지원을 위해 Vit
 - **블레이드 레이아웃 및 라우트 개선**:
   - `default.blade.php` 내 html lang 속성을 `config('app.locale')` 기반으로 갱신하였습니다.
   - 라우트 캐싱 지원을 위해 `AdministratorServiceProvider` 내의 라우트 바인딩 시점을 `register()` include에서 `boot()` 내 `loadRoutesFrom()` 호출 구조로 마이그레이션했습니다.
+- **보완 대응 사항 (2026-07-03)**:
+  - PHPUnit 11 실행 환경에서 `tests/Config/some_model.php`의 `some_model` 함수를 테스트 클래스로 오인해 발생시키던 `Class some_model cannot be found` runner warning을 해결하기 위해 `phpunit.xml`의 테스트 탐색 suffix를 `.php`에서 `Test.php`로 수정하였습니다.
+  - Laravel 13 패키지 부트스트랩 관례에 맞춰 `AdministratorServiceProvider.php`의 `mergeConfigFrom()` 호출을 `boot()`에서 `register()` 단계로 이동하였습니다.
 
 ## 3. 변경 파일
 - `composer.json`
+- `phpunit.xml`
 - `vite.config.js`
 - `src/config/administrator.php`
 - `src/viewComposers.php`
@@ -43,7 +47,7 @@ description: "Laravel 13 및 설정 기반 디자인 테마 지원을 위해 Vit
 ## 4. 테스트 결과
 - **NPM 빌드 검증**: `npm run build`를 정상 완수하여 테마 에셋 및 manifest를 `public/dist` 내에 빌드했습니다.
 - **단위 및 통합 테스트 결과**:
-  - `vendor/bin/phpunit --colors=never` 실행 결과: **Tests: 291, Assertions: 261, Failures: 0** 로 기존 286개 테스트 및 신규 작성된 5개의 Testbench 통합 테스트 케이스가 오류 없이 100% 정상 통과하였습니다.
+  - `vendor/bin/phpunit --colors=never` 실행 결과: **Tests: 291, Assertions: 261, Failures: 0, Warnings: 0** (종료 코드 0)로 기존 286개 테스트 및 신규 작성된 5개의 Testbench 통합 테스트 케이스가 어떠한 경고나 오류 없이 100% 정상 통과하였습니다.
   - **통합 테스트 검증 사항**:
     - 서비스 프로바이더 부트 및 라우트 등록 정상 검증 완료
     - `theme=silver` 설정 시 실버 테마 CSS 로드 확인 완료
