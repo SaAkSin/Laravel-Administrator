@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Laravel Administrator">
+  <rect width="64" height="64" rx="14" fill="#2563eb"/>
+  <path fill="#fff" d="M17 18h30v8H26v8h18v8H26v4h22v8H17V18z"/>
+  <path fill="#bfdbfe" d="M31 27h16v8H31z"/>
+</svg>

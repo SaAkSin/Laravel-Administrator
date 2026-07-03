@@ -1,121 +1,176 @@
-# 설치 (Installation)
+# 설치
 
-- [Composer](#composer)
-- [Laravel 4](#laravel-4)
-- [Laravel 3](#laravel-3)
-- [에셋 (Assets)](#assets)
-- [Administrator 설정 (Administrator Config)](#administrator-config)
-- [모델 설정 (Model Config)](#model-config)
-- [세팅 설정 (Settings Config)](#settings-config)
+- [요구사항](#requirements)
+- [Composer 설치](#composer)
+- [서비스 프로바이더](#service-provider)
+- [설정과 에셋 배포](#publish)
+- [관리자 설정 디렉터리](#administrator-directory)
+- [최소 모델 설정](#minimal-model-config)
+- [배포 시 에셋 갱신](#assets)
+
+<a name="requirements"></a>
+## 요구사항
+
+Laravel Administrator 10.x는 현재 패키지 기준으로 다음 환경을 요구합니다.
+
+| 항목 | 요구 버전 |
+| --- | --- |
+| PHP | `>= 8.1` |
+| Laravel Framework | `10.*` |
+| Composer | Laravel 애플리케이션 의존성 설치용 |
+
+패키지 개발이나 문서 빌드를 직접 수행하는 경우에만 Node.js와 npm이 필요합니다. 일반 Laravel 애플리케이션에서 패키지를 사용하는 경우에는 Composer와 `php artisan vendor:publish`가 핵심 절차입니다.
 
 <a name="composer"></a>
-## Composer
+## Composer 설치
 
-Laravel 10.x와 함께 사용할 Administrator를 설치하려면 다음 명령어를 실행하십시오:
+Laravel 10 애플리케이션 루트에서 패키지를 설치합니다.
 
-```sh
+```bash
 composer require "saaksin/laravel-administrator:^10.6"
 ```
 
-설치가 완료되면 `config/app.php` 파일의 `providers` 배열에 서비스 프로바이더(Service Provider)를 등록합니다 (라라벨의 패키지 자동 검색 기능이 활성화되어 있다면 자동 등록되므로 수동 등록을 생략할 수 있습니다):
+<a name="service-provider"></a>
+## 서비스 프로바이더
 
-```php
+Laravel의 패키지 자동 검색이 활성화되어 있으면 서비스 프로바이더는 자동 등록됩니다. 자동 검색을 끄고 운영하는 프로젝트라면 `config/app.php`에 직접 등록합니다.
+
+```php {4}
 'providers' => [
-    ...
+    // ...
+
     SaAkSin\Administrator\AdministratorServiceProvider::class,
-]
+],
 ```
 
-그런 다음 아래 명령어를 통해 패키지의 설정 파일 및 컴파일된 Vite 프론트엔드 에셋을 호스트 프로젝트로 퍼블리시(게시)합니다.
+<a name="publish"></a>
+## 설정과 에셋 배포
 
-```sh
-# 설정 파일 및 에셋 전체 강제 퍼블리시 (Vite 에셋 및 CKEditor 4 번들 포함)
-php artisan vendor:publish --tag=laravel-administrator --force
+설정 파일과 공개 에셋을 한 번에 배포하려면 서비스 프로바이더 기준으로 publish를 실행합니다.
+
+```bash
+php artisan vendor:publish --provider="SaAkSin\Administrator\AdministratorServiceProvider" --force
 ```
 
-이 명령을 실행하면 프로젝트 루트에 `config/administrator.php` 설정 파일이 추가되고, `public/packages/saaksin/administrator/dist/` 경로에 배포용 에셋들이 복사됩니다.
+실행 후 다음 파일과 디렉터리가 호스트 프로젝트에 생성됩니다.
 
-
-<a name="laravel-4"></a>
-## Laravel 4
-
-Laravel 4에서 Administrator를 사용하려면 Administrator 4 버전을 지정해야 합니다:
-
-```json
-"frozennode/administrator": "4.*"
+```text
+config/administrator.php
+public/packages/saaksin/administrator/
 ```
 
-그 다음 `php artisan config:publish frozennode/administrator` 명령어로 설정 파일을 퍼블리시하십시오. 이 명령을 실행하면 `app/config/packages/frozennode/administrator/administrator.php` 파일이 추가됩니다.
+패키지 코드 기준으로 `--tag=laravel-administrator`는 공개 에셋 갱신용 태그입니다. 설정 파일까지 처음 배포해야 하는 설치 단계에서는 위의 `--provider` 명령을 사용하는 편이 안전합니다.
 
-마지막으로 `php artisan asset:publish frozennode/administrator` 명령어를 사용하여 패키지의 에셋을 퍼블리시해야 합니다.
+<a name="administrator-directory"></a>
+## 관리자 설정 디렉터리
 
-<a name="laravel-3"></a>
-## Laravel 3
+기본 설정 파일은 모델 설정을 프로젝트 루트의 `administrator/`에서 읽고, 설정 페이지 파일을 `administrator/settings/`에서 읽습니다.
 
-Administrator가 Composer로 전환되었기 때문에 더 이상 `php artisan bundle:install administrator` 또는 `php artisan bundle:upgrade administrator` 명령어를 사용할 수 없습니다. Laravel 3에서 Administrator를 사용하려면 [3.3.2 브랜치](https://github.com/FrozenNode/Laravel-Administrator/tree/3.3.2)로 전환하여 다운로드한 뒤, 이를 `/bundles/administrator` 디렉토리에 추가하고 `bundles.php` 파일에 다음 코드를 추가해야 합니다:
-
-```php
-'administrator' => array(
-    'handles' => 'admin', // 이 번들이 사용할 URI를 결정합니다.
-    'auto' => true,
-),
+```php {2-3}
+return array(
+    'model_config_path' => base_path('administrator'),
+    'settings_config_path' => base_path('administrator/settings'),
+);
 ```
 
-<a name="assets"></a>
-## 에셋 (Assets) 및 배포 자동화
+처음 설치한 프로젝트에서는 디렉터리를 직접 생성합니다.
 
-패키지가 업데이트될 때마다 최신 빌드 에셋 자산이 호스트로 동기화되도록 퍼블리시 명령을 실행해야 합니다:
-
-```sh
-php artisan vendor:publish --tag=laravel-administrator --force
+```bash
+mkdir -p administrator/settings
 ```
 
-이 작업을 수동으로 처리하는 대신, 호스트 프로젝트의 `composer.json` 파일 내 `scripts` 객체에 아래와 같이 추가하여 자동화할 수 있습니다:
+그리고 `config/administrator.php`에서 최소한 `menu`, `home_page`, `permission`을 프로젝트 인증 구조에 맞게 조정합니다.
 
-```json
-"scripts": {
-	"post-install-cmd": [
-		"php artisan clear-compiled",
-		"php artisan vendor:publish --tag=laravel-administrator --force"
-	],
-	"post-update-cmd": [
-		"php artisan clear-compiled",
-		"php artisan vendor:publish --tag=laravel-administrator --force"
-	]
+```php {4-6,8}
+return array(
+    'uri' => 'admin',
+    'title' => 'Admin',
+    'menu' => array(
+        'users',
+        'Settings' => array('settings.site'),
+    ),
+    'home_page' => 'users',
+    'permission' => 'App\Http\Middleware\AdminPermission@check',
+);
+```
+
+`permission`에는 Laravel 컨테이너가 호출할 수 있는 문자열, 클로저, 불리언 값을 사용할 수 있습니다. 기본값은 `App\Http\Middleware\AdminPermission@check`이므로 실제 프로젝트에 해당 클래스가 없다면 반드시 바꾸어야 합니다.
+
+<a name="minimal-model-config"></a>
+## 최소 모델 설정
+
+`config/administrator.php`의 `menu`에 `users`를 추가했다면 `administrator/users.php` 파일을 만듭니다.
+
+```php {5,7-16,18-31}
+<?php
+
+return array(
+    'title' => '사용자',
+    'single' => '사용자',
+    'model' => App\Models\User::class,
+    'columns' => array(
+        'id' => array(
+            'title' => 'ID',
+        ),
+        'name' => array(
+            'title' => '이름',
+        ),
+        'email' => array(
+            'title' => '이메일',
+        ),
+    ),
+    'edit_fields' => array(
+        'name' => array(
+            'title' => '이름',
+            'type' => 'text',
+        ),
+        'email' => array(
+            'title' => '이메일',
+            'type' => 'text',
+        ),
+        'password' => array(
+            'title' => '비밀번호',
+            'type' => 'password',
+        ),
+    ),
+);
+```
+
+비밀번호 필드는 저장 전에 값을 숨기는 setter 필드로 동작합니다. 실제 해시는 Eloquent mutator 또는 모델 이벤트에서 처리하십시오.
+
+```php {7}
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+protected function password(): Attribute
+{
+    return Attribute::make(
+        set: fn ($value) => filled($value) ? bcrypt($value) : $this->password,
+    );
 }
 ```
 
-<a name="administrator-config"></a>
-## Administrator 설정 (Administrator Config)
+<a name="assets"></a>
+## 배포 시 에셋 갱신
 
-다음 명령어로 설정 파일을 퍼블리시할 수 있습니다:
+패키지를 업데이트한 뒤 공개 에셋만 최신 빌드로 다시 동기화하려면 에셋 태그를 사용합니다.
 
-	php artisan config:publish frozennode/administrator
+```bash
+php artisan vendor:publish --tag=laravel-administrator --force
+```
 
-이 명령을 실행하면 `app/config/packages/frozennode/administrator/administrator.php` 파일이 생성되고 몇 가지 기본값으로 채워집니다. 이 [설정 파일(config file)](http://administrator.frozennode.com/docs/configuration)은 Administrator와 상호작용하는 기본적인 방법입니다.
+운영 배포에서 Composer 설치 또는 업데이트 뒤 자동으로 실행하려면 호스트 프로젝트의 `composer.json`에 스크립트를 추가할 수 있습니다.
 
-Laravel 3 번들을 설치한 경우 `bundles/administrator/config/administrator.php` 파일을 직접 수정하거나, `application/config` 디렉토리에 `administrator.php` 파일을 새로 생성할 수 있습니다.
+```json {4,7}
+{
+  "scripts": {
+    "post-install-cmd": [
+      "php artisan vendor:publish --tag=laravel-administrator --force"
+    ],
+    "post-update-cmd": [
+      "php artisan vendor:publish --tag=laravel-administrator --force"
+    ]
+  }
+}
+```
 
-설정 파일에는 반드시 제공해야 하는 몇 가지 필수 필드가 있습니다. 그중 하나인 `menu` 옵션에서는 사이트의 메뉴 구조를 정의하고 모델 설정 파일을 가리키도록 설정합니다.
-
-> 모든 설정 옵션에 대한 자세한 설명은 **[설정 문서(configuration docs)](/docs/configuration)**를 참조하십시오.
-
-
-<a name="model-config"></a>
-## 모델 설정 (Model Config)
-
-모든 Eloquent 모델(또는 최종적으로 Eloquent 모델을 상속받는 모든 객체)은 모델 설정 파일로 표현될 수 있습니다. 이 파일들은 애플리케이션 디렉토리 구조 내부의 어느 곳에나 보관할 수 있으며, 메인 `administrator.php` 설정 파일에서 (`model_config_path` 옵션을 통해) 해당 파일들의 경로를 제공하면 됩니다. 이 파일들의 이름은 `administrator.php` 설정의 `menu` 옵션에 제공된 값과 일치해야 합니다.
-
-모델 설정 파일이 정상적으로 작동하려면 반드시 제공해야 하는 몇 가지 필수 필드가 있습니다. 그 외에도 모델별로 관리자 인터페이스를 커스터마이징하는 데 도움을 주는 다양한 선택 필드를 정의할 수 있습니다. 예를 들어, 특정 모델에 WYSIWYG 필드가 필요한 경우 일반적으로 수정 폼의 너비를 기본값보다 넓게 지정하고 싶을 것입니다. 이때 해당 모델 설정에서 `form_width` 옵션을 설정해주기만 하면 됩니다.
-
-> 모든 모델 설정 옵션에 대한 자세한 설명은 **[모델 설정 문서(model configuration docs)](/docs/model-configuration)**를 참조하십시오.
-
-
-<a name="settings-config"></a>
-## 세팅 설정 (Settings Config)
-
-세팅 설정 파일은 Eloquent 모델로 표현하기에 가장 적절하지 않은 관리적 옵션들을 관리하는 데 유용합니다. 이 파일들은 애플리케이션 디렉토리 구조 내부의 어느 곳에나 보관할 수 있으며, 메인 `administrator.php` 설정 파일에서 (`settings_config_path` 옵션을 통해) 해당 파일들의 경로를 제공하면 됩니다. 이 파일들의 이름은 `administrator.php` 설정의 `menu` 옵션에 제공된 값과 일치해야 합니다.
-
-세팅 설정 파일이 정상적으로 작동하려면 반드시 제공해야 하는 몇 가지 필수 필드가 있습니다. 그 외에도 세팅 페이지를 커스터마이징하는 데 도움을 주는 다양한 선택 필드를 정의할 수 있습니다.
-
-> 모든 세팅 설정 옵션에 대한 자세한 설명은 **[세팅 설정 문서(settings configuration docs)](/docs/settings-configuration)**를 참조하십시오.
+다음 단계는 [설정 문서](/docs/ko/configuration)와 [모델 설정 문서](/docs/ko/model-configuration)를 참고하십시오.

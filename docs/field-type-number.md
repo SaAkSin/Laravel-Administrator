@@ -6,18 +6,19 @@
 <a name="usage"></a>
 ## Usage
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-number.png" />
 
 The `number` field type should be a numeric type in your database.
 
-	'price' => array(
-		'type' => 'number',
-		'title' => 'Price',
-		'symbol' => '$', //optional, defaults to ''
-		'decimals' => 2, //optional, defaults to 0
-		'thousands_separator' => ',', //optional, defaults to ','
-		'decimal_separator' => '.', //optional, defaults to '.'
-	)
+```php
+'price' => array(
+	'type' => 'number',
+	'title' => 'Price',
+	'symbol' => '$', //optional, defaults to ''
+	'decimals' => 2, //optional, defaults to 0
+	'thousands_separator' => ',', //optional, defaults to ','
+	'decimal_separator' => '.', //optional, defaults to '.'
+)
+```
 
 In the edit form, an admin user will be presented with a text input. This text input will force your users to enter a number in the proper format.
 
@@ -32,6 +33,5 @@ The `decimal_separator` option lets you define the character to use as a decimal
 <a name="filter"></a>
 ## Filter
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-number-filter.png" />
 
 The `number` filter comes with a minimum and maximum value. This lets you either set a maximum and a minimum to narrow the result set to a range, only a minimum, or only a maximum.

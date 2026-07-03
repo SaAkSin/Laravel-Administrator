@@ -5,24 +5,25 @@
 <a name="usage"></a>
 ## Usage
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/field-type-image.jpg" />
 
 The `image` field type should be a text-like type in your database. The image's *file name* is stored in this field, while the original will be saved in the `location` you specify, and any resized copies will be stored where you define in the `sizes` option.
 
-	'image' => array(
-		'title' => 'Image',
-		'type' => 'image',
-		'location' => public_path() . '/uploads/products/originals/',
-		'naming' => 'random',
-		'length' => 20,
-		'size_limit' => 2,
-		'display_raw_value' => false,
-		'sizes' => array(
-			array(65, 57, 'crop', public_path() . '/uploads/products/thumbs/small/', 100),
-			array(220, 138, 'landscape', public_path() . '/uploads/products/thumbs/medium/', 100),
-			array(383, 276, 'fit', public_path() . '/uploads/products/thumbs/full/', 100)
-		)
+```php
+'image' => array(
+	'title' => 'Image',
+	'type' => 'image',
+	'location' => public_path() . '/uploads/products/originals/',
+	'naming' => 'random',
+	'length' => 20,
+	'size_limit' => 2,
+	'display_raw_value' => false,
+	'sizes' => array(
+		array(65, 57, 'crop', public_path() . '/uploads/products/thumbs/small/', 100),
+		array(220, 138, 'landscape', public_path() . '/uploads/products/thumbs/medium/', 100),
+		array(383, 276, 'fit', public_path() . '/uploads/products/thumbs/full/', 100)
 	)
+)
+```
 
 In the edit form, an admin user will be presented with an image uploader. For the moment, this uploader only allows one image to be uploaded at a time.
 

@@ -127,8 +127,6 @@ View::composer(array('administrator::layouts.default'), function($view)
 	// 에셋 배열 초기화
 	$view->css = array();
 	$view->js = array(
-		'jquery' => 'https://code.jquery.com/jquery-1.8.2.min.js',
-		'jquery-ui' => 'https://code.jquery.com/ui/1.10.3/jquery-ui.min.js',
 		'ckeditor' => asset('packages/saaksin/administrator/js/ckeditor/ckeditor.js'),
 	);
 
@@ -142,17 +140,6 @@ View::composer(array('administrator::layouts.default'), function($view)
 	} else {
 		// 프로덕션 상태에서는 manifest 기반 안전 에셋 로더 적용
 		$view->js['vite-app'] = getViteAsset('resources/js/app.ts', $view->css);
-	}
-
-	if (!$view->page && !$view->dashboard)
-	{
-		// 1. 특정 관리 뷰 전용 에셋(select2 스타일시트 및 스크립트)을 로드합니다.
-		$view->css += array(
-			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.css',
-		);
-		$view->js += array(
-			'select2' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js',
-		);
 	}
 
     // 3. 사용자 정의 js 추가

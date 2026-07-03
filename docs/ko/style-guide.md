@@ -8,6 +8,7 @@
 - [카멜 케이스](#camel-case)
 - [줄 바꿈](#line-breaks)
 - [공백 제거](#trimming-whitespace)
+- [문서 코드 블록](#documentation-code-blocks)
 
 <a name="introduction"></a>
 ## 소개
@@ -132,3 +133,33 @@
 	"trim_trailing_white_space_on_save": true
 
 ...를 추가할 수 있습니다.
+
+<a name="documentation-code-blocks"></a>
+## 문서 코드 블록
+
+문서의 예제 코드는 VitePress의 Shiki 하이라이트가 적용되도록 fenced code block으로 작성합니다. 들여쓰기만으로 만든 코드 블록은 언어 하이라이트와 줄 강조를 사용할 수 없으므로 새 문서에서는 사용하지 않습니다.
+
+````md
+```php {3,7-9}
+return array(
+    'title' => '사용자',
+    'model' => App\Models\User::class,
+    'columns' => array(
+        'name',
+    ),
+    'edit_fields' => array(
+        'name',
+    ),
+);
+```
+````
+
+셸 명령은 `bash`, 설정 예시는 `php`, JSON 예시는 `json`, 환경 변수 예시는 `dotenv`, 파일 구조 예시는 `text`를 사용합니다.
+
+````md
+```bash
+php artisan vendor:publish --tag=laravel-administrator --force
+```
+````
+
+전역 줄 번호는 VitePress 설정에서 켜져 있습니다. 특정 줄을 강조하려면 코드 블록 언어 뒤에 `{1}`, `{2-4}`, `{1,5-7}` 형식으로 표시합니다.

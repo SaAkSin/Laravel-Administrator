@@ -6,10 +6,9 @@
 - [Eloquent](#eloquent)
 - [Installation / Guidance](#installation-guidance)
 
-<img src="https://raw.github.com/FrozenNode/Laravel-Administrator/master/examples/images/overview.jpg" />
 
 <a name="overview"></a>
-##Overview
+## Overview
 
 Administrator is an administrative interface builder for [Laravel](http://laravel.com). With Administrator you can visually manage your Eloquent models and their relations, and also create stand-alone settings pages for storing site data and performing site tasks.
 
@@ -17,13 +16,13 @@ For each Eloquent model you can define which fields an administrative user can e
 
 
 <a name="authentication"></a>
-##Authentication
+## Authentication
 
 Unlike many other admin interface systems, Administrator doesn't come with authentication built in. Instead of providing an extra auth layer on top of what you already have, Administrator pipes into your existing authentication. By using "permission" anonymous functions, you can use your auth system to determine if the current user should have access to something.
 
 
 <a name="eloquent"></a>
-##Eloquent
+## Eloquent
 
 Most importantly, Administrator is built with [the Eloquent ORM](http://laravel.com/docs/eloquent) in mind, so it won't get in the way of you using normal Eloquent features like accessors, mutators, and events.
 
@@ -31,7 +30,7 @@ Most importantly, Administrator is built with [the Eloquent ORM](http://laravel.
 
 
 <a name="settings-pages"></a>
-##Settings Pages
+## Settings Pages
 
 If you want to just have a simple settings page where you get to define the validation rules, the fields, and the actions, you can do that! It's incredibly easy to create a page with any combination of fields (e.g. a checkbox to determine if your site is online or offline) or custom actions (e.g. a "clear cache" button).
 
@@ -39,7 +38,7 @@ If you want to just have a simple settings page where you get to define the vali
 
 
 <a name="installation-guidance"></a>
-##Installation / Guidance
+## Installation / Guidance
 
 To get started with Administrator, check out the [installation guide](/docs/installation).
 

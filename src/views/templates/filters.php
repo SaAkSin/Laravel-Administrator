@@ -32,7 +32,7 @@
 				</div>
 			</template>
 
-			<!-- 3. bool (Zero-jQuery 순수 Alpine.js 셀렉트) -->
+			<!-- 3. bool (Alpine.js 셀렉트) -->
 			<template x-if="filter.type === 'bool'">
 				<select x-model="filter.value" :id="filter.field_id" style="width: 225px; box-sizing: border-box; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; background-color: #fff;">
 					<option value="">-- 전체 --</option>

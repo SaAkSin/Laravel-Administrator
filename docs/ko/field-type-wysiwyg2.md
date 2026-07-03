@@ -1,20 +1,12 @@
-# 필드 타입 - 위지윅2 (WYSIWYG2)
+# 필드 타입 - WYSIWYG2
 
-- [사용법](#usage)
+`wysiwyg2`는 Quill 기반 리치 텍스트 편집기입니다. 데이터베이스 컬럼은 TEXT 계열을 사용하십시오.
 
-<a name="usage"></a>
-## 사용법
+```php {2}
+'body' => array(
+    'type' => 'wysiwyg2',
+    'title' => '본문',
+);
+```
 
-`wysiwyg2` 필드 타입은 데이터베이스에서 TEXT 타입이어야 합니다.
-
-	'entry' => array(
-		'type' => 'wysiwyg2',
-		'title' => 'Entry',
-	)
-
-수정 폼에서 관리자 사용자에게 현대적인 Quill WYSIWYG 에디터가 표시됩니다. 필드가 데이터베이스에 저장될 때 생성된 HTML이 TEXT 필드에 저장됩니다.
-
-> [!NOTE]
-> `wysiwyg2` 타입은 가볍고 세련된 **Quill** 에디터를 사용합니다. 테이블 지원 및 로우 HTML 소스코드 편집 모드 등 다양한 고급 기능이 포함된 클래식 에디터를 선호하신다면 **CKEditor 4**를 사용하는 [위지윅](/docs/ko/field-type-wysiwyg) (`type => 'wysiwyg'`) 필드 타입을 사용할 수 있습니다.
-
-WYSIWYG는 크기가 상당히 크므로, [모델의 폼 너비](/docs/ko/model-configuration#form-width)를 `400` 또는 `500` 정도로 확장하는 것을 고려해 보시는 것이 좋습니다.
+필드 값은 HTML로 저장됩니다. 테이블, 소스 편집 등 CKEditor 4 기능이 필요한 화면에서는 [WYSIWYG](/docs/ko/field-type-wysiwyg)를 사용할 수 있습니다.

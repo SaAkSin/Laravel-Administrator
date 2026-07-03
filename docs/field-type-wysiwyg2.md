@@ -7,10 +7,12 @@
 
 The `wysiwyg2` field type should be a TEXT type in your database.
 
-	'entry' => array(
-		'type' => 'wysiwyg2',
-		'title' => 'Entry',
-	)
+```php
+'entry' => array(
+	'type' => 'wysiwyg2',
+	'title' => 'Entry',
+)
+```
 
 In the edit form, an admin user will be presented with a modern Quill WYSIWYG editor. When the field is saved to the database, the resulting HTML is stored in the TEXT field.
 

@@ -462,14 +462,76 @@ class FieldFactoryTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($this->factory->formatSelectedItems(false), array());
 	}
 
-	public function testFilterQueryBySelectedItems()
+	public function testFilterQueryBySelectedItemsWithSortField()
 	{
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('hasGetMutator')->with('sort_field_name')->andReturn(false);
+		$model->shouldReceive('hasAttributeMutator')->with('sort_field_name')->andReturn(false);
+
 		$query = m::mock('Illuminate\Database\Eloquent\Builder');
-		$query->shouldReceive('whereIn')->once()
-				->shouldReceive('orderBy')->once();
+		$query->shouldReceive('whereIn')->once()->with('related_table', array(1, 2));
+		$query->shouldReceive('getModel')->once()->andReturn($model);
+		$query->shouldReceive('orderBy')->once()->with('sort_field_name');
+
 		$field = m::mock('SaAkSin\Administrator\Fields\Field');
-		$field->shouldReceive('getOption')->times(3)->andReturn(true);
-		$this->factory->filterQueryBySelectedItems($query, array(), $field, '');
+		$field->shouldReceive('getOption')->with('multiple_values')->once()->andReturn(true);
+		$field->shouldReceive('getOption')->with('sort_field')->twice()->andReturn('sort_field_name');
+
+		$this->factory->filterQueryBySelectedItems($query, array(1, 2), $field, 'related_table');
+	}
+
+	public function testFilterQueryBySelectedItemsWithNameField()
+	{
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('hasGetMutator')->with('name_field_name')->andReturn(false);
+		$model->shouldReceive('hasAttributeMutator')->with('name_field_name')->andReturn(false);
+
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('whereIn')->once()->with('related_table', array(1, 2));
+		$query->shouldReceive('getModel')->once()->andReturn($model);
+		$query->shouldReceive('orderBy')->once()->with('name_field_name');
+
+		$field = m::mock('SaAkSin\Administrator\Fields\Field');
+		$field->shouldReceive('getOption')->with('multiple_values')->once()->andReturn(false);
+		$field->shouldReceive('getOption')->with('name_field')->once()->andReturn('name_field_name');
+
+		$this->factory->filterQueryBySelectedItems($query, array(1, 2), $field, 'related_table');
+	}
+
+	public function testFilterQueryBySelectedItemsAvoidsOrderByWhenAccessorExists()
+	{
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('hasGetMutator')->with('sort_field_name')->andReturn(true);
+		$model->shouldReceive('hasAttributeMutator')->with('sort_field_name')->andReturn(false);
+
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('whereIn')->once()->with('related_table', array(1, 2));
+		$query->shouldReceive('getModel')->once()->andReturn($model);
+		$query->shouldNotReceive('orderBy');
+
+		$field = m::mock('SaAkSin\Administrator\Fields\Field');
+		$field->shouldReceive('getOption')->with('multiple_values')->once()->andReturn(true);
+		$field->shouldReceive('getOption')->with('sort_field')->twice()->andReturn('sort_field_name');
+
+		$this->factory->filterQueryBySelectedItems($query, array(1, 2), $field, 'related_table');
+	}
+
+	public function testFilterQueryBySelectedItemsAvoidsOrderByWhenMutatorExists()
+	{
+		$model = m::mock('Illuminate\Database\Eloquent\Model');
+		$model->shouldReceive('hasGetMutator')->with('sort_field_name')->andReturn(false);
+		$model->shouldReceive('hasAttributeMutator')->with('sort_field_name')->andReturn(true);
+
+		$query = m::mock('Illuminate\Database\Eloquent\Builder');
+		$query->shouldReceive('whereIn')->once()->with('related_table', array(1, 2));
+		$query->shouldReceive('getModel')->once()->andReturn($model);
+		$query->shouldNotReceive('orderBy');
+
+		$field = m::mock('SaAkSin\Administrator\Fields\Field');
+		$field->shouldReceive('getOption')->with('multiple_values')->once()->andReturn(true);
+		$field->shouldReceive('getOption')->with('sort_field')->twice()->andReturn('sort_field_name');
+
+		$this->factory->filterQueryBySelectedItems($query, array(1, 2), $field, 'related_table');
 	}
 
 	public function testApplyConstraints()

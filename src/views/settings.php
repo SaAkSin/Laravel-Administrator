@@ -32,7 +32,7 @@
 			data: <?php echo json_encode($config->getDataModel()) ?>,
 			actions: <?php echo json_encode($actions) ?>,
 			edit_fields: <?php echo json_encode($arrayFields) ?>,
-			languages: <?php echo json_encode(trans('administrator::knockout')) ?>
+			languages: <?php echo json_encode(trans('administrator::frontend')) ?>
 		};
 </script>
 
@@ -65,7 +65,7 @@
 		}
 	}
 	/* settings form style */
-	.settings_form select, .settings_form input[type=hidden], .settings_form .select2-container {
+	.settings_form select, .settings_form input[type=hidden] {
 		width: 100% !important;
 	}
 	.settings_form input[type="text"], .settings_form input[type="password"], .settings_form textarea, .settings_form .relation-combobox-wrapper {
