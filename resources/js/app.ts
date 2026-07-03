@@ -8,8 +8,29 @@ import accounting from 'accounting';
 (window as any).marked = marked;
 (window as any).accounting = accounting;
 
+// 마크다운 내부 HTML XSS 방어를 위한 escape 헬퍼 함수 및 marked 렌더러 정의
+const escapeHtml = (text: string): string => {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
+
+marked.use({
+    renderer: {
+        html(token: any) {
+            return escapeHtml(token.text || token.raw || '');
+        }
+    }
+});
+
 (window as any).markdown = {
-    toHTML: (str: string) => marked.parse(str || '')
+    toHTML: (str: string) => {
+        const parsed = marked.parse(str || '');
+        return typeof parsed === 'string' ? parsed : '';
+    }
 };
 
 // Alpine.js 엔진 및 Quill 모듈 바인딩
