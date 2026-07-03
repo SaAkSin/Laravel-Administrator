@@ -9,22 +9,24 @@
 
 The `enum` field type should be any text-like type or an ENUM in your database. This field type helps you narrow down the options for your admin users in a data set that you know will never change. The names of the seasons might be a good use of this field.
 
-	'season' => array(
-		'type' => 'enum',
-		'title' => 'Season',
-		'options' => array('Winter', 'Spring', 'Summer', 'Fall'), //must be an array
+```php
+'season' => array(
+	'type' => 'enum',
+	'title' => 'Season',
+	'options' => array('Winter', 'Spring', 'Summer', 'Fall'), //must be an array
+),
+//alternate method:
+'season' => array(
+	'type' => 'enum',
+	'title' => 'Season',
+	'options' => array(
+		'Winter' => 'Cold, Cold Winter!',
+		'Spring',
+		'Summer' => 'Hot, Hot Summer!',
+		'Fall'
 	),
-	//alternate method:
-	'season' => array(
-		'type' => 'enum',
-		'title' => 'Season',
-		'options' => array(
-			'Winter' => 'Cold, Cold Winter!',
-			'Spring',
-			'Summer' => 'Hot, Hot Summer!',
-			'Fall'
-		),
-	),
+),
+```
 
 In the edit form, an admin user will be presented with a select box showing the choices.
 

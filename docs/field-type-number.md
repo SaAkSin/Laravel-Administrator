@@ -9,14 +9,16 @@
 
 The `number` field type should be a numeric type in your database.
 
-	'price' => array(
-		'type' => 'number',
-		'title' => 'Price',
-		'symbol' => '$', //optional, defaults to ''
-		'decimals' => 2, //optional, defaults to 0
-		'thousands_separator' => ',', //optional, defaults to ','
-		'decimal_separator' => '.', //optional, defaults to '.'
-	)
+```php
+'price' => array(
+	'type' => 'number',
+	'title' => 'Price',
+	'symbol' => '$', //optional, defaults to ''
+	'decimals' => 2, //optional, defaults to 0
+	'thousands_separator' => ',', //optional, defaults to ','
+	'decimal_separator' => '.', //optional, defaults to '.'
+)
+```
 
 In the edit form, an admin user will be presented with a text input. This text input will force your users to enter a number in the proper format.
 

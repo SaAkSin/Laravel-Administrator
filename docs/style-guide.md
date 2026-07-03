@@ -19,33 +19,37 @@ In the interest of keeping everything nice and neat, there are a few style conve
 
 In almost all cases, a starting brace should be on the next line instead of on the same line. This is called [Allman style](http://en.wikipedia.org/wiki/Indent_style#Allman_style). This applies to everything from `if` statements to `function` declarations.
 
-	//correct
-	if ($something)
-	{
-		//do something
-	}
+```php
+//correct
+if ($something)
+{
+	//do something
+}
 
-	//incorrect
-	if ($something) {
+//incorrect
+if ($something) {
 
-	}
+}
 
-	//correct
-	if ($somethingElse)
-	{
+//correct
+if ($somethingElse)
+{
 
-	}
-	else
-	{
+}
+else
+{
 
-	}
+}
+```
 
 The only exception to this rule is for class names:
 
-	//correct
-	class Someting {
+```php
+//correct
+class Someting {
 
-	}
+}
+```
 
 <a name="tabs-instead-of-spaces"></a>
 ## Tabs Instead of Spaces
@@ -57,8 +61,10 @@ Your code should use tabs instead of spaces.
 
 You should pepper your code with inline comments as much as possible without being overly verbose. Ideally you want to make it so that someone reading through the code the first time has a reasonable chance at understanding it. The correct type of comment should be the double-slash like this:
 
-	//in order to ensure readability, we comment our code
-	$code = Comment::my_code();
+```php
+//in order to ensure readability, we comment our code
+$code = Comment::my_code();
+```
 
 Always make sure there are line breaks *above* inline comments so they're easier to spot!
 
@@ -67,25 +73,27 @@ Always make sure there are line breaks *above* inline comments so they're easier
 
 Function or method comments should be in this form:
 
-	/**
-	 * Description of the method goes here. It can be as long as you need it to be.
-	 *
-	 * @param string		$someString
-	 * @param int			$someInt
-	 *
-	 * @return false|array
-	 */
-	public function myMethod($someString, $someInt)
+```php
+/**
+ * Description of the method goes here. It can be as long as you need it to be.
+ *
+ * @param string		$someString
+ * @param int			$someInt
+ *
+ * @return false|array
+ */
+public function myMethod($someString, $someInt)
+{
+	if (true)
 	{
-		if (true)
-		{
-			return array('yay');
-		}
-		else
-		{
-			return false;
-		}
+		return array('yay');
 	}
+	else
+	{
+		return false;
+	}
+}
+```
 
 If there are no params, you can just put a single line between the description and the `@return`. If there is no return value, you can just include the description.
 
@@ -94,17 +102,19 @@ If there are no params, you can just put a single line between the description a
 
 For the most part, Administrator uses the camelCase style in both PHP and JavaScript. The general exceptions to this rule are in CSS class names and config files where snake case is used. An example of this in PHP would be:
 
-	/**
-	 * Example of camelCase
-	 */
-	public function writeTheNameLikeThis()
-	{
-		//correct
-		$varName = 'something';
+```php
+/**
+ * Example of camelCase
+ */
+public function writeTheNameLikeThis()
+{
+	//correct
+	$varName = 'something';
 
-		//incorrect
-		$var_name = 'something_else';
-	}
+	//incorrect
+	$var_name = 'something_else';
+}
+```
 
 <a name="line-breaks"></a>
 ## Line Breaks
@@ -113,22 +123,26 @@ Be liberal with your line breaks. The goal is to make the code very readable, an
 
 An example of correct spacing:
 
-	//optional descriptive comment
-	$someVar = 'value';
-	$otherVar = 5;
+```php
+//optional descriptive comment
+$someVar = 'value';
+$otherVar = 5;
 
-	//check to see if our value is set correctly
-	if ($someVar === 'value')
-	{
-		//it was set, echo it out
-		echo $someVar;
-	}
+//check to see if our value is set correctly
+if ($someVar === 'value')
+{
+	//it was set, echo it out
+	echo $someVar;
+}
+```
 
 <a name="trimming-whitespace"></a>
 ## Trimming Whitespace
 
 When possible, you should trim all whitespace at the end of lines. Many IDEs have a feature like this. In SublimeText, for example, you can add...
 
-	"trim_trailing_white_space_on_save": true
+```json
+"trim_trailing_white_space_on_save": true
+```
 
 ...to your user settings.

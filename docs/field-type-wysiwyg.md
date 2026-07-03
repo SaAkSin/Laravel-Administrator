@@ -8,10 +8,12 @@
 
 The `wysiwyg` field type should be a TEXT type in your database.
 
-	'entry' => array(
-		'type' => 'wysiwyg',
-		'title' => 'Entry',
-	)
+```php
+'entry' => array(
+	'type' => 'wysiwyg',
+	'title' => 'Entry',
+)
+```
 
 In the edit form, an admin user will be presented with a CKEditor 4 WYSIWYG (Full Spec Toolbar). When the field is saved to the database, the resulting HTML is stored in the TEXT field.
 

@@ -8,16 +8,18 @@
 
 The `file` field type should be a text-like type in your database. The file's name is stored in this field, while the original will be saved in the `location` you specify, and any resized copies will be stored where you define in the `sizes` option.
 
-	'media_document' => array(
-		'title' => 'File',
-		'type' => 'file',
-		'location' => storage_path() . '/media_documents/',
-		'naming' => 'random',
-		'length' => 20,
-		'size_limit' => 2,
-		'display_raw_value' => false,
-		'mimes' => 'pdf,psd,doc',
-	)
+```php
+'media_document' => array(
+	'title' => 'File',
+	'type' => 'file',
+	'location' => storage_path() . '/media_documents/',
+	'naming' => 'random',
+	'length' => 20,
+	'size_limit' => 2,
+	'display_raw_value' => false,
+	'mimes' => 'pdf,psd,doc',
+)
+```
 
 In the edit form, an admin user will be presented with a file uploader.
 

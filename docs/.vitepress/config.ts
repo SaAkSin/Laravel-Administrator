@@ -1,21 +1,21 @@
 import { defineConfig } from 'vitepress';
 
 const guideSidebar = [
-    { text: '소개', link: '/docs/introduction' },
-    { text: '설치', link: '/docs/installation' },
-    { text: '설정', link: '/docs/configuration' },
-    { text: '모델 설정', link: '/docs/model-configuration' },
-    { text: '세팅 설정', link: '/docs/settings-configuration' },
-    { text: '유효성 검사', link: '/docs/validation' },
-    { text: '다국어 지원', link: '/docs/localization' },
-    { text: '튜토리얼', link: '/docs/tutorials' },
+    { text: 'Introduction', link: '/docs/introduction' },
+    { text: 'Installation', link: '/docs/installation' },
+    { text: 'Configuration', link: '/docs/configuration' },
+    { text: 'Model Configuration', link: '/docs/model-configuration' },
+    { text: 'Settings Configuration', link: '/docs/settings-configuration' },
+    { text: 'Validation', link: '/docs/validation' },
+    { text: 'Localization', link: '/docs/localization' },
+    { text: 'Tutorials', link: '/docs/tutorials' },
 ];
 
 const referenceSidebar = [
-    { text: '필드 개요', link: '/docs/fields' },
-    { text: '컬럼 개요', link: '/docs/columns' },
-    { text: '관계 컬럼', link: '/docs/relationship-columns' },
-    { text: '액션', link: '/docs/actions' },
+    { text: 'Fields', link: '/docs/fields' },
+    { text: 'Columns', link: '/docs/columns' },
+    { text: 'Relationship Columns', link: '/docs/relationship-columns' },
+    { text: 'Actions', link: '/docs/actions' },
 ];
 
 const fieldSidebar = [

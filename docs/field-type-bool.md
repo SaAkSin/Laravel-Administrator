@@ -8,10 +8,12 @@
 
 The `bool` field type should be represented as an integer field in your database. Usually schema creators allow you to choose *BOOLEAN* which resolves to something like *TINYINT(1)*. This field will work as long as you can put integer 1s and 0s in your database field.
 
-	'is_good' => array(
-		'type' => 'bool',
-		'title' => 'Is Good',
-	)
+```php
+'is_good' => array(
+	'type' => 'bool',
+	'title' => 'Is Good',
+)
+```
 
 In the edit form, an admin user will be presented with a checkbox that looks like this:
 

@@ -9,10 +9,12 @@
 
 The `key` field type can be used to show the primary key's value. You cannot make this field editable since primary key values are handled internally by your database.
 
-	'id' => array(
-		'type' => 'key', //optional...Administrator will know when a field is the model's key
-		'title' => 'ID',
-	),
+```php
+'id' => array(
+	'type' => 'key', //optional...Administrator will know when a field is the model's key
+	'title' => 'ID',
+),
+```
 
 <a name="filter"></a>
 ## Filter
