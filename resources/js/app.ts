@@ -8,28 +8,67 @@ import accounting from 'accounting';
 (window as any).marked = marked;
 (window as any).accounting = accounting;
 
-// 마크다운 내부 HTML XSS 방어를 위한 escape 헬퍼 함수 및 marked 렌더러 정의
+// 마크다운 내부 HTML XSS 방어를 위한 escape 헬퍼 함수
 const escapeHtml = (text: string): string => {
     return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 };
 
-// 위험한 URL 프로토콜 방지를 위한 클린 URL 헬퍼 함수
-const cleanUrl = (href: string): string => {
+// HTML Entity를 디코딩하여 원본 텍스트를 복원 (우회 방어)
+const decodeHtmlEntities = (value: string): string => {
+    if (typeof document === 'undefined') return value;
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = value;
+    return textarea.value;
+};
+
+// 제어문자 및 공백을 정규화하여 우회 차단
+const normalizeUrlForPolicy = (value: string): string => {
+    return decodeHtmlEntities(value)
+        .replace(/[\u0000-\u001F\u007F\s]+/g, '')
+        .trim();
+};
+
+// 명시적인 프로토콜 스키마가 존재하는지 확인
+const hasExplicitScheme = (value: string): boolean => {
+    return /^[a-z][a-z0-9+.-]*:/i.test(value);
+};
+
+// 검증된 프로토콜 allowlist 기반 URL Sanitizer
+const sanitizeUrl = (rawUrl: string, allowedProtocols: string[]): string => {
     try {
-        const cleanHref = href.replace(/[^\x20-\x7E]/g, '').trim();
-        const lowerHref = cleanHref.toLowerCase();
-        if (lowerHref.startsWith('javascript:') || lowerHref.startsWith('data:') || lowerHref.startsWith('vbscript:')) {
+        const normalizedUrl = normalizeUrlForPolicy(rawUrl);
+        if (normalizedUrl === '') {
             return '#';
         }
-        return href;
+
+        // 상대 경로(/path, ./path 등)는 스키마가 없으므로 허용하되 이스케이프 처리
+        if (!hasExplicitScheme(normalizedUrl)) {
+            return escapeHtml(normalizedUrl);
+        }
+
+        // URL 파싱을 통해 프로토콜 확인
+        const parsedUrl = new URL(normalizedUrl);
+        if (allowedProtocols.includes(parsedUrl.protocol)) {
+            return escapeHtml(normalizedUrl);
+        }
+
+        return '#';
     } catch (e) {
         return '#';
     }
+};
+
+const sanitizeLinkUrl = (rawUrl: string): string => {
+    return sanitizeUrl(rawUrl, ['http:', 'https:', 'mailto:', 'tel:']);
+};
+
+const sanitizeImageUrl = (rawUrl: string): string => {
+    return sanitizeUrl(rawUrl, ['http:', 'https:']);
 };
 
 marked.use({
@@ -38,16 +77,16 @@ marked.use({
             return escapeHtml(token.text || token.raw || '');
         },
         link(this: any, token: any) {
-            const href = cleanUrl(token.href || '');
+            const href = sanitizeLinkUrl(token.href || '');
             const title = token.title ? ` title="${escapeHtml(token.title)}"` : '';
             const text = this.parser.parse(token.tokens || []);
             return `<a href="${href}"${title}>${text}</a>`;
         },
         image(token: any) {
-            const href = cleanUrl(token.href || '');
+            const src = sanitizeImageUrl(token.href || '');
             const title = token.title ? ` title="${escapeHtml(token.title)}"` : '';
             const alt = token.text ? ` alt="${escapeHtml(token.text)}"` : '';
-            return `<img src="${href}"${alt}${title} />`;
+            return `<img src="${src}"${alt}${title} />`;
         }
     }
 });
@@ -115,4 +154,55 @@ const injectInterval = setInterval(() => {
 // 전역 인스턴스가 패키지에서 처음 생성된 경우에만 start() 호출
 if (alpineInstance === Alpine) {
     alpineInstance.start();
+}
+
+// 마크다운 XSS 회귀 검증 스크립트 실행
+export const runMarkdownXssRegressionTests = (): void => {
+    if (typeof document === 'undefined') return;
+
+    const unsafeInputs = [
+        '<img src=x onerror=alert(1)>',
+        '[x](javascript:alert(1))',
+        '[x](javascript&#58;alert(1))',
+        '[x](java\nscript:alert(1))',
+        '[x](data:text/html,<script>alert(1)</script>)',
+        '![x](data:image/svg+xml,<svg onload=alert(1)>)',
+        '[x](vbscript:msgbox(1))',
+        '[x](https://example.com/"onclick="alert(1))',
+    ];
+
+    for (const input of unsafeInputs) {
+        const output = marked.parse(input) as string;
+        const doc = new DOMParser().parseFromString(output, 'text/html');
+
+        for (const element of Array.from(doc.body.querySelectorAll('*'))) {
+            // 1. onclick, onerror 등 이벤트 핸들러 삽입 여부 검사
+            for (const attributeName of element.getAttributeNames()) {
+                if (attributeName.toLowerCase().startsWith('on')) {
+                    throw new Error(`unsafe event attribute: ${input} -> ${output}`);
+                }
+            }
+
+            // 2. href, src 의 URL 위험성 검사
+            for (const attributeName of ['href', 'src']) {
+                const attributeValue = element.getAttribute(attributeName);
+                if (!attributeValue) {
+                    continue;
+                }
+
+                const normalizedValue = normalizeUrlForPolicy(attributeValue).toLowerCase();
+                if (/^(javascript|data|vbscript):/.test(normalizedValue)) {
+                    throw new Error(`unsafe url attribute: ${input} -> ${output}`);
+                }
+            }
+        }
+    }
+    console.log('[보안 검증] 모든 마크다운 XSS 회귀 테스트 케이스를 무사히 통과했습니다.');
+};
+
+// 로딩 시점에 회귀 테스트 즉시 기동하여 실시간 안전성 담보
+try {
+    runMarkdownXssRegressionTests();
+} catch (error) {
+    console.error('[보안 경고] 마크다운 XSS 회귀 테스트 실패:', error);
 }
