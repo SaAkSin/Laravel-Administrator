@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?php echo config('application.language') ?>">
+<html lang="<?php echo config('app.locale') ?>">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">

@@ -38,6 +38,7 @@ Below is a list of all the available options:
 - [Redirect Key](#redirect-key)
 - [Global Rows Per Page](#global-rows-per-page)
 - [Locales](#locales)
+- [Design Themes and Custom Assets](#themes-and-assets)
 
 <a name="uri"></a>
 ### Uri
@@ -342,3 +343,41 @@ When provided, this array of locale strings gives the administrative user the ch
 
 
 The user's choice of locale will persist across page loads until a user's session expires.
+
+<a name="themes-and-assets"></a>
+### Design Themes and Custom Assets
+
+```php
+/**
+ * Design theme settings
+ */
+'theme' => 'silver',
+
+'themes' => array(
+	'silver' => array(
+		'label' => '실버',
+		'entry' => 'resources/css/themes/silver.css',
+	),
+	'legacy' => array(
+		'label' => '레거시',
+		'entry' => null,
+	),
+),
+
+'custom_css' => array(
+	'custom' => asset('css/custom.css'),
+),
+
+'custom_js' => array(
+	'custom' => asset('js/custom.js'),
+),
+```
+
+#### Theme
+The active design theme for the administrator interface. Defaults to `silver`. If the selected theme is invalid or the assets are missing, it falls back to `silver` automatically. You can choose `legacy` to load no additional style overrides and use the legacy default interface.
+
+#### Themes
+Define the list of available themes and their corresponding Vite entry stylesheet paths.
+
+#### Custom CSS & JS
+Specify lists of custom stylesheet and script paths that you want to load after the theme stylesheets and main scripts are loaded.

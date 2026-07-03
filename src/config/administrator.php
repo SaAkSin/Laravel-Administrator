@@ -140,4 +140,42 @@ return array(
 	 */
 	'locales' => array(),
 
+	/**
+	 * The active theme. It must be defined in the themes array below.
+	 * If none is specified or the entry is missing from manifest, it falls back to 'silver'.
+	 *
+	 * @type string
+	 */
+	'theme' => 'silver',
+
+	/**
+	 * The list of available themes.
+	 *
+	 * @type array
+	 */
+	'themes' => array(
+		'silver' => array(
+			'label' => '실버',
+			'entry' => 'resources/css/themes/silver.css',
+		),
+		'legacy' => array(
+			'label' => '레거시',
+			'entry' => null,
+		),
+	),
+
+	/**
+	 * Custom stylesheet files to be loaded after theme styles.
+	 *
+	 * @type array
+	 */
+	'custom_css' => array(),
+
+	/**
+	 * Custom javascript files to be loaded after app scripts.
+	 *
+	 * @type array
+	 */
+	'custom_js' => array(),
+
 );

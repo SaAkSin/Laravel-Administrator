@@ -33,6 +33,8 @@ class AdministratorServiceProvider extends ServiceProvider {
 
 		$this->loadTranslationsFrom(__DIR__.'/../../lang', 'administrator');
 
+		$this->loadRoutesFrom(__DIR__.'/../../routes.php');
+
 		$this->publishes([
 			__DIR__.'/../../config/administrator.php' => config_path('administrator.php'),
 		]);
@@ -58,9 +60,8 @@ class AdministratorServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//include our view composers, and routes to avoid issues with catch-all routes defined by users
+		//include our view composers to avoid issues with catch-all routes defined by users
 		include __DIR__.'/../../viewComposers.php';
-		include __DIR__.'/../../routes.php';
 
 		//the admin validator
 		$this->app->singleton('admin_validator',function($app)
