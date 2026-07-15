@@ -70,7 +70,7 @@ class AdministratorIntegrationTest extends TestCase
 			if (file_exists($path)) {
 				$this->backupManifests[$path] = file_get_contents($path);
 			}
-			
+
 			$dir = dirname($path);
 			if (!is_dir($dir)) {
 				mkdir($dir, 0755, true);

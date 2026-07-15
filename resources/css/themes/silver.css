@@ -1,4 +1,4 @@
-/* 
+/*
  * =========================================================================
  * 모던 어드민: 클래식 실버/연그레이 테마 CSS 명세서
  * =========================================================================
@@ -30,7 +30,7 @@ select {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     padding-right: 28px !important; /* 우측 버튼 영역 축소에 맞춰 텍스트 가용 폭 확보 */
-    background-image: 
+    background-image:
         /* 1. 세련된 화살표 SVG (d="M19.5 8.25...") */
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E"),
         /* 2. 세로 경계 구분선 */
@@ -38,19 +38,19 @@ select {
         /* 3. 우측 버튼 영역 은은한 실버 그라데이션 */
         linear-gradient(to bottom, #ffffff 0%, #e2e8f0 100%) !important;
     background-repeat: no-repeat, no-repeat, no-repeat !important;
-    background-position: 
-        right 8px center, 
+    background-position:
+        right 8px center,
         right 22px center,
         right center !important;
-    background-size: 
-        10px 10px, 
-        1px 100%, 
+    background-size:
+        10px 10px,
+        1px 100%,
         22px 100% !important;
     cursor: pointer !important;
 }
 
 select:focus {
-    background-image: 
+    background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e293b' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E"),
         linear-gradient(to right, #94a3b8, #94a3b8),
         linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%) !important;
@@ -388,7 +388,7 @@ table.results td {
 /* =========================================================================
  * 🖋️ WYSIWYG Quill Editor 디자인 정합성 보정 (여백 및 플랫 버튼 일관성 복원)
  * =========================================================================
- * 전역 button 태그에 먹여둔 입체 그라데이션이 Quill 에디터의 툴바 내부 버튼들을 
+ * 전역 button 태그에 먹여둔 입체 그라데이션이 Quill 에디터의 툴바 내부 버튼들을
  * 오염시키는 문제를 차단하고, 우측 여백을 다른 폼 필드와 정확히 매칭시킵니다.
  */
 
@@ -468,7 +468,7 @@ table.results td {
 /* =========================================================================
  * 🗂️ 어드민 헤더 대분류 그룹 메뉴 호버 드롭다운(풀다운) 구동 스크립트 복원
  * =========================================================================
- * 마우스를 대분류(span)에 올렸을 때 서브 메뉴 목록이 보이도록 구동하고 
+ * 마우스를 대분류(span)에 올렸을 때 서브 메뉴 목록이 보이도록 구동하고
  * 텍스트 필드에 손가락 포인터를 활성화합니다.
  */
 
