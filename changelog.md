@@ -1,19 +1,19 @@
 ## Changelog
 
-### 10.8.0 (릴리스 후보, 태그 미정)
-- **Laravel 13 및 지원 범위 정리**:
-  - Laravel 10~13을 Composer 지원 범위로 명시하고 버전별 최소 PHP/Testbench/PHPUnit 조합을 문서화
-  - Laravel 13의 서비스 프로바이더 부팅 경로와 기존 Laravel 버전 호환성을 관련 통합 테스트 및 Composer 해석으로 검증
+### 13.0.0 (버전 확정, 게시 전)
+- **Laravel 13 전용 지원**:
+  - Composer 지원 범위를 Laravel `^13.0`, PHP `^8.3`으로 확정
+  - 개발 및 검증 도구를 Orchestra Testbench `^11.0`, PHPUnit `^11.0`으로 통일
+  - Laravel 13의 서비스 프로바이더 부팅 경로와 설정 병합을 관련 통합 테스트로 검증
 - **설정 기반 디자인 테마**:
   - 기본 `silver` 테마와 추가 테마 CSS를 로드하지 않는 `legacy` 선택지 제공
   - `custom_css`, `custom_js` 설정으로 프로젝트별 에셋을 테마 및 앱 엔트리 뒤에 확장 가능
   - Vite manifest에 앱과 `silver` 테마 엔트리를 각각 기록하고 배포 산출물 존재 여부를 회귀 테스트로 확인
 - **릴리스 메타데이터 및 검증**:
   - Composer 패키지 유형과 소스 저장소 메타데이터를 명시하고 안정 버전 의존성을 기본 정책으로 사용
-  - `composer.lock`을 릴리스 검증 기준으로 추적하고 `composer validate`, 관련 PHPUnit 테스트, `npm run build` 결과를 PR에 기록
+  - `composer.lock`을 Laravel 13 전용 제약으로 갱신하고 `composer validate`, `composer audit`, 관련 PHPUnit 테스트, `npm run build` 결과를 PR에 기록
 - **호환성 주의사항**:
-  - Laravel 10은 PHP 8.1 이상, Laravel 11~12는 PHP 8.2 이상, Laravel 13은 PHP 8.3 이상 필요
-  - 릴리스 후보 검증 시 Laravel 10·11 의존성은 Composer advisory 차단으로 기본 해석에 실패했으며, 배포 전 안전한 조합을 재검증해야 함
+  - Laravel `^13.0`, PHP `^8.3` 범위를 벗어난 런타임은 `13.0.0`에서 지원하지 않음
   - 태그 생성, GitHub Release 게시 및 Packagist 배포는 별도 Architect 승인 후 수행
 
 ### 10.7.0
