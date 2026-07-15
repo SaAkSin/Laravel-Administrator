@@ -2,11 +2,17 @@
 namespace SaAkSin\Administrator\Tests;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Store;
 use Illuminate\Validation\Validator as LaravelValidator;
+use Laravel\Octane\ApplicationFactory;
+use Laravel\Octane\OctaneServiceProvider;
+use Laravel\Octane\RequestContext;
+use Laravel\Octane\Testing\Fakes\FakeClient;
+use Laravel\Octane\Worker;
 use Orchestra\Testbench\TestCase;
 use ReflectionClass;
 use SaAkSin\Administrator\AdministratorServiceProvider;
@@ -36,6 +42,27 @@ class OctaneLifecycleState
 	public static function actionPermission($model)
 	{
 		return static::$permission;
+	}
+}
+
+class TestOctaneApplicationFactory extends ApplicationFactory
+{
+	public $createCount = 0;
+
+	public function __construct(protected Application $application)
+	{
+	}
+
+	public function createApplication(array $initialInstances = array()): Application
+	{
+		$this->createCount++;
+
+		foreach ($initialInstances as $key => $value)
+		{
+			$this->application->instance($key, $value);
+		}
+
+		return $this->application;
 	}
 }
 
@@ -74,7 +101,10 @@ class OctaneLifecycleTest extends TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return array(AdministratorServiceProvider::class);
+		return array(
+			OctaneServiceProvider::class,
+			AdministratorServiceProvider::class,
+		);
 	}
 
 	protected function defineEnvironment($app)
@@ -162,6 +192,104 @@ class OctaneLifecycleTest extends TestCase
 
 		$this->assertSame('settings', $this->app->make('itemconfig')->getType());
 		$this->assertSame($scopedCount, $this->scopedRegistrationCount());
+	}
+
+	public function testFilterStateIsClearedBetweenRequestLifecycles()
+	{
+		$this->bindRouteRequest('model', 'first_model', $this->makeSession());
+		$firstFilter = $this->app->make('admin_field_factory')->findFilter('id');
+		$firstFilter->setFilter(array(
+			'value' => '42',
+			'min_value' => '1,000',
+			'max_value' => '2,000',
+		));
+
+		$this->assertSame('42', $firstFilter->getOption('value'));
+		$this->assertSame('1000', $firstFilter->getOption('min_value'));
+		$this->assertSame('2000', $firstFilter->getOption('max_value'));
+
+		$this->app->forgetScopedInstances();
+		$this->bindRouteRequest('model', 'second_model', $this->makeSession());
+		$secondFilter = $this->app->make('admin_field_factory')->findFilter('id');
+
+		$this->assertNotSame($firstFilter, $secondFilter);
+		$this->assertSame('', $secondFilter->getOption('value'));
+		$this->assertSame('', $secondFilter->getOption('min_value'));
+		$this->assertSame('', $secondFilter->getOption('max_value'));
+	}
+
+	public function testOctaneWorkerBootsOnceAndHandlesTwoIsolatedRequests()
+	{
+		$this->assertTrue($this->app->providerIsLoaded(OctaneServiceProvider::class));
+
+		$this->app->make('router')->get('/__octane-lifecycle/{model}', function(Request $request)
+		{
+			$config = app('itemconfig');
+			$fieldFactory = app('admin_field_factory');
+			$filter = $fieldFactory->findFilter('id');
+
+			if ($request->hasAny(array('value', 'min_value', 'max_value')))
+			{
+				$filter->setFilter($request->only(array('value', 'min_value', 'max_value')));
+			}
+
+			return response()->json(array(
+				'title' => $config->getOption('title'),
+				'permission' => $config->getOption('permission'),
+				'action_permission' => app('admin_action_factory')->getActionPermissions()['update'],
+				'filter' => array(
+					'value' => $filter->getOption('value'),
+					'min_value' => $filter->getOption('min_value'),
+					'max_value' => $filter->getOption('max_value'),
+				),
+			));
+		})->middleware(ValidateModel::class);
+
+		$client = new FakeClient(array());
+		$applicationFactory = new TestOctaneApplicationFactory($this->app);
+		$worker = new Worker($applicationFactory, $client);
+		$lifecycleObjects = array();
+		$worker->onRequestHandled(function($request, $response, $sandbox) use (&$lifecycleObjects)
+		{
+			$lifecycleObjects[] = array(
+				'sandbox' => $sandbox,
+				'itemconfig' => $sandbox->make('itemconfig'),
+				'field_factory' => $sandbox->make('admin_field_factory'),
+				'action_factory' => $sandbox->make('admin_action_factory'),
+			);
+		});
+		$worker->boot();
+		$workerApplication = $worker->application();
+
+		OctaneLifecycleState::$permission = true;
+		$firstRequest = Request::create('/__octane-lifecycle/first_model?value=42&min_value=1%2C000&max_value=2%2C000', 'GET');
+		$worker->handle($firstRequest, new RequestContext(array('request' => $firstRequest)));
+
+		OctaneLifecycleState::$permission = false;
+		$secondRequest = Request::create('/__octane-lifecycle/second_model', 'GET');
+		$worker->handle($secondRequest, new RequestContext(array('request' => $secondRequest)));
+
+		$this->assertSame($workerApplication, $worker->application());
+		$this->assertSame(1, $applicationFactory->createCount);
+		$this->assertCount(2, $client->responses);
+		$this->assertSame(array(), $client->errors);
+		$this->assertCount(2, $lifecycleObjects);
+		$this->assertNotSame($lifecycleObjects[0]['sandbox'], $lifecycleObjects[1]['sandbox']);
+		$this->assertNotSame($lifecycleObjects[0]['itemconfig'], $lifecycleObjects[1]['itemconfig']);
+		$this->assertNotSame($lifecycleObjects[0]['field_factory'], $lifecycleObjects[1]['field_factory']);
+		$this->assertNotSame($lifecycleObjects[0]['action_factory'], $lifecycleObjects[1]['action_factory']);
+
+		$firstResponse = json_decode($client->responses[0]->getContent(), true);
+		$secondResponse = json_decode($client->responses[1]->getContent(), true);
+
+		$this->assertSame('첫 번째 모델', $firstResponse['title']);
+		$this->assertTrue($firstResponse['permission']);
+		$this->assertTrue($firstResponse['action_permission']);
+		$this->assertSame(array('value' => '42', 'min_value' => '1000', 'max_value' => '2000'), $firstResponse['filter']);
+		$this->assertSame('두 번째 모델', $secondResponse['title']);
+		$this->assertFalse($secondResponse['permission']);
+		$this->assertFalse($secondResponse['action_permission']);
+		$this->assertSame(array('value' => '', 'min_value' => '', 'max_value' => ''), $secondResponse['filter']);
 	}
 
 	public function testRoutesWithoutItemConfigDoNotResolveIt()
@@ -305,6 +433,7 @@ class OctaneLifecycleTest extends TestCase
 			'action_permissions' => array('update' => array(OctaneLifecycleState::class, 'actionPermission')),
 			'columns' => array('id' => array('title' => 'ID')),
 			'edit_fields' => array('id' => array('type' => 'key')),
+			'filters' => array('id' => array('type' => 'number')),
 		);
 
 		file_put_contents($this->tempConfigPath . '/' . $name . '.php', '<?php return ' . var_export($config, true) . ';');

@@ -10,13 +10,13 @@
 | Laravel | `^13.0` |
 | Orchestra Testbench | `^11.0` |
 | PHPUnit | `^11.0` |
-| Laravel Octane | 호스트가 선택적으로 설치하는 Laravel 13 호환 2.x |
+| Laravel Octane | `^2.0` 개발 테스트 의존성, 운영에서는 호스트가 선택적으로 설치 |
 
 `config.platform.php`는 최저 지원 런타임인 `8.3.0`으로 고정한다. `minimum-stability`는 `dev`이고 `prefer-stable`은 활성화돼 있다. Composer 제약과 lockfile은 설치 가능 범위를 나타내지만 실제 런타임 테스트를 대신하지 않는다.
 
 ## Octane 요청 생명주기
 
-- 패키지 운영 `require`에는 `laravel/octane`을 추가하지 않는다. RoadRunner, Swoole, FrankenPHP와 Octane 설치·배포는 호스트 애플리케이션의 책임이다.
+- 패키지 운영 `require`에는 `laravel/octane`을 추가하지 않는다. `require-dev`의 Octane 2.x는 Worker lifecycle 통합 테스트에만 사용하며, RoadRunner, Swoole, FrankenPHP와 Octane 설치·배포는 호스트 애플리케이션의 책임이다.
 - `admin_validator`, `admin_config_factory`, `itemconfig`, 필드·컬럼·액션 factory, data table과 menu는 Laravel scoped binding으로 등록한다. 같은 요청·작업 안에서는 인스턴스를 재사용하고 다음 lifecycle에서는 새 인스턴스를 만든다.
 - 모델·설정 `itemconfig`는 현재 라우트 parameter로 해석한다. dashboard, custom page와 secure asset 경로에서는 해석하지 않는다.
 - 관리자 validator는 공유 validation factory를 clone한 전용 factory에서 만든다. 호스트가 등록한 resolver, 확장, presence verifier와 컨테이너 계약을 공유 factory에서 변경하지 않는다.

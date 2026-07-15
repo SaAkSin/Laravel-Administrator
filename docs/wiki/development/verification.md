@@ -18,10 +18,12 @@
 
 ## 장기 실행 워커 검증
 
-Octane 호환성 변경은 실제 서버 드라이버에 결합하지 않고 Laravel container의 lifecycle 종료를 재현해 다음 경계를 확인한다.
+Octane 호환성 변경은 실제 서버 바이너리에 결합하지 않고 두 수준으로 검증한다. scoped binding 단위 테스트는 Laravel container의 lifecycle 종료를 직접 재현하고, 통합 테스트는 개발 의존성의 `Laravel\Octane\Worker`와 공식 `FakeClient`로 애플리케이션을 한 번 boot한 뒤 요청을 두 번 연속 처리한다.
 
 - 같은 lifecycle에서 모든 `admin_*` scoped 서비스와 `itemconfig`가 같은 인스턴스를 반환하는지 확인한다.
-- `forgetScopedInstances()` 뒤 모델, 사용자 권한과 세션을 바꿔 설정, 필드·컬럼·액션 캐시, action permission과 페이지당 행 수가 새 요청 값으로 계산되는지 확인한다.
+- `forgetScopedInstances()` 단위 경계와 Worker handle-twice 통합 경계에서 sandbox, 설정, 필드·컬럼·액션 cache가 새 인스턴스로 교체되는지 확인한다.
+- 첫 요청의 모델 permission, action permission, 필터 `value`·`min_value`·`max_value`를 변경한 뒤 두 번째 Worker 요청에서 다른 사용자·모델 값과 필터 초기값이 사용되는지 확인한다.
+- 서로 다른 세션의 페이지당 행 수가 lifecycle마다 해당 세션 값으로 계산되는지 확인한다.
 - 모델·설정 middleware를 연속 실행해 scoped 등록 목록이 증가하지 않고 각 라우트의 `itemconfig`가 한 번만 생성되는지 확인한다.
 - dashboard, custom page와 secure asset처럼 `itemconfig`가 없는 경로가 설정을 해석하지 않는지 확인한다.
 - 호스트 사용자 정의 validation resolver와 확장을 등록한 뒤 관리자 validator를 해석해도 일반 validation이 같은 resolver를 계속 사용하는지 확인한다.
