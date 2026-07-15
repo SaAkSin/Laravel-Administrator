@@ -9,7 +9,7 @@
 <a name="introduction"></a>
 ## Introduction
 
-You can define custom actions in your [model](/docs/model-configuration#custom-actions) or [settings config files](/docs/settings-configuration#custom-actions) if you want to provide the administrative user buttons to perform custom code. You can modify an Eloquent model, or on a settings page you can give a user a button to clear the site cache or backup the database. A custom action is part of the `actions` array in your config files and it looks like this:
+You can define custom actions in your [model](./model-configuration.md#custom-actions) or [settings config files](./settings-configuration.md#custom-actions) if you want to provide the administrative user buttons to perform custom code. You can modify an Eloquent model, or on a settings page you can give a user a button to clear the site cache or backup the database. A custom action is part of the `actions` array in your config files and it looks like this:
 
 ```php
 /**
@@ -43,14 +43,14 @@ The `title` option lets you define the button's label value.
 
 The `messages` option is an array with three keys: `active`, `success`, and `error`. The `active` key is what is shown to the user as the action is being performed. The `success` key is the success message. The `error` key is the default error message.
 
-The `permission` option is an anonymous function that gets the relevant `$model` passed to it as its only parameter. This is exactly the same as if you were to put this action in your [`action_permissions`](/docs/model-configuration#action-permissions) array. Where you choose to put the permission callback is entirely up to you.
+The `permission` option is an anonymous function that gets the relevant `$model` passed to it as its only parameter. This is exactly the same as if you were to put this action in your [`action_permissions`](./model-configuration.md#action-permissions) array. Where you choose to put the permission callback is entirely up to you.
 
 > **Note**: If you want to show a custom error message, return an error string back from the `action` function. If you want to initiate a file download, return a Response::download().
 
 <a name="model-config"></a>
 ## Model Config
 
-In a [model configuration file](/docs/model-configuration#custom-actions), the Eloquent model instance for that item will be passed into the `action` function.
+In a [model configuration file](./model-configuration.md#custom-actions), the Eloquent model instance for that item will be passed into the `action` function.
 
 ```php
 'action' => function(&$model)
@@ -74,7 +74,7 @@ These global custom actions are passed the filtered query builder object so that
 <a name="settings-config"></a>
 ## Settings Config
 
-In a [settings configuration file](/docs/settings-configuration#custom-actions), the currently-saved data for the page is passed by reference into the `action` function.
+In a [settings configuration file](./settings-configuration.md#custom-actions), the currently-saved data for the page is passed by reference into the `action` function.
 
 ```php
 'action' => function(&$data)

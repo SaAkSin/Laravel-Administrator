@@ -94,11 +94,11 @@ const koreanSidebar = [
 
 export default defineConfig({
     title: 'Laravel Administrator',
-    description: 'Laravel 10 기반 관리자 페이지 빌더 패키지',
+    description: 'Laravel 13 관리자 페이지 빌더 패키지',
     lang: 'ko-KR',
     cleanUrls: true,
     lastUpdated: true,
-    srcExclude: ['tasks/**'],
+    srcExclude: ['tasks/**', 'wiki/**', '_meta/**'],
     markdown: {
         lineNumbers: true,
     },
@@ -152,7 +152,7 @@ export default defineConfig({
             provider: 'local',
         },
         editLink: {
-            pattern: 'https://github.com/SaAkSin/Laravel-Administrator/edit/dev/docs/:path',
+            pattern: 'https://github.com/SaAkSin/Laravel-Administrator/edit/main/docs/:path',
             text: 'GitHub에서 이 문서 수정',
         },
         footer: {

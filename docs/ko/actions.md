@@ -162,4 +162,4 @@
 ),
 ```
 
-모델 설정의 권한 옵션은 [모델 설정 문서](/docs/ko/model-configuration#permission), 세팅 설정의 액션 작성법은 [세팅 설정 문서](/docs/ko/settings-configuration#custom-actions)를 참고하십시오.
+모델 설정의 권한 옵션은 [모델 설정 문서](./model-configuration.md#permission), 세팅 설정의 액션 작성법은 [세팅 설정 문서](./settings-configuration.md#custom-actions)를 참고하십시오.

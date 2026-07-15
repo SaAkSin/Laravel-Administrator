@@ -23,7 +23,7 @@ return array(
 );
 ```
 
-Laravel 10에서는 환경별로 관리하려면 `.env`와 config 값을 연결해 사용할 수 있습니다.
+Laravel 13에서는 환경별로 관리하려면 `.env`와 config 값을 연결해 사용할 수 있습니다.
 
 ```dotenv
 APP_LOCALE=ko
@@ -88,4 +88,4 @@ src/lang/ko/
   frontend.php
 ```
 
-번역 개선은 [GitHub 이슈](https://github.com/SaAkSin/Laravel-Administrator/issues) 또는 Pull Request로 제안할 수 있습니다. 기여 절차는 [기여하기 문서](/docs/ko/contributing)를 참고하십시오.
+번역 개선은 [GitHub 이슈](https://github.com/SaAkSin/Laravel-Administrator/issues) 또는 Pull Request로 제안할 수 있습니다. 기여 절차는 [기여하기 문서](./contributing.md)를 참고하십시오.

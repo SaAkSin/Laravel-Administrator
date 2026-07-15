@@ -23,7 +23,7 @@ return array(
 );
 ```
 
-In Laravel 10 applications, you can also wire this value to an environment variable in your application config:
+In Laravel 13 applications, you can also wire this value to an environment variable in your application config:
 
 ```dotenv
 APP_LOCALE=en

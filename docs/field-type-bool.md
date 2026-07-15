@@ -21,4 +21,4 @@ In the edit form, an admin user will be presented with a checkbox that looks lik
 <a name="filter"></a>
 ## Filter
 
-A `bool` field type can be used in the [`filters`](/docs/model-configuration#filters) option. When used as a filter, it will give the admin user the option to either choose true, false, or all.
+A `bool` field type can be used in the [`filters`](./model-configuration.md#filters) option. When used as a filter, it will give the admin user the option to either choose true, false, or all.

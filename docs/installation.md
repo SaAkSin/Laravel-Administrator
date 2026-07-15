@@ -11,7 +11,7 @@
 <a name="requirements"></a>
 ## Requirements
 
-Laravel Administrator targets Laravel 10 and PHP 8.1 or later. For public deployments, prefer currently supported PHP releases and keep the host Laravel application patched.
+Laravel Administrator 13.0 targets Laravel `^13.0` and PHP `^8.3`. Keep the host Laravel application and PHP runtime patched within those supported release lines.
 
 The package ships built Vite assets for normal Composer installation. You only need Node.js when you are developing the package assets or building the VitePress documentation site.
 
@@ -21,7 +21,7 @@ The package ships built Vite assets for normal Composer installation. You only n
 Install the package in your Laravel application:
 
 ```bash
-composer require saaksin/laravel-administrator
+composer require "saaksin/laravel-administrator:^13.0"
 ```
 
 Laravel package auto-discovery registers the service provider automatically. If auto-discovery is disabled, register it manually:
@@ -68,7 +68,7 @@ Create the configuration directories if they do not exist:
 mkdir -p administrator/settings
 ```
 
-For all available options, see the [configuration docs](/docs/configuration).
+For all available options, see the [configuration docs](./configuration.md).
 
 <a name="model-config"></a>
 ## Model Config
@@ -100,14 +100,14 @@ return array(
 );
 ```
 
-For details, see the [model configuration docs](/docs/model-configuration).
+For details, see the [model configuration docs](./model-configuration.md).
 
 <a name="settings-config"></a>
 ## Settings Config
 
 Settings configuration files manage administrative values that are not best represented by an Eloquent model. Their file names map to `settings.*` entries in the `menu` option.
 
-For details, see the [settings configuration docs](/docs/settings-configuration).
+For details, see the [settings configuration docs](./settings-configuration.md).
 
 <a name="updates"></a>
 ## Update Workflow

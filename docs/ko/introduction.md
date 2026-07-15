@@ -10,7 +10,7 @@
 <a name="overview"></a>
 ## 개요
 
-Laravel Administrator는 Laravel 10 기반 프로젝트에서 Eloquent 모델과 운영 설정을 선언형 PHP 설정으로 관리하는 관리자 페이지 빌더입니다.
+Laravel Administrator는 Laravel 13 프로젝트에서 Eloquent 모델과 운영 설정을 선언형 PHP 설정으로 관리하는 관리자 페이지 빌더입니다.
 
 기존 FrozenNode Administrator를 기반으로 현대 Laravel 환경에 맞게 패키지 구조, PHP 요구 버전, Vite 기반 프론트엔드, Alpine.js/Tailwind CSS UI, Quill 기반 `wysiwyg2` 필드 등을 정비한 배포판입니다.
 
@@ -32,7 +32,7 @@ return array(
 <a name="features"></a>
 ## 주요 특징
 
-- Laravel 10과 PHP 8.1 이상 지원
+- Laravel `^13.0`과 PHP `^8.3` 지원
 - 모델, 컬럼, 필드, 필터, 액션을 PHP 배열로 선언
 - `belongsTo`, `belongsToMany`, `hasOne`, `hasMany` 관계 필드 지원
 - 모델 목록 컬럼, 관계 컬럼, 커스텀 출력 포맷 지원
@@ -68,7 +68,7 @@ public function role()
 }
 ```
 
-모델 화면 구성은 [모델 설정 문서](/docs/ko/model-configuration)를 참고하십시오.
+모델 화면 구성은 [모델 설정 문서](./model-configuration.md)를 참고하십시오.
 
 <a name="settings-pages"></a>
 ## 설정 페이지
@@ -91,9 +91,9 @@ return array(
 );
 ```
 
-세팅 페이지 작성법은 [세팅 설정 문서](/docs/ko/settings-configuration)를 참고하십시오.
+세팅 페이지 작성법은 [세팅 설정 문서](./settings-configuration.md)를 참고하십시오.
 
 <a name="next"></a>
 ## 다음 단계
 
-처음 설치하는 경우 [설치 문서](/docs/ko/installation)를 먼저 확인하십시오. 전역 옵션은 [설정 문서](/docs/ko/configuration), 필드별 옵션은 [필드 문서](/docs/ko/fields)에서 확인할 수 있습니다.
+처음 설치하는 경우 [설치 문서](./installation.md)를 먼저 확인하십시오. 전역 옵션은 [설정 문서](./configuration.md), 필드별 옵션은 [필드 문서](./fields.md)에서 확인할 수 있습니다.

@@ -199,7 +199,7 @@
 <a name="settings-page"></a>
 ## 설정 페이지
 
-세팅 설정 파일에서는 `key`와 관계 필드(`belongs_to`, `belongs_to_many`, `has_one`, `has_many`)를 제외한 타입을 사용할 수 있습니다. 세팅 페이지 작성법은 [세팅 설정 문서](/docs/ko/settings-configuration)를 참고하십시오.
+세팅 설정 파일에서는 `key`와 관계 필드(`belongs_to`, `belongs_to_many`, `has_one`, `has_many`)를 제외한 타입을 사용할 수 있습니다. 세팅 페이지 작성법은 [세팅 설정 문서](./settings-configuration.md)를 참고하십시오.
 
 <a name="field-types"></a>
 ## 지원 필드 타입
@@ -221,4 +221,4 @@
 | `fulltext_mysql` | MySQL FULLTEXT 검색 필터 |
 | `relationship` | Eloquent 관계 입력 |
 
-관계 필드의 세부 옵션은 [관계 필드 문서](/docs/ko/field-type-relationship)를 참고하십시오.
+관계 필드의 세부 옵션은 [관계 필드 문서](./field-type-relationship.md)를 참고하십시오.

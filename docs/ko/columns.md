@@ -154,7 +154,7 @@ public function getFormattedSalaryAttribute()
 );
 ```
 
-중첩 관계와 관계 타입별 세부 동작은 [관계 컬럼 문서](/docs/ko/relationship-columns)를 참고하십시오.
+중첩 관계와 관계 타입별 세부 동작은 [관계 컬럼 문서](./relationship-columns.md)를 참고하십시오.
 
 <a name="custom-outputs"></a>
 ## 커스텀 출력

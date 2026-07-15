@@ -9,4 +9,4 @@
 );
 ```
 
-필드 값은 HTML로 저장됩니다. 테이블, 소스 편집 등 CKEditor 4 기능이 필요한 화면에서는 [WYSIWYG](/docs/ko/field-type-wysiwyg)를 사용할 수 있습니다.
+필드 값은 HTML로 저장됩니다. 테이블, 소스 편집 등 CKEditor 4 기능이 필요한 화면에서는 [WYSIWYG](./field-type-wysiwyg.md)를 사용할 수 있습니다.
