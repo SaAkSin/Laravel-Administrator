@@ -20,12 +20,12 @@
 
 ## 알려진 제한사항
 
-- 이번 릴리스 준비 PR의 로컬 검증 환경은 PHP 8.4이므로 PHP 8.3 실제 런타임 검증은 게시 환경에서 같은 명령으로 다시 확인해야 합니다.
 - `13.0.0` 태그, GitHub Release와 Packagist 패키지는 아직 게시하지 않았습니다.
 
 ## 릴리스 전 Architect 승인 체크리스트
 
 - [x] 버전을 `13.0.0`으로 확정하고 Laravel `^13.0`, PHP `^8.3` 지원 범위를 검토한다.
+- [x] PHP 8.3 실제 런타임에서 Composer 해석과 관련 PHPUnit 테스트를 검토한다.
 - [x] `composer validate`, `composer audit`, Laravel 13 의존성 해석, 관련 PHPUnit 테스트와 `npm run build` 결과를 검토한다.
 - [x] `public/dist/.vite/manifest.json`의 앱/실버 테마 엔트리와 산출물을 검토한다.
 - [x] README, CHANGELOG와 본 릴리스 노트의 지원 범위가 일치하는지 검토한다.
