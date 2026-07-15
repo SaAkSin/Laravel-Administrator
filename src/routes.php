@@ -13,7 +13,11 @@ Route::get('packages/saaksin/administrator/secure-dist/{path}', [
  * TODO: remove in favor of setting the config for middleware outside of the routes file
  */
 // 'web' 미들웨어 그룹을 기본 적용하여 CSRF 토큰 검증 및 세션 바인딩을 강제화합니다.
-$default_middleware = array('web', 'SaAkSin\Administrator\Http\Middleware\ValidateAdmin');
+$default_middleware = array(
+	'web',
+	'SaAkSin\Administrator\Http\Middleware\SetLocale',
+	'SaAkSin\Administrator\Http\Middleware\ValidateAdmin',
+);
 if(is_array(config('administrator.middleware'))) {
     $middleware_array = array_unique(array_merge($default_middleware, config('administrator.middleware')));
 } else {

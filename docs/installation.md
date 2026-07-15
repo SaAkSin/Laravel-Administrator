@@ -6,6 +6,7 @@
 - [Administrator Config](#administrator-config)
 - [Model Config](#model-config)
 - [Settings Config](#settings-config)
+- [Laravel Octane](#octane)
 - [Update Workflow](#updates)
 
 <a name="requirements"></a>
@@ -109,6 +110,19 @@ Settings configuration files manage administrative values that are not best repr
 
 For details, see the [settings configuration docs](./settings-configuration.md).
 
+<a name="octane"></a>
+## Laravel Octane
+
+Administrator isolates request-specific configuration, fields, columns, actions, permissions, pagination state, and locale when a Laravel 13 host application runs under Laravel Octane with RoadRunner, Swoole, or FrankenPHP. Octane remains an optional host runtime: this package does not add `laravel/octane` as a production dependency or install a server driver for the application.
+
+Install and configure a Laravel 13-compatible Octane 2.x release in the host application when you choose this runtime. The `administrator.ready` event is dispatched once while the application or worker boots; do not use it to reset request-specific state.
+
+After deploying package code or configuration changes to a running Octane environment, reload the workers so that the new code is booted:
+
+```bash
+php artisan octane:reload
+```
+
 <a name="updates"></a>
 ## Update Workflow
 
@@ -118,6 +132,8 @@ After updating the package, publish the latest assets again:
 composer update saaksin/laravel-administrator
 php artisan vendor:publish --tag=laravel-administrator --force
 ```
+
+If the host application uses Octane, run `php artisan octane:reload` after this update workflow.
 
 If you automate publishing in the host application's `composer.json`, keep the command scoped to the package tag:
 

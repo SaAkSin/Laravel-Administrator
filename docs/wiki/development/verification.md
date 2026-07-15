@@ -16,6 +16,19 @@
 
 [PHPUnit 설정](../../../phpunit.xml)은 `Test.php` suffix를 가진 테스트를 탐색한다. [TypeScript 설정](../../../tsconfig.json)은 Vite 환경에 맞는 `bundler` module resolution을 사용한다.
 
+## 장기 실행 워커 검증
+
+Octane 호환성 변경은 실제 서버 드라이버에 결합하지 않고 Laravel container의 lifecycle 종료를 재현해 다음 경계를 확인한다.
+
+- 같은 lifecycle에서 모든 `admin_*` scoped 서비스와 `itemconfig`가 같은 인스턴스를 반환하는지 확인한다.
+- `forgetScopedInstances()` 뒤 모델, 사용자 권한과 세션을 바꿔 설정, 필드·컬럼·액션 캐시, action permission과 페이지당 행 수가 새 요청 값으로 계산되는지 확인한다.
+- 모델·설정 middleware를 연속 실행해 scoped 등록 목록이 증가하지 않고 각 라우트의 `itemconfig`가 한 번만 생성되는지 확인한다.
+- dashboard, custom page와 secure asset처럼 `itemconfig`가 없는 경로가 설정을 해석하지 않는지 확인한다.
+- 호스트 사용자 정의 validation resolver와 확장을 등록한 뒤 관리자 validator를 해석해도 일반 validation이 같은 resolver를 계속 사용하는지 확인한다.
+- 허용 로케일 세션, 다른 세션, 빈 값과 허용되지 않은 값을 순차 적용해 각 요청의 세션 값 또는 `app.locale`이 사용되는지 확인한다.
+
+공용 container binding과 validation factory 계약을 바꾸는 작업은 관련 lifecycle 테스트 뒤 전체 PHPUnit suite를 실행한다.
+
 ## 결과 기록
 
 Pull Request body에는 다음을 남긴다.
