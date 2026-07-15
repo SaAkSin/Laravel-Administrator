@@ -1,6 +1,6 @@
 # Laravel Administrator 13.0.0 릴리스 노트
 
-> 상태: 버전은 `13.0.0`으로 확정했습니다. 태그 생성, GitHub Release 게시와 Packagist 배포 시점은 미정입니다.
+> 상태: `13.0.0` 릴리스 게시를 승인했습니다. 이 문서가 포함된 `main` 커밋을 기준으로 태그, GitHub Release와 Packagist 패키지를 게시합니다.
 
 ## 변경 요약
 
@@ -18,23 +18,19 @@
 - 기본값은 `silver`이며, 배포 전에 `npm run build`로 `public/dist`와 manifest를 함께 갱신해야 합니다.
 - 사용자 정의 CSS는 테마 뒤에, 사용자 정의 JavaScript는 앱 엔트리 뒤에 로드됩니다.
 
-## 알려진 제한사항
-
-- `13.0.0` 태그, GitHub Release와 Packagist 패키지는 아직 게시하지 않았습니다.
-
-## 릴리스 전 Architect 승인 체크리스트
+## 릴리스 Architect 승인 체크리스트
 
 - [x] 버전을 `13.0.0`으로 확정하고 Laravel `^13.0`, PHP `^8.3` 지원 범위를 검토한다.
 - [x] PHP 8.3 실제 런타임에서 Composer 해석과 관련 PHPUnit 테스트를 검토한다.
 - [x] `composer validate`, `composer audit`, Laravel 13 의존성 해석, 관련 PHPUnit 테스트와 `npm run build` 결과를 검토한다.
 - [x] `public/dist/.vite/manifest.json`의 앱/실버 테마 엔트리와 산출물을 검토한다.
 - [x] README, CHANGELOG와 본 릴리스 노트의 지원 범위가 일치하는지 검토한다.
-- [ ] `13.0.0` 태그 생성 시점을 승인한다.
-- [ ] GitHub Release 게시 시점을 승인한다.
-- [ ] Packagist 배포 시점을 승인한다.
+- [x] `13.0.0` 태그 생성을 승인한다.
+- [x] GitHub Release 게시를 승인한다.
+- [x] Packagist 배포를 승인한다.
 
-## 이번 PR에서 수행하지 않는 작업
+## 게시 대상
 
-- Git 태그 생성
-- GitHub Release 게시
-- Packagist 배포
+- Git 태그: `13.0.0`
+- GitHub Release: `Laravel Administrator 13.0.0`
+- Packagist: `saaksin/laravel-administrator` `13.0.0`
