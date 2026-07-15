@@ -181,9 +181,9 @@ View::composer(array('administrator::layouts.default'), function($view)
 If you want to have a submenu, instead of passing in a string, pass in an array of strings. The index of this slot will be the submenu's title in the UI. Submenus can themselves have submenus and there is no depth limit.
 
 
-> For a detailed description of all the model configuration options, see the **[model configuration docs](/docs/model-configuration)**
+> For a detailed description of all the model configuration options, see the **[model configuration docs](./model-configuration.md)**
 
-> For a detailed description of all the settings configuration options, see the **[settings configuration docs](/docs/settings-configuration)**
+> For a detailed description of all the settings configuration options, see the **[settings configuration docs](./settings-configuration.md)**
 
 <a name="permission"></a>
 ### Permission

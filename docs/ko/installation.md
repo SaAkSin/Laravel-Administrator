@@ -11,12 +11,12 @@
 <a name="requirements"></a>
 ## 요구사항
 
-Laravel Administrator 10.x는 현재 패키지 기준으로 다음 환경을 요구합니다.
+Laravel Administrator 13.0은 다음 환경을 요구합니다.
 
 | 항목 | 요구 버전 |
 | --- | --- |
-| PHP | `>= 8.1` |
-| Laravel Framework | `10.*` |
+| PHP | `^8.3` |
+| Laravel Framework | `^13.0` |
 | Composer | Laravel 애플리케이션 의존성 설치용 |
 
 패키지 개발이나 문서 빌드를 직접 수행하는 경우에만 Node.js와 npm이 필요합니다. 일반 Laravel 애플리케이션에서 패키지를 사용하는 경우에는 Composer와 `php artisan vendor:publish`가 핵심 절차입니다.
@@ -24,10 +24,10 @@ Laravel Administrator 10.x는 현재 패키지 기준으로 다음 환경을 요
 <a name="composer"></a>
 ## Composer 설치
 
-Laravel 10 애플리케이션 루트에서 패키지를 설치합니다.
+Laravel 13 애플리케이션 루트에서 패키지를 설치합니다.
 
 ```bash
-composer require "saaksin/laravel-administrator:^10.6"
+composer require "saaksin/laravel-administrator:^13.0"
 ```
 
 <a name="service-provider"></a>
@@ -173,4 +173,4 @@ php artisan vendor:publish --tag=laravel-administrator --force
 }
 ```
 
-다음 단계는 [설정 문서](/docs/ko/configuration)와 [모델 설정 문서](/docs/ko/model-configuration)를 참고하십시오.
+다음 단계는 [설정 문서](./configuration.md)와 [모델 설정 문서](./model-configuration.md)를 참고하십시오.

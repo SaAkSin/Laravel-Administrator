@@ -184,7 +184,7 @@ class State extends Eloquent {
 }
 ```
 
-Now when we create the `Theater` [model config](/docs/model-configuration), we'd set up the [edit fields](/docs/fields) to something like this:
+Now when we create the `Theater` [model config](./model-configuration.md), we'd set up the [edit fields](./fields.md) to something like this:
 
 ```php
 'edit_fields' => array
@@ -248,7 +248,7 @@ class BoxOffice extends Eloquent {
 }
 ```
 
-Now when we create the `BoxOffice` [model config](/docs/model-configuration), we'd set up the [edit fields](/docs/fields) to something like this:
+Now when we create the `BoxOffice` [model config](./model-configuration.md), we'd set up the [edit fields](./fields.md) to something like this:
 
 ```php
 'edit_fields' => array

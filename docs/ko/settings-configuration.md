@@ -94,7 +94,7 @@ return array(
 );
 ```
 
-세팅 페이지에서는 `key`, 관계 필드(`belongs_to`, `belongs_to_many`, `has_one`, `has_many`)를 제외한 필드 타입을 사용할 수 있습니다. 필드 옵션은 [필드 문서](/docs/ko/fields)를 참고하십시오.
+세팅 페이지에서는 `key`, 관계 필드(`belongs_to`, `belongs_to_many`, `has_one`, `has_many`)를 제외한 필드 타입을 사용할 수 있습니다. 필드 옵션은 [필드 문서](./fields.md)를 참고하십시오.
 
 <a name="validation"></a>
 ## 유효성 검사
@@ -173,4 +173,4 @@ return array(
 
 `storage_path`를 지정하지 않으면 현재 코드 기준 기본 저장 디렉터리는 `storage_path() . '/administrator_settings/'`입니다. 직접 지정하는 경우 실제 존재하는 디렉터리여야 합니다.
 
-설정 페이지를 메뉴에 추가하는 방법은 [설정 문서의 메뉴 섹션](/docs/ko/configuration#menu)을 참고하십시오.
+설정 페이지를 메뉴에 추가하는 방법은 [설정 문서의 메뉴 섹션](./configuration.md#menu)을 참고하십시오.

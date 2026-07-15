@@ -37,7 +37,7 @@ php artisan vendor:publish --tag=laravel-administrator --force
 <a name="example"></a>
 ## 전체 예시
 
-아래 예시는 Laravel 10 프로젝트에서 바로 사용할 수 있는 최소 전역 설정입니다.
+아래 예시는 Laravel 13 프로젝트에서 바로 사용할 수 있는 최소 전역 설정입니다.
 
 ```php {6-9,11,13}
 <?php
@@ -239,4 +239,4 @@ false로 평가되면 `login_path`로 리다이렉트되고, 세션에는 `login
 
 ---
 
-다음 단계는 [모델 설정](/docs/ko/model-configuration), [세팅 설정](/docs/ko/settings-configuration), [필드](/docs/ko/fields)를 참고하십시오.
+다음 단계는 [모델 설정](./model-configuration.md), [세팅 설정](./settings-configuration.md), [필드](./fields.md)를 참고하십시오.

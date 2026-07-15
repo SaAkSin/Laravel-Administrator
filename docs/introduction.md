@@ -26,7 +26,7 @@ Unlike many other admin interface systems, Administrator doesn't come with authe
 
 Most importantly, Administrator is built with [the Eloquent ORM](http://laravel.com/docs/eloquent) in mind, so it won't get in the way of you using normal Eloquent features like accessors, mutators, and events.
 
-> For more on how to configure your Eloquent models with Administrator, see the [model configuration docs](/docs/model-configuration)
+> For more on how to configure your Eloquent models with Administrator, see the [model configuration docs](./model-configuration.md)
 
 
 <a name="settings-pages"></a>
@@ -34,12 +34,12 @@ Most importantly, Administrator is built with [the Eloquent ORM](http://laravel.
 
 If you want to just have a simple settings page where you get to define the validation rules, the fields, and the actions, you can do that! It's incredibly easy to create a page with any combination of fields (e.g. a checkbox to determine if your site is online or offline) or custom actions (e.g. a "clear cache" button).
 
-> For more on how to create a settings page, see the [settings configuration docs](/docs/settings-configuration)
+> For more on how to create a settings page, see the [settings configuration docs](./settings-configuration.md)
 
 
 <a name="installation-guidance"></a>
 ## Installation / Guidance
 
-To get started with Administrator, check out the [installation guide](/docs/installation).
+To get started with Administrator, check out the [installation guide](./installation.md).
 
-If you need some guidance, check out the [tutorials](/docs/tutorials).
+If you need some guidance, check out the [tutorials](./tutorials.md).

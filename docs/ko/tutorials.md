@@ -9,7 +9,7 @@
 
 처음 적용하는 프로젝트에서는 다음 순서로 진행하는 것을 권장합니다.
 
-1. [설치](/docs/ko/installation) 문서에 따라 Composer 설치와 publish를 실행합니다.
+1. [설치](./installation.md) 문서에 따라 Composer 설치와 publish를 실행합니다.
 2. `administrator/settings` 디렉터리를 생성합니다.
 3. `config/administrator.php`의 `menu`, `home_page`, `permission`을 프로젝트에 맞게 수정합니다.
 4. 첫 모델 설정 파일을 `administrator/{name}.php`에 작성합니다.
@@ -50,8 +50,8 @@ return array(
 <a name="references"></a>
 ## 참고 문서
 
-- [설정](/docs/ko/configuration)
-- [모델 설정](/docs/ko/model-configuration)
-- [필드](/docs/ko/fields)
-- [컬럼](/docs/ko/columns)
-- [액션](/docs/ko/actions)
+- [설정](./configuration.md)
+- [모델 설정](./model-configuration.md)
+- [필드](./fields.md)
+- [컬럼](./columns.md)
+- [액션](./actions.md)

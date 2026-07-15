@@ -92,4 +92,4 @@ return array(
 );
 ```
 
-모델 설정과 세팅 설정의 전체 옵션은 [모델 설정 문서](/docs/ko/model-configuration#validation)와 [세팅 설정 문서](/docs/ko/settings-configuration#validation)를 참고하십시오.
+모델 설정과 세팅 설정의 전체 옵션은 [모델 설정 문서](./model-configuration.md#validation)와 [세팅 설정 문서](./settings-configuration.md#validation)를 참고하십시오.

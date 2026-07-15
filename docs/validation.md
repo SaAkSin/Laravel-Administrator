@@ -7,7 +7,7 @@
 <a name="introduction"></a>
 ## Introduction
 
-Administrator uses [Laravel's validation](http://laravel.com/docs/validation) to validate your models. You can either provide a [`rules`](/docs/model-configuration#validation-rules) option in your configuration files:
+Administrator uses [Laravel's validation](http://laravel.com/docs/validation) to validate your models. You can either provide a [`rules`](./model-configuration.md#validation-rules) option in your configuration files:
 
 ```php
 'rules' => array(
@@ -36,7 +36,7 @@ Now if an admin user tries to save a Movie without an age or an age below 18, Ad
 <a name="custom-messages"></a>
 ## Custom Messages
 
-There's a good chance that you'll need to use custom validation messages for each model that you're presenting to your users. In order to do this, you can provide a [`messages`](/docs/model-configuration#validation-messages) option in your configuration files:
+There's a good chance that you'll need to use custom validation messages for each model that you're presenting to your users. In order to do this, you can provide a [`messages`](./model-configuration.md#validation-messages) option in your configuration files:
 
 ```php
 'messages' => array(

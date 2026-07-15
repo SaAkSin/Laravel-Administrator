@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: Laravel Administrator
-  text: Laravel 10 관리자 페이지 빌더
+  text: Laravel 13 관리자 페이지 빌더
   tagline: Eloquent 모델, 관계형 데이터, 설정 페이지를 선언형 구성으로 빠르게 관리합니다.
   image:
     src: /favicon.svg
@@ -20,8 +20,8 @@ hero:
       link: https://github.com/SaAkSin/Laravel-Administrator
 
 features:
-  - title: Laravel 10 지원
-    details: PHP 8.1 이상과 Laravel 10 기반 프로젝트에서 관리자 화면을 구성합니다.
+  - title: Laravel 13 지원
+    details: PHP 8.3과 Laravel 13 프로젝트에서 관리자 화면을 구성합니다.
   - title: 선언형 관리자 구성
     details: 모델, 컬럼, 필드, 필터, 액션을 PHP 설정 파일로 정의합니다.
   - title: 현대화된 프론트엔드
@@ -37,7 +37,7 @@ features:
 ## 빠른 설치
 
 ```bash
-composer require "saaksin/laravel-administrator:10.7.*"
+composer require "saaksin/laravel-administrator:^13.0"
 ```
 
 서비스 프로바이더를 등록한 뒤 설정 파일을 배포합니다.
@@ -46,4 +46,4 @@ composer require "saaksin/laravel-administrator:10.7.*"
 php artisan vendor:publish --provider="SaAkSin\Administrator\AdministratorServiceProvider" --force
 ```
 
-자세한 내용은 [설치 문서](/docs/ko/installation)를 확인하십시오.
+자세한 내용은 [설치 문서](./ko/installation.md)를 확인하십시오.

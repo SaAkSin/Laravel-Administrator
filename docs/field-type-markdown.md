@@ -23,4 +23,4 @@ The `limit` option lets you set a character limit for the field.
 
 The `height` option lets you set the height of the textarea in pixels.
 
-Since the `markdown` field type requires a bit of space, you may want to think about [expanding your model's form width](/docs/model-configuration#form-width) to something like `400`.
+Since the `markdown` field type requires a bit of space, you may want to think about [expanding your model's form width](./model-configuration.md#form-width) to something like `400`.
