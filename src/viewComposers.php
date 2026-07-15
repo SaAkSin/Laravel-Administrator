@@ -125,12 +125,13 @@ View::composer(array('administrator::partials.header'), function($view)
 View::composer(array('administrator::layouts.default'), function($view)
 {
 	// 에셋 배열 초기화
-	$view->css = array();
 	$view->js = array(
 		'ckeditor' => asset('packages/saaksin/administrator/js/ckeditor/ckeditor.js'),
 	);
 
-	// Vite 현대화 에셋 (Alpine.js 및 Tailwind CSS)은 대시보드와 커스텀 페이지를 포함한 모든 레이아웃에 필수적이므로 항상 등록합니다.
+	$css = array();
+
+	// 1. 공통 CSS 로드
 	$hotPath = __DIR__ . '/../public/dist/hot';
 	if (file_exists($hotPath)) {
 		// Vite HMR 활성화 시 @vite/client 추가 로드 및 app.ts HMR 주소 바인딩
@@ -139,10 +140,76 @@ View::composer(array('administrator::layouts.default'), function($view)
 		$view->js['vite-app'] = $devServerUrl . '/resources/js/app.ts';
 	} else {
 		// 프로덕션 상태에서는 manifest 기반 안전 에셋 로더 적용
-		$view->js['vite-app'] = getViteAsset('resources/js/app.ts', $view->css);
+		$view->js['vite-app'] = getViteAsset('resources/js/app.ts', $css);
 	}
 
-    // 3. 사용자 정의 js 추가
-    $customs = config('administrator.custom_js');
-    if ($customs) $view->js += $customs;
+	// 2. 테마 CSS 처리
+	$theme = config('administrator.theme', 'silver');
+	$themes = config('administrator.themes', array());
+
+	if (!isset($themes[$theme])) {
+		$theme = 'silver';
+	}
+
+	$themeEntry = isset($themes[$theme]) ? $themes[$theme]['entry'] : null;
+	$themeCssUrl = null;
+
+	if ($themeEntry) {
+		if (!file_exists($hotPath)) {
+			// 프로덕션 환경 manifest 확인
+			$manifestPath = __DIR__ . '/../public/dist/.vite/manifest.json';
+			if (!file_exists($manifestPath)) {
+				$manifestPath = __DIR__ . '/../public/dist/manifest.json';
+			}
+
+			$manifestExists = false;
+			if (file_exists($manifestPath)) {
+				$manifest = json_decode(file_get_contents($manifestPath), true);
+				if (isset($manifest[$themeEntry])) {
+					$manifestExists = true;
+				}
+			}
+
+			// 만약 manifest에 entry가 없고, 현재 테마가 silver가 아니라면 silver로 fallback 시도
+			if (!$manifestExists && $theme !== 'silver') {
+				$theme = 'silver';
+				$themeEntry = isset($themes[$theme]) ? $themes[$theme]['entry'] : null;
+				if ($themeEntry && file_exists($manifestPath)) {
+					$manifest = json_decode(file_get_contents($manifestPath), true);
+					if (isset($manifest[$themeEntry])) {
+						$manifestExists = true;
+					}
+				}
+			}
+
+			if ($themeEntry && $manifestExists) {
+				$themeCssUrl = getViteAsset($themeEntry);
+			}
+		} else {
+			// HMR 환경
+			$devServerUrl = trim(file_get_contents($hotPath));
+			$themeCssUrl = $devServerUrl . '/' . $themeEntry;
+		}
+	}
+
+	if ($themeCssUrl) {
+		$css['theme-' . $theme] = $themeCssUrl;
+	}
+
+	// 3. 사용자 정의 CSS 추가
+	$customCss = config('administrator.custom_css');
+	if ($customCss && is_array($customCss)) {
+		foreach ($customCss as $key => $val) {
+			$cssKey = is_numeric($key) ? 'custom-css-' . $key : $key;
+			$css[$cssKey] = $val;
+		}
+	}
+
+	$view->css = $css;
+
+	// 4. 사용자 정의 JS 추가
+	$customs = config('administrator.custom_js');
+	if ($customs && is_array($customs)) {
+		$view->js += $customs;
+	}
 });

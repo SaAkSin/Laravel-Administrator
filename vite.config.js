@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         // 애플리케이션의 메인 엔트리 포인트를 지정합니다.
         app: resolve(__dirname, 'resources/js/app.ts'),
+        silver: resolve(__dirname, 'resources/css/themes/silver.css'),
       },
       output: {
         // 빌드 에셋 파일 이름에 해시를 추가하여 자동 캐시 버스팅을 구현합니다.

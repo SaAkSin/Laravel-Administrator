@@ -10,6 +10,7 @@
 - [대시보드와 홈 페이지](#dashboard)
 - [이동 경로](#paths)
 - [목록과 로케일](#list-and-locales)
+- [디자인 테마 및 커스텀 에셋](#themes-and-assets)
 
 <a name="introduction"></a>
 ## 소개
@@ -200,5 +201,42 @@ false로 평가되면 `login_path`로 리다이렉트되고, 세션에는 `login
 ```
 
 `global_rows_per_page`는 모델 목록의 기본 페이지당 행 수입니다. `locales`에 둘 이상의 로케일을 넣으면 관리자 화면에서 언어 선택 UI를 사용할 수 있습니다.
+
+<a name="themes-and-assets"></a>
+## 디자인 테마 및 커스텀 에셋
+
+```php
+'theme' => 'silver',
+
+'themes' => array(
+    'silver' => array(
+        'label' => '실버',
+        'entry' => 'resources/css/themes/silver.css',
+    ),
+    'legacy' => array(
+        'label' => '레거시',
+        'entry' => null,
+    ),
+),
+
+'custom_css' => array(
+    'custom' => asset('css/custom.css'),
+),
+
+'custom_js' => array(
+    'custom' => asset('js/custom.js'),
+),
+```
+
+### Theme
+관리자 화면의 메인 디자인 테마를 설정합니다. 기본 테마는 `silver`이며, 잘못된 테마가 지정되거나 에셋 빌드가 누락되었을 때는 `silver`로 안전하게 fallback됩니다. 추가 디자인 스타일 오버라이드를 로드하지 않는 기본 UI 화면을 적용하려면 `legacy` 테마를 선택할 수 있습니다.
+
+### Themes
+사용 가능한 테마 리스트와 그에 대응하는 Vite 에셋 엔트리 경로를 정의합니다.
+
+### Custom CSS & JS
+테마 스타일시트나 메인 스크립트가 로드된 이후 추가로 로드할 커스텀 스타일 및 스크립트 경로 목록을 배열 형식으로 지정합니다.
+
+---
 
 다음 단계는 [모델 설정](/docs/ko/model-configuration), [세팅 설정](/docs/ko/settings-configuration), [필드](/docs/ko/fields)를 참고하십시오.

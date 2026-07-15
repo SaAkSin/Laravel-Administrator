@@ -31,17 +31,22 @@
     "file": "woff/oxygen-regular-webfont-6iKgAd8C.woff",
     "src": "resources/css/fonts/Oxygen/oxygen-regular-webfont.woff"
   },
+  "resources/css/themes/silver.css": {
+    "file": "css/silver-uMlnBzb6.css",
+    "src": "resources/css/themes/silver.css",
+    "isEntry": true
+  },
   "resources/img/loader.gif": {
     "file": "gif/loader-S2xpefX9.gif",
     "src": "resources/img/loader.gif"
   },
   "resources/js/app.ts": {
-    "file": "js/app-DrugvA1p.js",
+    "file": "js/app-F92EYCkz.js",
     "name": "app",
     "src": "resources/js/app.ts",
     "isEntry": true,
     "css": [
-      "css/app-C7S5gx_j.css"
+      "css/app-CYGsObsV.css"
     ],
     "assets": [
       "eot/oxygen-regular-webfont-lbYjdCSB.eot",
