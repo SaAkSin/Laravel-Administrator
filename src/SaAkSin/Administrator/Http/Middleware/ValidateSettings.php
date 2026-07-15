@@ -13,13 +13,8 @@ class ValidateSettings {
 	 */
 	public function handle($request, Closure $next)
 	{
-		$settingsName = $request->route()->parameter('settings');
-
-		app()->singleton('itemconfig', function($app) use ($settingsName)
-		{
-			$configFactory = app('admin_config_factory');
-			return $configFactory->make($configFactory->getSettingsPrefix() . $settingsName, true);
-		});
+		// 서비스 프로바이더에 한 번 등록된 요청별 설정을 현재 생명주기에서 해석한다.
+		app('itemconfig');
 
 		return $next($request);
 	}

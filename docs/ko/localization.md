@@ -42,6 +42,8 @@ return array(
 
 `locales`가 비어 있으면 별도 언어 선택 메뉴를 표시하지 않습니다.
 
+사용자가 언어를 선택하면 Administrator는 현재 세션에 값을 저장하고, 이후 모든 관리자 요청에서 Laravel `web` 세션 미들웨어가 실행된 다음 해당 값을 적용합니다. `administrator.locales`에 포함된 값만 허용됩니다. 다른 세션은 각자의 선택을 유지하며, 세션 값이 없거나 허용 목록에 없으면 `config('app.locale')`로 명시적으로 복원하여 장기 실행 워커가 이전 요청의 언어를 재사용하지 않게 합니다.
+
 <a name="config-translation"></a>
 ## 설정 파일에서 번역 사용
 

@@ -6,6 +6,7 @@
 - [설정과 에셋 배포](#publish)
 - [관리자 설정 디렉터리](#administrator-directory)
 - [최소 모델 설정](#minimal-model-config)
+- [Laravel Octane](#octane)
 - [배포 시 에셋 갱신](#assets)
 
 <a name="requirements"></a>
@@ -149,6 +150,19 @@ protected function password(): Attribute
 }
 ```
 
+<a name="octane"></a>
+## Laravel Octane
+
+Laravel 13 호스트 애플리케이션이 RoadRunner, Swoole 또는 FrankenPHP 기반 Laravel Octane에서 실행될 때 Administrator는 요청별 설정, 필드, 컬럼, 액션, 권한, 페이지당 행 수와 로케일 상태를 분리합니다. Octane은 호스트가 선택하는 실행 환경이며, 이 패키지는 운영 의존성으로 `laravel/octane`을 추가하거나 서버 드라이버 설치를 강제하지 않습니다.
+
+Octane을 사용할 때는 호스트 애플리케이션에 Laravel 13 호환 Octane 2.x를 별도로 설치하고 구성하십시오. `administrator.ready` 이벤트는 애플리케이션 또는 워커가 부트될 때 한 번만 발생하므로 요청별 상태 초기화에 사용하면 안 됩니다.
+
+실행 중인 Octane 환경에 패키지 코드나 설정 변경을 배포한 뒤에는 새 코드로 워커를 다시 부트합니다.
+
+```bash
+php artisan octane:reload
+```
+
 <a name="assets"></a>
 ## 배포 시 에셋 갱신
 
@@ -172,5 +186,7 @@ php artisan vendor:publish --tag=laravel-administrator --force
   }
 }
 ```
+
+호스트 애플리케이션이 Octane을 사용한다면 위 갱신 절차 뒤에 `php artisan octane:reload`도 실행하십시오.
 
 다음 단계는 [설정 문서](./configuration.md)와 [모델 설정 문서](./model-configuration.md)를 참고하십시오.

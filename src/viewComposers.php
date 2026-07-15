@@ -118,7 +118,9 @@ View::composer(array('administrator::partials.header'), function($view)
 	$view->menu = app('admin_menu')->getMenu();
 	$view->settingsPrefix = app('admin_config_factory')->getSettingsPrefix();
 	$view->pagePrefix = app('admin_config_factory')->getPagePrefix();
-	$view->configType = app()->bound('itemconfig') ? app('itemconfig')->getType() : false;
+	$route = app('request')->route();
+	$hasItemConfig = $route && (!is_null($route->parameter('model')) || !is_null($route->parameter('settings')));
+	$view->configType = $hasItemConfig ? app('itemconfig')->getType() : false;
 });
 
 //the layout view

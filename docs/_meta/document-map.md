@@ -5,6 +5,7 @@
 | 구현 영역 | 공개 매뉴얼 | 내부 Wiki | 주요 검증 |
 | --- | --- | --- | --- |
 | 설치·지원 버전·서비스 프로바이더 | `installation.md`, `ko/installation.md` | `wiki/compatibility/support-matrix.md` | Composer 검증, 관련 PHPUnit |
+| 요청 생명주기·Octane·로케일 격리 | 설치·다국어 영문/한국어 문서 | 지원 매트릭스, `wiki/development/verification.md` | lifecycle 통합 테스트, 전체 PHPUnit |
 | 전역 설정·테마·커스텀 에셋 | `configuration.md`, `ko/configuration.md` | `wiki/architecture/theme-assets.md` | 관련 통합 테스트, Vite build |
 | 마크다운·HTML 출력·관계 선택 UI | 관련 필드·컬럼 문서 | `wiki/security/rendering-boundaries.md` | 보안 입력 회귀, TypeScript 검사 |
 | 빌드·테스트·문서 검증 | 기여 문서 | `wiki/development/verification.md` | 변경 경로별 명령 |

@@ -13,14 +13,8 @@ class ValidateModel {
 	 */
 	public function handle($request, Closure $next)
 	{
-		$modelName = $request->route()->parameter('model');
-
-		app()->singleton('itemconfig', function($app) use ($modelName)
-		{
-			$configFactory = app('admin_config_factory');
-
-			return $configFactory->make($modelName, true);
-		});
+		// 서비스 프로바이더에 한 번 등록된 요청별 설정을 현재 생명주기에서 해석한다.
+		app('itemconfig');
 
 		return $next($request);
 	}

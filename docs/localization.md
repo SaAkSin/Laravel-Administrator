@@ -42,6 +42,8 @@ return array(
 
 If `locales` is empty, Administrator does not render a separate locale menu.
 
+When a user selects a locale, Administrator stores it in the current session and applies it after Laravel's `web` session middleware on every following administrator request. Only values present in `administrator.locales` are accepted. A different session keeps its own selection; a missing or invalid session value explicitly restores `config('app.locale')` so that a long-running worker cannot reuse the previous request's locale.
+
 <a name="config-translation"></a>
 ## Translations In Config Files
 
