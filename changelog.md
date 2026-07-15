@@ -1,5 +1,17 @@
 ## Changelog
 
+### 13.0.1 (2026-07-15)
+- **Laravel Octane 요청 생명주기 지원**:
+  - 요청 상태를 보관하는 관리자 서비스와 `itemconfig`를 scoped binding으로 전환해 같은 요청 안에서는 재사용하고 다음 요청·작업 lifecycle에서는 새 인스턴스로 해석
+  - 모델·액션 권한, 설정, 필드·컬럼·필터 cache와 페이지당 행 수가 RoadRunner, Swoole, FrankenPHP 장기 실행 워커의 연속 요청 사이에 유출되지 않도록 격리
+  - `Laravel\Octane\Worker`와 공식 `FakeClient`를 사용한 boot-once/handle-twice 통합 테스트 및 필터 상태 회귀 테스트 추가
+- **로케일 및 validation 격리**:
+  - 관리자 로케일을 `web` 세션 미들웨어 이후 매 요청 적용하고 유효하지 않은 값은 애플리케이션 기본 로케일로 복원
+  - 공유 validation factory를 변경하지 않는 관리자 전용 validator를 생성해 호스트의 사용자 정의 resolver와 확장을 보존
+- **호환성 및 운영 문서**:
+  - Laravel Octane `^2.0`은 테스트용 개발 의존성에만 추가하고 PHP-FPM과 Octane 미설치 운영 환경을 계속 지원
+  - README와 영문·한국어 설치·다국어 문서에 Octane 호환 범위와 배포 후 `php artisan octane:reload` 절차를 기록
+
 ### 13.0.0 (2026-07-15)
 - **Laravel 13 전용 지원**:
   - Composer 지원 범위를 Laravel `^13.0`, PHP `^8.3`으로 확정
