@@ -1,6 +1,6 @@
 ## Changelog
 
-### 13.0.0 (버전 확정, 게시 전)
+### 13.0.0 (2026-07-15)
 - **Laravel 13 전용 지원**:
   - Composer 지원 범위를 Laravel `^13.0`, PHP `^8.3`으로 확정
   - 개발 및 검증 도구를 Orchestra Testbench `^11.0`, PHPUnit `^11.0`으로 통일
@@ -14,7 +14,7 @@
   - `composer.lock`을 Laravel 13 전용 제약으로 갱신하고 `composer validate`, `composer audit`, 관련 PHPUnit 테스트, `npm run build` 결과를 PR에 기록
 - **호환성 주의사항**:
   - Laravel `^13.0`, PHP `^8.3` 범위를 벗어난 런타임은 `13.0.0`에서 지원하지 않음
-  - 태그 생성, GitHub Release 게시 및 Packagist 배포는 별도 Architect 승인 후 수행
+  - `13.0.0` 태그, GitHub Release 및 Packagist 패키지 게시
 
 ### 10.7.0
 - **공식 문서 사이트 및 매뉴얼 최신화**:
